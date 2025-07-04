@@ -3,19 +3,16 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { engine } = require('express-handlebars');
 const morgan = require('morgan');
+const router = require('./routes');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
-
-const app = express();
-
-// 載入環境變數
-dotenv.config();
-
-
 // 載入日誌配置
 const logger = require('./utils/logger');
 
-// 設置端口
+const app = express();
 const PORT = process.env.PORT || 3000;
+
+// 載入環境變數
+dotenv.config();
 
 // 解析請求體
 app.use(express.json());
@@ -37,17 +34,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // HTTP 請求日誌
 app.use(morgan('dev', { stream: logger.stream }));
 
-
-// 基本路由測試
-app.get('/', (req, res) => {
-  res.json({ message: '設計作品展示平台 API 運行中' });
-});
-
-// 加載路由 (暫時註釋掉，直到路由實現)
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/users', require('./routes/users'));
-// app.use('/api/projects', require('./routes/projects'));
-// app.use('/api/search', require('./routes/search'));
+app.use(router);
 
 // 404 處理
 app.use(notFoundHandler);
