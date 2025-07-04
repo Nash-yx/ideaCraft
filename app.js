@@ -21,7 +21,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 設置視圖引擎
 app.engine('hbs', engine({
   extname: '.hbs',
   defaultLayout: 'main',
