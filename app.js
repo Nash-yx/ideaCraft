@@ -1,50 +1,65 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const path = require('path');
-const { engine } = require('express-handlebars');
-const morgan = require('morgan');
-const router = require('./routes');
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
-// 載入日誌配置
-const logger = require('./utils/logger');
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
+const express = require('express')
+const dotenv = require('dotenv')
 // 載入環境變數
-dotenv.config();
+dotenv.config()
+
+const path = require('path')
+const { engine } = require('express-handlebars')
+const morgan = require('morgan')
+const router = require('./routes')
+const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')
+const logger = require('./utils/logger') // 載入日誌配置
+const passport = require('./config/passport')
+const session = require('express-session')
+
+const app = express()
+const PORT = process.env.PORT || 3000
 
 // 解析請求體
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-app.engine('hbs', engine({
-  extname: '.hbs',
-  defaultLayout: 'main',
-  layoutsDir: path.join(__dirname, 'views/layouts'),
-  partialsDir: path.join(__dirname, 'views/partials')
-}));
-app.set('view engine', 'hbs');
-app.set('views', path.join(__dirname, 'views'));
+// 配置 session
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}))
+
+// 初始化 Passport
+app.use(passport.initialize())
+app.use(passport.session())
+
+app.engine(
+  'hbs',
+  engine({
+    extname: '.hbs',
+    defaultLayout: 'main',
+    layoutsDir: path.join(__dirname, 'views/layouts'),
+    partialsDir: path.join(__dirname, 'views/partials'),
+  })
+)
+app.set('view engine', 'hbs')
+app.set('views', path.join(__dirname, 'views'))
 
 // 靜態文件服務
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(__dirname, 'public')))
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // HTTP 請求日誌
-app.use(morgan('dev', { stream: logger.stream }));
+app.use(morgan('dev', { stream: logger.stream }))
 
-app.use(router);
+app.use(router)
 
 // 404 處理
-app.use(notFoundHandler);
+app.use(notFoundHandler)
 
 // 錯誤處理中間件
-app.use(errorHandler);
+app.use(errorHandler)
 
 // 啟動服務器
 app.listen(PORT, () => {
-  logger.info(`服務器運行在 http://localhost:${PORT}`);
-});
+  logger.info(`Server is running on http://localhost:${PORT}`)
+})
 
-module.exports = app; 
+module.exports = app
