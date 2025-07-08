@@ -1,16 +1,18 @@
-const express = require('express')
 const dotenv = require('dotenv')
 // 載入環境變數
 dotenv.config()
 
+const express = require('express')
 const path = require('path')
 const { engine } = require('express-handlebars')
 const morgan = require('morgan')
 const router = require('./routes')
-const { errorHandler, notFoundHandler } = require('./middleware/errorHandler')
 const logger = require('./utils/logger') // 載入日誌配置
 const passport = require('./config/passport')
 const session = require('express-session')
+const flash = require('connect-flash')
+const { errorHandler, notFoundHandler } = require('./middleware/error-handler')
+const messageHandler = require('./middleware/message-handler')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -21,7 +23,7 @@ app.use(express.urlencoded({ extended: true }))
 
 // 配置 session
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'secret',
   resave: false,
   saveUninitialized: false
 }))
@@ -30,15 +32,15 @@ app.use(session({
 app.use(passport.initialize())
 app.use(passport.session())
 
-app.engine(
-  'hbs',
-  engine({
-    extname: '.hbs',
-    defaultLayout: 'main',
-    layoutsDir: path.join(__dirname, 'views/layouts'),
-    partialsDir: path.join(__dirname, 'views/partials'),
-  })
-)
+// 設置 flash 訊息
+app.use(flash())
+
+app.engine('hbs', engine({
+  extname: '.hbs',
+  defaultLayout: 'main',
+  layoutsDir: path.join(__dirname, 'views/layouts'),
+  partialsDir: path.join(__dirname, 'views/partials'),
+}))
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 
@@ -48,6 +50,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // HTTP 請求日誌
 app.use(morgan('dev', { stream: logger.stream }))
+
+app.use(messageHandler)
 
 app.use(router)
 

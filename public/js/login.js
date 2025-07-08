@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // 按鈕點擊效果
   loginBtn.addEventListener('click', function (e) {
-    e.preventDefault()
     this.style.transform = 'scale(0.98)'
     setTimeout(() => {
       this.style.transform = ''

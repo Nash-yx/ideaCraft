@@ -1,0 +1,64 @@
+{{#if success_msg}}
+  <div class="message-container success" id="success-message">
+    <div class="message-content">
+      <div class="message-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="message-text">{{success_msg}}</div>
+      <button class="message-close" onclick="closeMessage('success-message')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+{{/if}}
+
+{{#if error_msg}}
+  <div class="message-container error" id="error-message">
+    <div class="message-content">
+      <div class="message-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <div class="message-text">{{error_msg}}</div>
+      <button class="message-close" onclick="closeMessage('error-message')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+{{/if}}
+
+{{#if warning_msg}}
+  <div class="message-container warning" id="warning-message">
+    <div class="message-content">
+      <div class="message-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <div class="message-text">{{warning_msg}}</div>
+      <button class="message-close" onclick="closeMessage('warning-message')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+{{/if}}
+
+<script>
+  function closeMessage(id) {
+    const element = document.getElementById(id)
+    element.classList.add('fade-out')
+    setTimeout(() => {
+      element.style.display = 'none'
+    }, 300)
+  }
+
+  // 自動隱藏消息
+  document.addEventListener('DOMContentLoaded', function() {
+    const messages = document.querySelectorAll('.message-container')
+    messages.forEach(message => {
+      setTimeout(() => {
+        message.classList.add('fade-out')
+        setTimeout(() => {
+          message.style.display = 'none'
+        }, 300)
+      }, 5000)
+    })
+  })
+</script> 

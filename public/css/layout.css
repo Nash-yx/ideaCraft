@@ -2,18 +2,8 @@
 body {
   margin: 0;
   padding: 0;
-  font-family:
-    "Inter",
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    "Open Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   background-color: #111;
   color: #fff;
   min-height: 100vh;
@@ -80,7 +70,11 @@ body {
 .glow-dot {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
   box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.3);
   animation: float-animation 10s infinite ease-in-out;
 }
@@ -98,6 +92,82 @@ body {
     transform: translate(0, 0) scale(1);
     opacity: 0.7;
   }
+}
+
+/* Flash Message 樣式 */
+.message-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(10px);
+  max-width: 350px;
+  min-width: 280px;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.message-container.fade-out {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-10px);
+}
+
+.message-content {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+}
+
+.message-icon {
+  margin-right: 12px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.message-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  padding: 0;
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.message-close:hover {
+  opacity: 1;
+}
+
+/* 不同類型的消息 */
+.message-container.success {
+  background: rgba(46, 125, 50, 0.95);
+  border-left: 4px solid #2e7d32;
+  color: #fff;
+}
+
+.message-container.error {
+  background: rgba(198, 40, 40, 0.95);
+  border-left: 4px solid #c62828;
+  color: #fff;
+}
+
+.message-container.warning {
+  background: rgba(245, 124, 0, 0.95);
+  border-left: 4px solid #f57c00;
+  color: #fff;
 }
 
 /* 響應式調整 */
