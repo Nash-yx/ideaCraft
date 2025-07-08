@@ -12,7 +12,7 @@ router.post('/login', passport.authenticate('local', {
 }), userController.login)
 
 router.get('/', (req, res) => {
-  res.render('login')
+  res.json({ message: 'Image Gallery API is running' })
 })
 
 module.exports = router

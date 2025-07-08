@@ -5,11 +5,11 @@ const userController = {
   },
   signup: async (req, res, next) => {
     try {
-      const user = await userServices.signup(req)
-      req.flash('success_msg', 'Signup successfully')
-      return res.redirect('/login')
-    } catch (error) {
-      next(error)
+      await userServices.signup(req)
+      req.flash('success_msg', 'Sign up successfully')
+      return res.redirect('/')
+    } catch (err) {
+      next(err)
     }
   },
   loginPage: (req, res) => {

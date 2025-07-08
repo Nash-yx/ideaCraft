@@ -11,7 +11,7 @@ const logger = require('./utils/logger') // 載入日誌配置
 const passport = require('./config/passport')
 const session = require('express-session')
 const flash = require('connect-flash')
-const { errorHandler, notFoundHandler } = require('./middleware/error-handler')
+const { generalErrorHandler, errorHandler, notFoundHandler } = require('./middleware/error-handler')
 const messageHandler = require('./middleware/message-handler')
 
 const app = express()
@@ -54,6 +54,8 @@ app.use(morgan('dev', { stream: logger.stream }))
 app.use(messageHandler)
 
 app.use(router)
+
+// app.use(generalErrorHandler)
 
 // 404 處理
 app.use(notFoundHandler)

@@ -23,8 +23,8 @@ passport.use(
         if (!isPasswordMatch) return done(null, false, req.flash('error_msg', 'Email or password is incorrect'))
 
         return done(null, user)
-      } catch (error) {
-        return done(error)
+      } catch (err) {
+        return done(err)
       }
     }
   )

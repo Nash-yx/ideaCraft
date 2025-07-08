@@ -3,6 +3,17 @@ const logger = require('../utils/logger')
 /**
  * 集中式錯誤處理中間件
  */
+const generalErrorHandler = (err, req, res, next) => {
+  if (err instanceof Error) {
+    req.flash('error_msg', `${err.name}: ${err.message}`)
+  } else {
+    req.flash('error_msg', `${err}`)
+  }
+  // 重定向到上一頁
+  const referer = req.get('Referrer')
+  res.redirect(referer)
+}
+
 const errorHandler = (err, req, res, next) => {
   // 日誌記錄錯誤
   logger.error(`${err.name}: ${err.message}`, {
@@ -22,14 +33,14 @@ const errorHandler = (err, req, res, next) => {
 
   // 根據請求類型返回不同格式
   if (req.accepts('html')) {
-    // HTML 響應
+    // HTML response
     res.render('error', {
       message: process.env.NODE_ENV === 'production' ? '服務器錯誤' : err.message,
       error: process.env.NODE_ENV === 'production' ? {} : err,
       stack: process.env.NODE_ENV === 'production' ? '' : err.stack
     })
   } else {
-    // API 響應
+    // API response
     res.json({
       success: false,
       error: {
@@ -51,6 +62,7 @@ const notFoundHandler = (req, res, next) => {
 }
 
 module.exports = {
+  generalErrorHandler,
   errorHandler,
   notFoundHandler
 }
