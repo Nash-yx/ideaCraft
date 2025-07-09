@@ -55,7 +55,7 @@ app.use(messageHandler)
 
 app.use(router)
 
-// app.use(generalErrorHandler)
+app.use(generalErrorHandler)
 
 // 404 處理
 app.use(notFoundHandler)

@@ -11,6 +11,14 @@ router.post('/login', passport.authenticate('local', {
   failureFlash: true
 }), userController.login)
 
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+router.get('/auth/google/callback', passport.authenticate('google', {
+  failureRedirect: '/login',
+  failureFlash: true
+}), userController.login)
+
+router.get('/logout', userController.logout)
+
 router.get('/', (req, res) => {
   res.json({ message: 'Image Gallery API is running' })
 })

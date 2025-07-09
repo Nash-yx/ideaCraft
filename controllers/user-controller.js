@@ -18,6 +18,11 @@ const userController = {
   login: (req, res) => {
     req.flash('success_msg', 'Login successfully')
     return res.redirect('/')
+  },
+  logout: (req, res) => {
+    req.flash('success_msg', 'Logout successfully')
+    req.logout()
+    return res.redirect('/login')
   }
 }
 
