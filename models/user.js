@@ -15,13 +15,16 @@ module.exports = (sequelize, DataTypes) => {
     {
       name: DataTypes.STRING,
       email: DataTypes.STRING,
-      password: DataTypes.STRING
+      password: DataTypes.STRING,
+      googleId: DataTypes.STRING,
+      githubId: DataTypes.STRING,
+      avatar: DataTypes.STRING,
     },
     {
       sequelize,
       modelName: 'User',
       tableName: 'Users',
-      underscored: true
+      underscored: true,
     }
   )
   return User

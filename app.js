@@ -58,10 +58,10 @@ app.use(router)
 app.use(generalErrorHandler)
 
 // 404 處理
-app.use(notFoundHandler)
+// app.use(notFoundHandler)
 
 // 錯誤處理中間件
-app.use(errorHandler)
+// app.use(errorHandler)
 
 // 啟動服務器
 app.listen(PORT, () => {
