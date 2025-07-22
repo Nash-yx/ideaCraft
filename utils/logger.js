@@ -21,7 +21,7 @@ const logFormat = format.combine(
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: logFormat,
-  defaultMeta: { service: 'design-platform' },
+  defaultMeta: { service: 'ideaCraft' },
   transports: [
     // 錯誤日誌
     new transports.File({

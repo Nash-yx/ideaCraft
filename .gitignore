@@ -28,5 +28,6 @@ build/
 *.tmp
 *.temp 
 
-project-implementation-plan.md
-requirement.md
+spec.md
+CLAUDE.md
+/docs

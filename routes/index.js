@@ -29,7 +29,7 @@ router.get('/auth/github/callback',
 router.get('/logout', userController.logout)
 
 router.get('/', (req, res) => {
-  res.json({ message: 'Image Gallery API is running' })
+  res.json({ message: 'IdeaCraft API is running' })
 })
 
 module.exports = router
