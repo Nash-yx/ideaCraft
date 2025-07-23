@@ -7,7 +7,7 @@ const userController = {
     try {
       await userServices.signup(req)
       req.flash('success_msg', 'Sign up successfully')
-      return res.redirect('/')
+      return res.redirect('/login')
     } catch (err) {
       next(err)
     }

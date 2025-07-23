@@ -29,7 +29,8 @@ router.get('/auth/github/callback',
 router.get('/logout', userController.logout)
 
 router.get('/', (req, res) => {
-  res.json({ message: 'IdeaCraft API is running' })
+  res.render('home')
+  // res.json({ message: 'IdeaCraft API is running' })
 })
 
 module.exports = router
