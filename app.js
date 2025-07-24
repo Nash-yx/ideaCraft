@@ -13,6 +13,7 @@ const session = require('express-session')
 const flash = require('connect-flash')
 const { generalErrorHandler, errorHandler, notFoundHandler } = require('./middleware/error-handler')
 const messageHandler = require('./middleware/message-handler')
+const handlebarsHelpers = require('./utils/handlebars-helpers')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -40,6 +41,7 @@ app.engine('hbs', engine({
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views/layouts'),
   partialsDir: path.join(__dirname, 'views/partials'),
+  helpers: handlebarsHelpers
 }))
 app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))

@@ -14,7 +14,7 @@ passport.use(
     },
     async (req, email, password, done) => {
       try {
-        console.log(req.body)
+        // console.log(req.body)
         const user = await User.findOne({
           where: { email },
           raw: true,
@@ -152,6 +152,7 @@ passport.use(
 )
 
 passport.serializeUser((user, done) => {
+  // console.log('userId: ', user.id)
   done(null, user.id)
 })
 

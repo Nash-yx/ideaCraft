@@ -31,7 +31,7 @@ const handlebarsHelpers = {
   },
 
   // Conditional helper
-  if: function (conditional, options) {
+  ifCond: function (conditional, options) {
     if (conditional) {
       return options.fn(this)
     } else {

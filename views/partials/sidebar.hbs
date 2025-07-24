@@ -1,0 +1,45 @@
+<!-- Sidebar -->
+<div class="home-sidebar">
+  <!-- Logo -->
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <i class="fas fa-lightbulb"></i>
+    </div>
+    <span class="logo-text">IdeaCraft</span>
+  </div>
+
+  <!-- Menu Section -->
+  <div class="sidebar-section">
+    <h6 class="sidebar-section-title">MENU</h6>
+    <nav class="sidebar-nav">
+      <a href="/" class="nav-item {{#ifCond (eq activePage 'dashboard')}}active{{/ifCond}}">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/" class="nav-item {{#ifCond (eq activePage 'tasks')}}active{{/ifCond}}">
+        <i class="fas fa-tasks"></i>
+        <span>Tasks</span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Bottom Actions -->
+  <div class="sidebar-footer">
+    <a href="/profile" class="nav-item {{#ifCond (eq activePage 'profile')}}active{{/ifCond}}">
+      <i class="fas fa-user"></i>
+      <span>My profile</span>
+    </a>
+    <div class="dark-mode-toggle">
+      <i class="fas fa-moon"></i>
+      <span>Dark Mode</span>
+      <div class="toggle-switch">
+        <input type="checkbox" id="darkModeToggle">
+        <label for="darkModeToggle"></label>
+      </div>
+    </div>
+    <a href="/logout" class="nav-item logout-btn">
+      <i class="fas fa-sign-out-alt"></i>
+      <span>Logout</span>
+    </a>
+  </div>
+</div>

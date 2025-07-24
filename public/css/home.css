@@ -852,6 +852,20 @@ body:has(.home-wrapper) .container-fluid {
   transform: translateX(20px);
 }
 
+/* Logout Button Styling */
+.logout-btn {
+  color: var(--secondary-red) !important;
+}
+
+.logout-btn i {
+  color: var(--secondary-red) !important;
+}
+
+.logout-btn:hover {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: var(--secondary-red) !important;
+}
+
 /* Main Content */
 .home-main {
   flex: 1;
