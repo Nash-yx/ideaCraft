@@ -28,11 +28,19 @@ const userController = {
       return res.redirect('/login')
     })
   },
-  profilePage: async (req, res) => {
-    // const id = req.user.id
-    // const user = await User.findByPk(id, { raw: true })
-    // console.log(user)
-    // return res.render('profile', { activePage: 'profile' })
+  getUser: async (req, res) => {
+    const id = req.user.id
+    const user = await User.findByPk(id, { raw: true })
+    return res.render('profile', { user, activePage: 'profile' })
+  },
+  putUser: async (req, res, next) => {
+    try {
+      const user = await userServices.putUser(req)
+      req.flash('success_msg', 'User profile successfully edited')
+      return res.redirect(`/users/${req.params.id}`)
+    } catch (err) {
+      next(err)
+    }
   }
 }
 

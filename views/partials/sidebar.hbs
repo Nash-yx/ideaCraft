@@ -25,7 +25,7 @@
 
   <!-- Bottom Actions -->
   <div class="sidebar-footer">
-    <a href="/profile" class="nav-item {{#ifCond (eq activePage 'profile')}}active{{/ifCond}}">
+    <a href="/users/{{user.id}}" class="nav-item {{#ifCond (eq activePage 'profile')}}active{{/ifCond}}">
       <i class="fas fa-user"></i>
       <span>My profile</span>
     </a>

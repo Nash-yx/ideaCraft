@@ -6,13 +6,15 @@ const express = require('express')
 const path = require('path')
 const { engine } = require('express-handlebars')
 const morgan = require('morgan')
+const methodOverride = require('method-override')
+
 const router = require('./routes')
 const logger = require('./utils/logger') // 載入日誌配置
 const passport = require('./config/passport')
 const session = require('express-session')
 const flash = require('connect-flash')
 const { generalErrorHandler, errorHandler, notFoundHandler } = require('./middleware/error-handler')
-const messageHandler = require('./middleware/message-handler')
+const { getUser } = require('./middleware/auth')
 const handlebarsHelpers = require('./utils/handlebars-helpers')
 
 const app = express()
@@ -36,6 +38,8 @@ app.use(passport.session())
 // 設置 flash 訊息
 app.use(flash())
 
+app.use(methodOverride('_method'))
+
 app.engine('hbs', engine({
   extname: '.hbs',
   defaultLayout: 'main',
@@ -53,7 +57,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 // HTTP 請求日誌
 app.use(morgan('dev', { stream: logger.stream }))
 
-app.use(messageHandler)
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg')
+  res.locals.error_msg = req.flash('error_msg')
+  res.locals.warning_msg = req.flash('warning_msg')
+  res.locals.user = getUser(req)
+  next()
+})
 
 app.use(router)
 

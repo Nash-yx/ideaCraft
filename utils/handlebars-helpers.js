@@ -60,6 +60,11 @@ const handlebarsHelpers = {
       })
     }
     return result
+  },
+
+  // Default avatar helper
+  defaultAvatar: (avatar) => {
+    return avatar && avatar.trim() !== '' ? avatar : '/img/default-avatar.svg'
   }
 }
 

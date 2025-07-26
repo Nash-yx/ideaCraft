@@ -1,6 +1,7 @@
 <div class="home-wrapper">
   
   {{> sidebar}}
+  {{> messages}}
   <!-- Main Profile Content -->
   <div class="home-main">
     <!-- Profile Header -->
@@ -8,7 +9,7 @@
       <div class="header-left">
         <h1 class="profile-title">Edit User Profile</h1>
       </div>
-      <div class="header-right">
+      {{!-- <div class="header-right">
         <button class="preview-btn">
           <span>Preview</span>
           <i class="fas fa-external-link-alt"></i>
@@ -22,31 +23,60 @@
         <button class="messages-btn">
           <i class="fas fa-envelope"></i>
         </button>
-      </div>
+      </div> --}}
     </div>
 
     <!-- Profile Form Content -->
     <div class="profile-form-container">
-      <div class="profile-content-grid">
+      <form id="profile-form" action="/users/{{user.id}}?_method=PUT" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="backgroundColor" id="backgroundColorInput" value="{{user.backgroundColor}}">
+        <div class="profile-content-grid">
         <!-- Left Column -->
         <div class="profile-left-section">
           <!-- Profile Photo Section -->
           <div class="profile-photo-card">
             <div class="photo-gradient-container">
-              <div class="gradient-background"></div>
-              <div class="profile-avatar-container">
-                <img src="https://i.pravatar.cc/80?img=1" alt="Profile Avatar" class="profile-avatar-img">
+              <div class="gradient-background">
+                <button type="button" class="color-palette-btn" onclick="toggleColorPalette()">
+                  <i class="fas fa-palette"></i>
+                </button>
+                <div class="color-palette-panel" id="colorPalettePanel">
+                  <div class="color-presets">
+                    <div class="color-preset" data-gradient="linear-gradient(135deg, #E879F9 0%, #8B5CF6 25%, #06B6D4 50%, #10B981 75%, #F59E0B 100%)" style="background: linear-gradient(135deg, #E879F9 0%, #8B5CF6 25%, #06B6D4 50%, #10B981 75%, #F59E0B 100%);"></div>
+                    <div class="color-preset" data-gradient="linear-gradient(135deg, #FF6B6B, #4ECDC4)" style="background: linear-gradient(135deg, #FF6B6B, #4ECDC4);"></div>
+                    <div class="color-preset" data-gradient="linear-gradient(135deg, #667eea, #764ba2)" style="background: linear-gradient(135deg, #667eea, #764ba2);"></div>
+                    <div class="color-preset" data-gradient="linear-gradient(135deg, #f093fb, #f5576c)" style="background: linear-gradient(135deg, #f093fb, #f5576c);"></div>
+                    <div class="color-preset" data-gradient="linear-gradient(135deg, #4facfe, #00f2fe)" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
+                    <div class="color-preset" data-gradient="linear-gradient(135deg, #43e97b, #38f9d7)" style="background: linear-gradient(135deg, #43e97b, #38f9d7);"></div>
+                  </div>
+                  <div class="custom-color-section">
+                    <label class="custom-color-label">Custom Colors:</label>
+                    <div class="custom-color-inputs">
+                      <input type="color" id="color1" class="color-input" value="#E879F9" onchange="updateCustomGradient()">
+                      <input type="color" id="color2" class="color-input" value="#8B5CF6" onchange="updateCustomGradient()">
+                      <input type="color" id="color3" class="color-input" value="#06B6D4" onchange="updateCustomGradient()">
+                    </div>
+                  </div>
+                  <div class="reset-section">
+                    <button type="button" class="reset-color-btn" onclick="resetToOriginalColor()">
+                      <i class="fas fa-undo"></i>
+                      Reset to Original
+                    </button>
+                  </div>
+                </div>
               </div>
-              <button class="edit-photo-icon">
-                <i class="fas fa-camera"></i>
-              </button>
+              <div class="profile-avatar-container">
+                <img src="{{defaultAvatar user.avatar}}" alt="Profile Avatar" class="profile-avatar-img">
+              </div>
+              
             </div>
             <div class="photo-section-content">
               <h3 class="photo-title">Your Photo</h3>
               <p class="photo-description">This will be displayed on your profile</p>
               <div class="photo-actions">
-                <button class="upload-btn">Upload New</button>
-                <button class="save-photo-btn">Save</button>
+                <input type="file" name="avatar" id="avatar-upload" accept="image/*" style="display: none;" onchange="previewAvatar(this)">
+                <button type="button" class="upload-btn" onclick="document.getElementById('avatar-upload').click()">Upload New</button>
+                <button type="submit" class="save-photo-btn">Save</button>
               </div>
             </div>
           </div>
@@ -56,36 +86,24 @@
             <h3 class="section-title">Personal information</h3>
             
             <div class="form-field">
-              <label class="field-label">Full Name</label>
+              <label class="field-label" for="name">Full Name</label>
               <div class="input-with-icon">
                 <i class="fas fa-user input-icon"></i>
-                <input type="text" class="form-input" value="Ayman Shaltoni" placeholder="Enter your full name">
+                <input type="text" name="name" id="name" class="form-input" value="{{user.name}}" placeholder="Enter your full name">
               </div>
             </div>
 
             <div class="form-field">
-              <label class="field-label">Email address</label>
+              <label class="field-label" for="email">Email address</label>
               <div class="input-with-icon">
                 <i class="fas fa-envelope input-icon"></i>
-                <input type="email" class="form-input" value="Aymanshaltoni@gmail.com" placeholder="Enter your email">
+                <input type="email" name="email" id="email" class="form-input" value="{{user.email}}" placeholder="Enter your email" readonly>
               </div>
             </div>
 
             <div class="form-field">
-              <label class="field-label">Mobile number</label>
-              <div class="phone-input-container">
-                <div class="country-selector">
-                  <span class="country-flag"><�<�</span>
-                  <span class="country-code">+966</span>
-                  <i class="fas fa-chevron-down"></i>
-                </div>
-                <input type="tel" class="form-input phone-input" value="5502938123" placeholder="Enter phone number">
-              </div>
-            </div>
-
-            <div class="form-field">
-              <label class="field-label">Role</label>
-              <input type="text" class="form-input" value="Senior Product designer" placeholder="Enter your role">
+              <label class="field-label" for="role">Role</label>
+              <input type="text" name="role" id="role" class="form-input" value="{{user.role}}" placeholder="Enter your role">
             </div>
           </div>
         </div>
@@ -95,7 +113,7 @@
           <!-- Bio Section -->
           <div class="bio-card">
             <h3 class="section-title">Bio</h3>
-            <textarea class="bio-textarea" placeholder="Tell us about yourself...">Hey, I'm a product designer specialized in user interface designs (Web & Mobile) with 10 years of experience. Last year I have been ranked as a top-rated designer on Upwork. I've completed 25/27 projects with 5 star rating with high client satisfaction, on-time delivery and top quality output.</textarea>
+            <textarea name="bio" id="bio" class="bio-textarea" placeholder="Tell us about yourself...">{{user.bio}}</textarea>
           </div>
 
           <!-- Industry/Interests Section -->
@@ -159,19 +177,19 @@
                 <div class="social-icon-container twitter">
                   <i class="fab fa-twitter"></i>
                 </div>
-                <input type="url" class="form-input social-input" value="https://twitter.com/ShaltOni" placeholder="Twitter URL">
+                <input type="url" name="twitter" class="form-input social-input" value="https://twitter.com/ShaltOni" placeholder="Twitter URL">
               </div>
               <div class="social-link-row">
                 <div class="social-icon-container instagram">
                   <i class="fab fa-instagram"></i>
                 </div>
-                <input type="url" class="form-input social-input" value="https://instagram.com/shaltoni" placeholder="Instagram URL">
+                <input type="url" name="instagram" class="form-input social-input" value="https://instagram.com/shaltoni" placeholder="Instagram URL">
               </div>
               <div class="social-link-row">
                 <div class="social-icon-container linkedin">
                   <i class="fab fa-linkedin"></i>
                 </div>
-                <input type="url" class="form-input social-input" value="https://www.linkedin.com/in/aymanshaltoni/" placeholder="LinkedIn URL">
+                <input type="url" name="linkedin" class="form-input social-input" value="https://www.linkedin.com/in/aymanshaltoni/" placeholder="LinkedIn URL">
               </div>
               <button class="add-social-btn">
                 <i class="fas fa-plus"></i>
@@ -180,7 +198,135 @@
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 </div>
+
+<script>
+function previewAvatar(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    
+    // 檔案大小驗證 (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB');
+      input.value = '';
+      return;
+    }
+    
+    // 檔案類型驗證
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      input.value = '';
+      return;
+    }
+    
+    // 預覽圖片
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const avatarImg = document.querySelector('.profile-avatar-img');
+      avatarImg.src = e.target.result;
+    };
+    
+    // 這是非同步操作，讀取完成後會觸發 onload 事件
+    reader.readAsDataURL(file);
+  }
+}
+
+// Color Palette Functions
+function toggleColorPalette() {
+  const panel = document.getElementById('colorPalettePanel');
+  panel.classList.toggle('active');
+  
+  // Close panel when clicking outside
+  if (panel.classList.contains('active')) {
+    document.addEventListener('click', closeColorPaletteOnOutsideClick);
+  } else {
+    document.removeEventListener('click', closeColorPaletteOnOutsideClick);
+  }
+}
+
+function closeColorPaletteOnOutsideClick(event) {
+  const panel = document.getElementById('colorPalettePanel');
+  const button = document.querySelector('.color-palette-btn');
+  
+  if (!panel.contains(event.target) && !button.contains(event.target)) {
+    panel.classList.remove('active');
+    document.removeEventListener('click', closeColorPaletteOnOutsideClick);
+  }
+}
+
+// Store the user's original background color for reset functionality
+let userOriginalBackgroundColor = '';
+
+// Initialize color preset click handlers
+document.addEventListener('DOMContentLoaded', function() {
+  const colorPresets = document.querySelectorAll('.color-preset');
+  
+  // Load saved background color on page load and store as original
+  const savedBackgroundColor = document.getElementById('backgroundColorInput').value;
+  if (savedBackgroundColor) {
+    userOriginalBackgroundColor = savedBackgroundColor; // Store original color
+    document.querySelector('.gradient-background').style.background = savedBackgroundColor;
+  } else {
+    // If no saved color, use default
+    const defaultColor = 'linear-gradient(135deg, #E879F9 0%, #8B5CF6 25%, #06B6D4 50%, #10B981 75%, #F59E0B 100%)';
+    userOriginalBackgroundColor = defaultColor;
+    document.querySelector('.gradient-background').style.background = defaultColor;
+    document.getElementById('backgroundColorInput').value = defaultColor;
+  }
+  
+  colorPresets.forEach(preset => {
+    preset.addEventListener('click', function() {
+      // Remove active class from all presets
+      colorPresets.forEach(p => p.classList.remove('active'));
+      
+      // Add active class to clicked preset
+      this.classList.add('active');
+      
+      // Apply the gradient to background
+      const gradient = this.getAttribute('data-gradient');
+      document.querySelector('.gradient-background').style.background = gradient;
+      
+      // Update hidden input field
+      document.getElementById('backgroundColorInput').value = gradient;
+    });
+  });
+});
+
+function updateCustomGradient() {
+  const color1 = document.getElementById('color1').value;
+  const color2 = document.getElementById('color2').value;
+  const color3 = document.getElementById('color3').value;
+  
+  const customGradient = `linear-gradient(135deg, ${color1}, ${color2}, ${color3})`;
+  document.querySelector('.gradient-background').style.background = customGradient;
+  
+  // Update hidden input field
+  document.getElementById('backgroundColorInput').value = customGradient;
+  
+  // Remove active class from all presets when using custom colors
+  document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+}
+
+function resetToOriginalColor() {
+  // Reset to the user's original background color
+  document.querySelector('.gradient-background').style.background = userOriginalBackgroundColor;
+  document.getElementById('backgroundColorInput').value = userOriginalBackgroundColor;
+  
+  // Remove active class from all presets
+  document.querySelectorAll('.color-preset').forEach(p => p.classList.remove('active'));
+  
+  // If the original color matches a preset, activate it
+  const colorPresets = document.querySelectorAll('.color-preset');
+  colorPresets.forEach(preset => {
+    if (preset.getAttribute('data-gradient') === userOriginalBackgroundColor) {
+      preset.classList.add('active');
+    }
+  });
+  
+  // Close the color palette panel
+  document.getElementById('colorPalettePanel').classList.remove('active');
+}
+</script>

@@ -10,6 +10,7 @@ logs/
 
 # 上傳的文件
 uploads/
+temp/
 
 # IDE文件
 .idea/

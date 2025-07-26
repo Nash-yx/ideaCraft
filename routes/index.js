@@ -3,6 +3,7 @@ const router = express.Router()
 const userController = require('../controllers/user-controller')
 const passport = require('../config/passport')
 const { requireAuth } = require('../middleware/auth')
+const { upload } = require('../middleware/multer')
 
 router.get('/signup', userController.signupPage)
 router.post('/signup', userController.signup)
@@ -29,7 +30,8 @@ router.get('/auth/github/callback',
 
 router.get('/logout', userController.logout)
 
-router.get('/profile', requireAuth, userController.profilePage)
+router.get('/users/:id', requireAuth, userController.getUser)
+router.put('/users/:id', requireAuth, upload.single('avatar'), userController.putUser)
 
 router.get('/', (req, res) => {
   res.render('home', { activePage: 'tasks' })

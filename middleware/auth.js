@@ -16,10 +16,8 @@ const authMiddleware = {
     next()
   },
 
-  // Middleware to add user to res.locals for templates
-  addUserToLocals: (req, res, next) => {
-    res.locals.user = req.user || null
-    next()
+  getUser: (req, res, next) => {
+    return req.user || null
   }
 }
 
