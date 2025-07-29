@@ -67,20 +67,30 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Tab switching functionality
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  tabButtons.forEach(button => {
+  // View toggle functionality (Grid vs List)
+  const viewButtons = document.querySelectorAll('.view-btn');
+  const ideasGrid = document.querySelector('.ideas-grid');
+  
+  viewButtons.forEach(button => {
     button.addEventListener('click', function() {
-      // Remove active class from all tabs
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      // Add active class to clicked tab
+      // Remove active class from all view buttons
+      viewButtons.forEach(btn => btn.classList.remove('active'));
+      // Add active class to clicked button
       this.classList.add('active');
+      
+      // Toggle grid/list view
+      const viewType = this.getAttribute('data-view');
+      if (viewType === 'list') {
+        ideasGrid.classList.add('list-view');
+      } else {
+        ideasGrid.classList.remove('list-view');
+      }
     });
   });
   
-  // Task card hover effects
-  const taskCards = document.querySelectorAll('.task-card');
-  taskCards.forEach(card => {
+  // Idea card hover effects
+  const ideaCards = document.querySelectorAll('.idea-card');
+  ideaCards.forEach(card => {
     card.addEventListener('mouseenter', function() {
       this.style.transform = 'translateY(-2px)';
     });
@@ -90,31 +100,62 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Create task button functionality
-  const createTaskBtn = document.querySelector('.create-task-btn');
-  if (createTaskBtn) {
-    createTaskBtn.addEventListener('click', function() {
-      // Placeholder for create task functionality
-      alert('Create task functionality would be implemented here');
+  // Create idea button functionality
+  const createIdeaBtn = document.querySelector('.create-idea-btn');
+  if (createIdeaBtn) {
+    createIdeaBtn.addEventListener('click', function() {
+      // Placeholder for create idea functionality
+      alert('Create idea functionality would be implemented here');
     });
   }
   
-  // Column menu buttons
-  const columnMenuBtns = document.querySelectorAll('.column-menu-btn');
-  columnMenuBtns.forEach(btn => {
+  // Empty state button functionality
+  const emptyStateBtn = document.querySelector('.empty-state-btn');
+  if (emptyStateBtn) {
+    emptyStateBtn.addEventListener('click', function() {
+      // Placeholder for create first idea functionality
+      alert('Create your first idea functionality would be implemented here');
+    });
+  }
+  
+  // Search functionality
+  const searchInput = document.querySelector('.search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      // Placeholder for search functionality
+      console.log('Searching for:', searchTerm);
+    });
+  }
+  
+  // Filter functionality
+  const tagFilter = document.getElementById('tagFilter');
+  const sortFilter = document.getElementById('sortFilter');
+  
+  if (tagFilter) {
+    tagFilter.addEventListener('change', function() {
+      const selectedTag = this.value;
+      // Placeholder for tag filtering functionality
+      console.log('Filtering by tag:', selectedTag);
+    });
+  }
+  
+  if (sortFilter) {
+    sortFilter.addEventListener('change', function() {
+      const sortBy = this.value;
+      // Placeholder for sorting functionality
+      console.log('Sorting by:', sortBy);
+    });
+  }
+  
+  // Idea action buttons
+  const actionButtons = document.querySelectorAll('.action-btn');
+  actionButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      // Placeholder for column menu functionality
-      console.log('Column menu clicked');
+      const action = this.getAttribute('title').toLowerCase();
+      // Placeholder for idea actions
+      console.log('Idea action:', action);
     });
   });
-  
-  // Add member button
-  const addMemberBtn = document.querySelector('.add-member-btn');
-  if (addMemberBtn) {
-    addMemberBtn.addEventListener('click', function() {
-      // Placeholder for add member functionality
-      alert('Add member functionality would be implemented here');
-    });
-  }
 });

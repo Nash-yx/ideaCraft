@@ -34,7 +34,7 @@ router.get('/users/:id', requireAuth, userController.getUser)
 router.put('/users/:id', requireAuth, upload.single('avatar'), userController.putUser)
 
 router.get('/', (req, res) => {
-  res.render('home', { activePage: 'tasks' })
+  res.render('home', { activePage: 'ideas' })
   // res.json({ message: 'IdeaCraft API is running' })
 })
 
