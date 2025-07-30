@@ -1,0 +1,299 @@
+<div class="home-wrapper">
+      
+      {{> sidebar}}
+      {{> messages}}
+      <!-- Main Content -->
+      <div class="home-main">
+        <!-- Header -->
+        <div class="home-header">
+          <div class="header-left">
+            <h1 class="page-title">My Ideas</h1>
+          </div>
+          <div class="header-right">
+            <button class="create-idea-btn">
+              <i class="fas fa-plus"></i>
+              <span>New Idea</span>
+            </button>
+          </div>
+        </div>
+
+        
+
+        <!-- Ideas Statistics -->
+        <div class="ideas-stats">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Total Ideas</span>
+              <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>2</span>
+              </div>
+            </div>
+            <div class="stat-number">12</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Public Ideas</span>
+              <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>1</span>
+              </div>
+            </div>
+            <div class="stat-number">3</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Private Ideas</span>
+              <div class="stat-trend negative">
+                <i class="fas fa-arrow-down"></i>
+                <span>1</span>
+              </div>
+            </div>
+            <div class="stat-number">9</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">This Week</span>
+              <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>2</span>
+              </div>
+            </div>
+            <div class="stat-number">5</div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <div class="search-wrapper">
+            <div class="search-input-container">
+              <i class="fas fa-search search-icon"></i>
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Search ideas..."
+                autocomplete="off"
+              >
+            </div>
+            <button class="filter-btn" title="Filter">
+              <i class="fas fa-filter"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ideas Grid -->
+        <div class="ideas-content">
+          <div class="ideas-grid">
+            <!-- Idea Card 1 -->
+            <div class="idea-card" data-border="purple">
+              <div class="idea-actions">
+                <button class="action-btn" title="Pin">
+                  <i class="fas fa-thumbtack"></i>
+                </button>
+              </div>
+              <h3 class="idea-title">Behind-the-scenes workflow video</h3>
+              <p class="idea-description">Create a short video showing how I prepare content from...</p>
+              <div class="idea-tags">
+                <span class="tag instagram">Instagram</span>
+                <span class="tag youtube">YouTube</span>
+              </div>
+              <div class="idea-meta">
+                <div class="idea-types">
+                  <span class="type-tag">Video</span>
+                  <span class="type-tag">Story</span>
+                </div>
+              </div>
+              <div class="idea-footer">
+                <span class="idea-date">May 17, 2025</span>
+                <div class="idea-footer-actions">
+                  <button class="footer-btn" title="Edit">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button class="footer-btn" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Idea Card 2 -->
+            <div class="idea-card" data-border="green">
+              <div class="idea-actions">
+                <button class="action-btn" title="Pin">
+                  <i class="fas fa-thumbtack"></i>
+                </button>
+              </div>
+              <h3 class="idea-title">Top 10 productivity tools for content creators</h3>
+              <p class="idea-description">A listicle comparing different tools that have improved my...</p>
+              <div class="idea-tags">
+                <span class="tag blog">Blog</span>
+                <span class="tag newsletter">Newsletter</span>
+              </div>
+              <div class="idea-meta">
+                <div class="idea-types">
+                  <span class="type-tag">Article</span>
+                  <span class="type-tag">Carousel</span>
+                </div>
+              </div>
+              <div class="idea-footer">
+                <span class="idea-date">May 19, 2025</span>
+                <div class="idea-footer-actions">
+                  <button class="footer-btn" title="Edit">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button class="footer-btn" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Idea Card 3 -->
+            <div class="idea-card" data-border="red">
+              <div class="idea-actions">
+                <button class="action-btn" title="Pin">
+                  <i class="fas fa-thumbtack"></i>
+                </button>
+              </div>
+              <h3 class="idea-title">Interview with industry expert</h3>
+              <p class="idea-description">Questions about upcoming trends and best practices</p>
+              <div class="idea-tags">
+                <span class="tag podcast">Podcast</span>
+                <span class="tag youtube">YouTube</span>
+              </div>
+              <div class="idea-meta">
+                <div class="idea-types">
+                  <span class="type-tag">Audio</span>
+                  <span class="type-tag">Video</span>
+                </div>
+              </div>
+              <div class="idea-footer">
+                <span class="idea-date">May 15, 2025</span>
+                <div class="idea-footer-actions">
+                  <button class="footer-btn" title="Edit">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button class="footer-btn" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Idea Card 4 -->
+            <div class="idea-card" data-border="blue">
+              <div class="idea-actions">
+                <button class="action-btn" title="Pin">
+                  <i class="fas fa-thumbtack"></i>
+                </button>
+              </div>
+              <h3 class="idea-title">Design system best practices</h3>
+              <p class="idea-description">Comprehensive guide for building scalable design systems...</p>
+              <div class="idea-tags">
+                <span class="tag design">Design</span>
+                <span class="tag blog">Blog</span>
+              </div>
+              <div class="idea-meta">
+                <div class="idea-types">
+                  <span class="type-tag">Article</span>
+                  <span class="type-tag">Guide</span>
+                </div>
+              </div>
+              <div class="idea-footer">
+                <span class="idea-date">May 10, 2025</span>
+                <div class="idea-footer-actions">
+                  <button class="footer-btn" title="Edit">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button class="footer-btn" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Idea Card 5 -->
+            <div class="idea-card" data-border="orange">
+              <div class="idea-actions">
+                <button class="action-btn" title="Pin">
+                  <i class="fas fa-thumbtack"></i>
+                </button>
+              </div>
+              <h3 class="idea-title">AI tools for content automation</h3>
+              <p class="idea-description">Review of AI-powered tools for content creation and optimization...</p>
+              <div class="idea-tags">
+                <span class="tag ai">AI</span>
+                <span class="tag tools">Tools</span>
+              </div>
+              <div class="idea-meta">
+                <div class="idea-types">
+                  <span class="type-tag">Review</span>
+                  <span class="type-tag">Tutorial</span>
+                </div>
+              </div>
+              <div class="idea-footer">
+                <span class="idea-date">May 8, 2025</span>
+                <div class="idea-footer-actions">
+                  <button class="footer-btn" title="Edit">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button class="footer-btn" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Idea Card 6 -->
+            <div class="idea-card" data-border="teal">
+              <div class="idea-actions">
+                <button class="action-btn" title="Pin">
+                  <i class="fas fa-thumbtack"></i>
+                </button>
+              </div>
+              <h3 class="idea-title">Remote work productivity tips</h3>
+              <p class="idea-description">Strategies for maintaining focus and efficiency while working from home...</p>
+              <div class="idea-tags">
+                <span class="tag productivity">Productivity</span>
+                <span class="tag remote">Remote</span>
+              </div>
+              <div class="idea-meta">
+                <div class="idea-types">
+                  <span class="type-tag">Tips</span>
+                  <span class="type-tag">Article</span>
+                </div>
+              </div>
+              <div class="idea-footer">
+                <span class="idea-date">May 5, 2025</span>
+                <div class="idea-footer-actions">
+                  <button class="footer-btn" title="Edit">
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button class="footer-btn" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State (hidden by default, shown when no ideas) -->
+          <div class="empty-state" style="display: none;">
+            <div class="empty-state-content">
+              <div class="empty-state-icon">
+                <i class="fas fa-lightbulb"></i>
+              </div>
+              <h3 class="empty-state-title">No Ideas Yet</h3>
+              <p class="empty-state-message">Start capturing your brilliant thoughts and ideas. Create your first idea to get started!</p>
+              <button class="btn btn-primary empty-state-btn">
+                <i class="fas fa-plus"></i>
+                Create Your First Idea
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

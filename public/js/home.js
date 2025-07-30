@@ -100,21 +100,146 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Create idea button functionality
+  // Modal functionality
+  const modal = document.getElementById('createIdeaModal');
   const createIdeaBtn = document.querySelector('.create-idea-btn');
-  if (createIdeaBtn) {
-    createIdeaBtn.addEventListener('click', function() {
-      // Placeholder for create idea functionality
-      alert('Create idea functionality would be implemented here');
-    });
+  const emptyStateBtn = document.querySelector('.empty-state-btn');
+  const modalClose = document.querySelector('.modal-close');
+  const modalCancel = document.querySelector('.modal-cancel');
+  const createIdeaForm = document.getElementById('createIdeaForm');
+  
+  // Open modal function
+  function openModal() {
+    modal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+    // Focus on title input
+    setTimeout(() => {
+      document.getElementById('ideaTitle').focus();
+    }, 100);
   }
   
-  // Empty state button functionality
-  const emptyStateBtn = document.querySelector('.empty-state-btn');
+  // Close modal function
+  function closeModal() {
+    modal.classList.remove('show');
+    document.body.style.overflow = '';
+    // Reset form
+    createIdeaForm.reset();
+  }
+  
+  // Show success message function
+  function showSuccessMessage(message) {
+    // Create message element
+    const messageEl = document.createElement('div');
+    messageEl.className = 'flash-message success-message';
+    messageEl.innerHTML = `
+      <div class="flash-content">
+        <i class="fas fa-check-circle"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    // Add to page
+    document.body.appendChild(messageEl);
+    
+    // Show with animation
+    setTimeout(() => {
+      messageEl.classList.add('show');
+    }, 100);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+      messageEl.classList.remove('show');
+      setTimeout(() => {
+        if (messageEl.parentNode) {
+          messageEl.parentNode.removeChild(messageEl);
+        }
+      }, 300);
+    }, 3000);
+  }
+  
+  // Event listeners for opening modal
+  if (createIdeaBtn) {
+    createIdeaBtn.addEventListener('click', openModal);
+  }
+  
   if (emptyStateBtn) {
-    emptyStateBtn.addEventListener('click', function() {
-      // Placeholder for create first idea functionality
-      alert('Create your first idea functionality would be implemented here');
+    emptyStateBtn.addEventListener('click', openModal);
+  }
+  
+  // Event listeners for closing modal
+  if (modalClose) {
+    modalClose.addEventListener('click', closeModal);
+  }
+  
+  if (modalCancel) {
+    modalCancel.addEventListener('click', closeModal);
+  }
+  
+  // Close modal when clicking outside
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+  
+  // Close modal with Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.classList.contains('show')) {
+      closeModal();
+    }
+  });
+  
+  // Form submission
+  if (createIdeaForm) {
+    createIdeaForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalText = submitButton.innerHTML;
+      
+      // Convert FormData to URLSearchParams for proper encoding
+      const params = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        params.append(key, value);
+      }
+      
+      // Show loading state
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+      
+      // Submit form
+      fetch('/ideas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: params.toString()
+      })
+      .then(response => {
+        if (response.redirected || response.ok) {
+          // Close modal first
+          closeModal();
+          
+          // Show success message
+          showSuccessMessage('Idea created successfully!');
+          
+          // Wait a bit then redirect to refresh data
+          setTimeout(() => {
+            window.location.href = '/ideas';
+          }, 1000);
+        } else {
+          throw new Error('Failed to create idea');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to create idea. Please try again.');
+        
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+      });
     });
   }
   

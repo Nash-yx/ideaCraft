@@ -4,6 +4,7 @@ const userController = require('../controllers/user-controller')
 const passport = require('../config/passport')
 const { requireAuth } = require('../middleware/auth')
 const { upload } = require('../middleware/multer')
+const ideaController = require('../controllers/idea-controller')
 
 router.get('/signup', userController.signupPage)
 router.post('/signup', userController.signup)
@@ -33,9 +34,14 @@ router.get('/logout', userController.logout)
 router.get('/users/:id', requireAuth, userController.getUser)
 router.put('/users/:id', requireAuth, upload.single('avatar'), userController.putUser)
 
+router.get('/ideas', requireAuth, ideaController.getIdeas)
+router.post('/ideas', requireAuth, ideaController.postIdea)
+
 router.get('/', (req, res) => {
+  if (req.isAuthenticated()) {
+    return res.redirect('/ideas')
+  }
   res.render('home', { activePage: 'ideas' })
-  // res.json({ message: 'IdeaCraft API is running' })
 })
 
 module.exports = router

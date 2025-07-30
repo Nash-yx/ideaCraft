@@ -32,3 +32,4 @@ build/
 spec.md
 CLAUDE.md
 /docs
+.claude

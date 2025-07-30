@@ -17,52 +17,58 @@
           </div>
         </div>
 
-        
-
         <!-- Ideas Statistics -->
         <div class="ideas-stats">
           <div class="stat-card">
             <div class="stat-header">
               <span class="stat-label">Total Ideas</span>
-              <div class="stat-trend positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>2</span>
+              {{#with (getTrendData ideas "total")}}
+              <div class="stat-trend {{type}}">
+                <i class="fas {{icon}}"></i>
+                <span>{{value}}</span>
               </div>
+              {{/with}}
             </div>
-            <div class="stat-number">12</div>
+            <div class="stat-number">{{ideas.length}}</div>
           </div>
           
           <div class="stat-card">
             <div class="stat-header">
               <span class="stat-label">Public Ideas</span>
-              <div class="stat-trend positive">
-                <i class="fas fa-arrow-up"></i>
-                <span>1</span>
+              {{#with (getTrendData ideas "public")}}
+              <div class="stat-trend {{type}}">
+                <i class="fas {{icon}}"></i>
+                <span>{{value}}</span>
               </div>
+              {{/with}}
             </div>
-            <div class="stat-number">3</div>
+            <div class="stat-number">{{getPublicCount ideas}}</div>
           </div>
           
           <div class="stat-card">
             <div class="stat-header">
               <span class="stat-label">Private Ideas</span>
-              <div class="stat-trend negative">
-                <i class="fas fa-arrow-down"></i>
-                <span>1</span>
+              {{#with (getTrendData ideas "private")}}
+              <div class="stat-trend {{type}}">
+                <i class="fas {{icon}}"></i>
+                <span>{{value}}</span>
               </div>
+              {{/with}}
             </div>
-            <div class="stat-number">9</div>
+            <div class="stat-number">{{getPrivateCount ideas}}</div>
           </div>
           
           <div class="stat-card">
             <div class="stat-header">
               <span class="stat-label">This Week</span>
+              {{#if (getThisWeekCount ideas)}}
               <div class="stat-trend positive">
                 <i class="fas fa-arrow-up"></i>
-                <span>2</span>
+                <span>{{getThisWeekCount ideas}}</span>
               </div>
+              {{/if}}
             </div>
-            <div class="stat-number">5</div>
+            <div class="stat-number">{{getThisWeekCount ideas}}</div>
           </div>
         </div>
 
@@ -86,214 +92,112 @@
 
         <!-- Ideas Grid -->
         <div class="ideas-content">
+          {{#if ideas.length}}
           <div class="ideas-grid">
-            <!-- Idea Card 1 -->
-            <div class="idea-card" data-border="purple">
+            {{#each ideas}}
+            <div class="idea-card" data-border="{{getBorderColor @index}}">
               <div class="idea-actions">
                 <button class="action-btn" title="Pin">
                   <i class="fas fa-thumbtack"></i>
                 </button>
               </div>
-              <h3 class="idea-title">Behind-the-scenes workflow video</h3>
-              <p class="idea-description">Create a short video showing how I prepare content from...</p>
-              <div class="idea-tags">
-                <span class="tag instagram">Instagram</span>
-                <span class="tag youtube">YouTube</span>
+              <h3 class="idea-title">{{title}}</h3>
+              <p class="idea-description">{{truncate content 80}}</p>
+              {{#if isPublic}}
+              <div class="idea-visibility">
+                <span class="visibility-tag public">
+                  <i class="fas fa-globe"></i> Public
+                </span>
               </div>
-              <div class="idea-meta">
-                <div class="idea-types">
-                  <span class="type-tag">Video</span>
-                  <span class="type-tag">Story</span>
-                </div>
+              {{else}}
+              <div class="idea-visibility">
+                <span class="visibility-tag private">
+                  <i class="fas fa-lock"></i> Private
+                </span>
               </div>
+              {{/if}}
               <div class="idea-footer">
-                <span class="idea-date">May 17, 2025</span>
+                <span class="idea-date">{{formatDate createdAt}}</span>
                 <div class="idea-footer-actions">
-                  <button class="footer-btn" title="Edit">
+                  <button class="footer-btn" title="Edit" data-id="{{id}}">
                     <i class="fas fa-pencil-alt"></i>
                   </button>
-                  <button class="footer-btn" title="Delete">
+                  <button class="footer-btn" title="Delete" data-id="{{id}}">
                     <i class="fas fa-trash"></i>
                   </button>
                 </div>
               </div>
             </div>
-
-            <!-- Idea Card 2 -->
-            <div class="idea-card" data-border="green">
-              <div class="idea-actions">
-                <button class="action-btn" title="Pin">
-                  <i class="fas fa-thumbtack"></i>
-                </button>
-              </div>
-              <h3 class="idea-title">Top 10 productivity tools for content creators</h3>
-              <p class="idea-description">A listicle comparing different tools that have improved my...</p>
-              <div class="idea-tags">
-                <span class="tag blog">Blog</span>
-                <span class="tag newsletter">Newsletter</span>
-              </div>
-              <div class="idea-meta">
-                <div class="idea-types">
-                  <span class="type-tag">Article</span>
-                  <span class="type-tag">Carousel</span>
-                </div>
-              </div>
-              <div class="idea-footer">
-                <span class="idea-date">May 19, 2025</span>
-                <div class="idea-footer-actions">
-                  <button class="footer-btn" title="Edit">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
-                  <button class="footer-btn" title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Idea Card 3 -->
-            <div class="idea-card" data-border="red">
-              <div class="idea-actions">
-                <button class="action-btn" title="Pin">
-                  <i class="fas fa-thumbtack"></i>
-                </button>
-              </div>
-              <h3 class="idea-title">Interview with industry expert</h3>
-              <p class="idea-description">Questions about upcoming trends and best practices</p>
-              <div class="idea-tags">
-                <span class="tag podcast">Podcast</span>
-                <span class="tag youtube">YouTube</span>
-              </div>
-              <div class="idea-meta">
-                <div class="idea-types">
-                  <span class="type-tag">Audio</span>
-                  <span class="type-tag">Video</span>
-                </div>
-              </div>
-              <div class="idea-footer">
-                <span class="idea-date">May 15, 2025</span>
-                <div class="idea-footer-actions">
-                  <button class="footer-btn" title="Edit">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
-                  <button class="footer-btn" title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Idea Card 4 -->
-            <div class="idea-card" data-border="blue">
-              <div class="idea-actions">
-                <button class="action-btn" title="Pin">
-                  <i class="fas fa-thumbtack"></i>
-                </button>
-              </div>
-              <h3 class="idea-title">Design system best practices</h3>
-              <p class="idea-description">Comprehensive guide for building scalable design systems...</p>
-              <div class="idea-tags">
-                <span class="tag design">Design</span>
-                <span class="tag blog">Blog</span>
-              </div>
-              <div class="idea-meta">
-                <div class="idea-types">
-                  <span class="type-tag">Article</span>
-                  <span class="type-tag">Guide</span>
-                </div>
-              </div>
-              <div class="idea-footer">
-                <span class="idea-date">May 10, 2025</span>
-                <div class="idea-footer-actions">
-                  <button class="footer-btn" title="Edit">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
-                  <button class="footer-btn" title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Idea Card 5 -->
-            <div class="idea-card" data-border="orange">
-              <div class="idea-actions">
-                <button class="action-btn" title="Pin">
-                  <i class="fas fa-thumbtack"></i>
-                </button>
-              </div>
-              <h3 class="idea-title">AI tools for content automation</h3>
-              <p class="idea-description">Review of AI-powered tools for content creation and optimization...</p>
-              <div class="idea-tags">
-                <span class="tag ai">AI</span>
-                <span class="tag tools">Tools</span>
-              </div>
-              <div class="idea-meta">
-                <div class="idea-types">
-                  <span class="type-tag">Review</span>
-                  <span class="type-tag">Tutorial</span>
-                </div>
-              </div>
-              <div class="idea-footer">
-                <span class="idea-date">May 8, 2025</span>
-                <div class="idea-footer-actions">
-                  <button class="footer-btn" title="Edit">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
-                  <button class="footer-btn" title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Idea Card 6 -->
-            <div class="idea-card" data-border="teal">
-              <div class="idea-actions">
-                <button class="action-btn" title="Pin">
-                  <i class="fas fa-thumbtack"></i>
-                </button>
-              </div>
-              <h3 class="idea-title">Remote work productivity tips</h3>
-              <p class="idea-description">Strategies for maintaining focus and efficiency while working from home...</p>
-              <div class="idea-tags">
-                <span class="tag productivity">Productivity</span>
-                <span class="tag remote">Remote</span>
-              </div>
-              <div class="idea-meta">
-                <div class="idea-types">
-                  <span class="type-tag">Tips</span>
-                  <span class="type-tag">Article</span>
-                </div>
-              </div>
-              <div class="idea-footer">
-                <span class="idea-date">May 5, 2025</span>
-                <div class="idea-footer-actions">
-                  <button class="footer-btn" title="Edit">
-                    <i class="fas fa-pencil-alt"></i>
-                  </button>
-                  <button class="footer-btn" title="Delete">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
+            {{/each}}
           </div>
-
-          <!-- Empty State (hidden by default, shown when no ideas) -->
-          <div class="empty-state" style="display: none;">
+          {{else}}
+          <!-- Empty State -->
+          <div class="empty-state">
             <div class="empty-state-content">
               <div class="empty-state-icon">
                 <i class="fas fa-lightbulb"></i>
               </div>
-              <h3 class="empty-state-title">No Ideas Yet</h3>
-              <p class="empty-state-message">Start capturing your brilliant thoughts and ideas. Create your first idea to get started!</p>
-              <button class="btn btn-primary empty-state-btn">
-                <i class="fas fa-plus"></i>
-                Create Your First Idea
-              </button>
+              <h3 class="empty-state-title">No ideas yet</h3>
+              <p class="empty-state-message">Click the "New Idea" button above to start capturing your thoughts.</p>
             </div>
           </div>
+          {{/if}}
         </div>
       </div>
     </div>
+
+<!-- Create Idea Modal -->
+<div id="createIdeaModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Create New Idea</h2>
+      <button class="modal-close" aria-label="Close modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="createIdeaForm" class="modal-body" method="POST" action="/ideas">
+      <div class="form-group">
+        <label for="ideaTitle" class="form-label">Title</label>
+        <input 
+          type="text" 
+          id="ideaTitle" 
+          name="title" 
+          class="form-input" 
+          placeholder="Enter your idea title..."
+          required
+          maxlength="255"
+        >
+      </div>
+      
+      <div class="form-group">
+        <label for="ideaContent" class="form-label">Content</label>
+        <textarea 
+          id="ideaContent" 
+          name="content" 
+          class="form-textarea" 
+          placeholder="Describe your idea in detail..."
+          rows="6"
+          required
+        ></textarea>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="ideaPublic" name="isPublic" value="true">
+          <label for="ideaPublic" class="checkbox-label">
+            <span class="checkbox-text">Make this idea public</span>
+            <span class="checkbox-hint">Public ideas can be discovered and shared with others</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-plus"></i>
+          Create Idea
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
