@@ -36,6 +36,9 @@ router.put('/users/:id', requireAuth, upload.single('avatar'), userController.pu
 
 router.get('/ideas', requireAuth, ideaController.getIdeas)
 router.post('/ideas', requireAuth, ideaController.postIdea)
+router.get('/ideas/:id', requireAuth, ideaController.getIdea)
+router.put('/ideas/:id', requireAuth, ideaController.updateIdea)
+router.delete('/ideas/:id', requireAuth, ideaController.deleteIdea)
 
 router.get('/', (req, res) => {
   if (req.isAuthenticated()) {

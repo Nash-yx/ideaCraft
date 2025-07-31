@@ -243,44 +243,394 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Search functionality
+  // Search functionality (placeholder - to be implemented)
   const searchInput = document.querySelector('.search-input');
   if (searchInput) {
     searchInput.addEventListener('input', function() {
       const searchTerm = this.value.toLowerCase();
-      // Placeholder for search functionality
-      console.log('Searching for:', searchTerm);
+      // TODO: Implement search functionality
     });
   }
   
-  // Filter functionality
+  // Filter functionality (placeholder - to be implemented)
   const tagFilter = document.getElementById('tagFilter');
   const sortFilter = document.getElementById('sortFilter');
   
   if (tagFilter) {
     tagFilter.addEventListener('change', function() {
       const selectedTag = this.value;
-      // Placeholder for tag filtering functionality
-      console.log('Filtering by tag:', selectedTag);
+      // TODO: Implement tag filtering
     });
   }
   
   if (sortFilter) {
     sortFilter.addEventListener('change', function() {
       const sortBy = this.value;
-      // Placeholder for sorting functionality
-      console.log('Sorting by:', sortBy);
+      // TODO: Implement sorting functionality
     });
   }
   
-  // Idea action buttons
+  // Edit functionality
+  const editModal = document.getElementById('editIdeaModal');
+  const editModalClose = editModal.querySelector('.modal-close');
+  const editModalCancel = editModal.querySelector('.modal-cancel');
+  const editIdeaForm = document.getElementById('editIdeaForm');
+  
+  // Open edit modal function
+  function openEditModal() {
+    editModal.classList.add('show');
+    document.body.style.overflow = 'hidden'; // 防止背景滾動
+    // Focus on title input
+    setTimeout(() => {
+      document.getElementById('editIdeaTitle').focus();
+    }, 100);
+  }
+  
+  // Close edit modal function
+  function closeEditModal() {
+    editModal.classList.remove('show');
+    document.body.style.overflow = '';  // 恢復背景滾動
+    // Reset form
+    editIdeaForm.reset();
+  }
+  
+  // Event listeners for closing edit modal
+  if (editModalClose) {
+    editModalClose.addEventListener('click', closeEditModal);
+  }
+  
+  if (editModalCancel) {
+    editModalCancel.addEventListener('click', closeEditModal);
+  }
+  
+  // Close edit modal when clicking outside
+  editModal.addEventListener('click', function(e) {
+    if (e.target === editModal) {
+      closeEditModal();
+    }
+  });
+  
+  // Edit idea buttons
+  const editButtons = document.querySelectorAll('.footer-btn[title="Edit"]');
+  editButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const ideaId = this.getAttribute('data-id');
+      
+      // Fetch idea data
+      fetch(`/ideas/${ideaId}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const idea = data.idea;
+            
+            // Fill form with idea data
+            document.getElementById('editIdeaId').value = idea.id;
+            document.getElementById('editIdeaTitle').value = idea.title;
+            document.getElementById('editIdeaContent').value = idea.content;
+            document.getElementById('editIdeaPublic').checked = idea.isPublic;
+            
+            // Open modal
+            openEditModal();
+          } else {
+            alert('Failed to load idea data');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Failed to load idea data');
+        });
+    });
+  });
+  
+  // Handle edit form submission
+  if (editIdeaForm) {
+    editIdeaForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const ideaId = document.getElementById('editIdeaId').value;
+      const formData = new FormData(this);
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalText = submitButton.innerHTML;
+      
+      // Convert FormData to URLSearchParams for proper encoding
+      const params = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        if (key !== 'ideaId') { // Skip the ideaId from body
+          params.append(key, value);
+        }
+      }
+      
+      // Show loading state
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+      
+      // Submit form
+      fetch(`/ideas/${ideaId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: params.toString()
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          return response.json().then(data => {
+            throw new Error(data.message || 'Failed to update idea');
+          });
+        }
+      })
+      .then(data => {
+        if (data.success) {
+          // Close modal first
+          closeEditModal();
+          
+          // Show success message
+          showSuccessMessage('Idea updated successfully!');
+          
+          // Wait a bit then redirect to refresh data
+          setTimeout(() => {
+            window.location.href = '/ideas';
+          }, 1000);
+        } else {
+          throw new Error(data.message || 'Failed to update idea');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert(`Failed to update idea: ${error.message}`);
+        
+        // Reset button state
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+      });
+    });
+  }
+  
+  // Idea Preview Modal functionality
+  const previewModal = document.getElementById('ideaPreviewModal');
+  const previewModalClose = previewModal.querySelector('.modal-close');
+  const expandBtn = document.getElementById('expandToFullPage');
+  let currentPreviewIdeaId = null;
+
+  // Open preview modal function
+  function openPreviewModal(ideaData) {
+    document.getElementById('previewIdeaTitle').textContent = ideaData.title;
+    document.getElementById('previewIdeaContent').textContent = ideaData.content || 'No content provided.';
+    document.getElementById('previewIdeaDate').textContent = formatDate(ideaData.createdAt);
+    
+    // Set visibility status
+    const visibilityElement = document.getElementById('previewIdeaVisibility');
+    if (ideaData.isPublic) {
+      visibilityElement.innerHTML = '<span class="visibility-tag public"><i class="fas fa-globe"></i> Public</span>';
+    } else {
+      visibilityElement.innerHTML = '<span class="visibility-tag private"><i class="fas fa-lock"></i> Private</span>';
+    }
+    
+    currentPreviewIdeaId = ideaData.id;
+    previewModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Close preview modal function
+  function closePreviewModal() {
+    previewModal.classList.remove('show');
+    document.body.style.overflow = '';
+    currentPreviewIdeaId = null;
+  }
+
+  // Format date helper function
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  }
+
+  // Event listeners for preview modal
+  if (previewModalClose) {
+    previewModalClose.addEventListener('click', closePreviewModal);
+  }
+
+  // Close preview modal when clicking outside
+  previewModal.addEventListener('click', function(e) {
+    if (e.target === previewModal) {
+      closePreviewModal();
+    }
+  });
+
+  // Expand to full page functionality
+  if (expandBtn) {
+    expandBtn.addEventListener('click', function() {
+      if (currentPreviewIdeaId) {
+        window.location.href = `/ideas/${currentPreviewIdeaId}`;
+      }
+    });
+  }
+
+  // Quick edit functionality
+  const quickEditBtn = document.getElementById('quickEditBtn');
+  if (quickEditBtn) {
+    quickEditBtn.addEventListener('click', function() {
+      if (currentPreviewIdeaId) {
+        // Close preview modal first
+        closePreviewModal();
+        
+        // Trigger edit functionality for current idea
+        const editButton = document.querySelector(`.footer-btn[title="Edit"][data-id="${currentPreviewIdeaId}"]`);
+        if (editButton) {
+          editButton.click();
+        }
+      }
+    });
+  }
+
+  // Quick delete functionality
+  const quickDeleteBtn = document.getElementById('quickDeleteBtn');
+  if (quickDeleteBtn) {
+    quickDeleteBtn.addEventListener('click', function() {
+      if (currentPreviewIdeaId) {
+        // Close preview modal first
+        closePreviewModal();
+        
+        // Trigger delete functionality for current idea
+        const deleteButton = document.querySelector(`.footer-btn[title="Delete"][data-id="${currentPreviewIdeaId}"]`);
+        if (deleteButton) {
+          deleteButton.click();
+        }
+      }
+    });
+  }
+
+  // Idea card click functionality for preview
+  const previewIdeaCards = document.querySelectorAll('.idea-card');
+  previewIdeaCards.forEach(card => {
+    card.addEventListener('click', function(e) {
+      // Don't trigger if clicking on action buttons
+      if (e.target.closest('.idea-actions') || e.target.closest('.idea-footer-actions')) {
+        return;
+      }
+      
+      const ideaId = this.getAttribute('data-id');
+      
+      // Fetch idea data and show preview
+      fetch(`/ideas/${ideaId}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          openPreviewModal(data.idea);
+        } else {
+          alert('Failed to load idea');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load idea');
+      });
+    });
+  });
+
+  // Keyboard shortcuts for preview modal
+  document.addEventListener('keydown', function(e) {
+    if (previewModal.classList.contains('show')) {
+      if (e.key === 'Escape') {
+        closePreviewModal();
+      } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        // Ctrl+Enter to expand to full page
+        if (currentPreviewIdeaId) {
+          window.location.href = `/ideas/${currentPreviewIdeaId}`;
+        }
+      } else if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
+        // Ctrl+E to edit
+        e.preventDefault();
+        if (quickEditBtn) quickEditBtn.click();
+      }
+    }
+  });
+
+  // Delete idea buttons
+  const deleteButtons = document.querySelectorAll('.footer-btn[title="Delete"]');
+  deleteButtons.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const ideaId = this.getAttribute('data-id');
+      const ideaCard = this.closest('.idea-card');
+      const ideaTitle = ideaCard.querySelector('.idea-title').textContent;
+      
+      // 確認對話框
+      const confirmed = confirm(`Are you sure you want to delete "${ideaTitle}"?\n\nThis action cannot be undone.`);
+      
+      if (confirmed) {
+        // 顯示loading狀態
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        
+        // 發送刪除請求
+        fetch(`/ideas/${ideaId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            return response.json().then(data => {
+              throw new Error(data.message || 'Failed to delete idea');
+            });
+          }
+        })
+        .then(data => {
+          if (data.success) {
+            // 顯示成功訊息
+            showSuccessMessage('Idea deleted successfully!');
+            
+            // 短暫延遲後刷新頁面以更新統計數據
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          } else {
+            throw new Error(data.message || 'Failed to delete idea');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert(`Failed to delete idea: ${error.message}`);
+          
+          // 重置按鈕狀態
+          this.disabled = false;
+          this.innerHTML = '<i class="fas fa-trash"></i>';
+        });
+      }
+    });
+  });
+  
+  // Pin action buttons (placeholder for future pin functionality)
   const actionButtons = document.querySelectorAll('.action-btn');
   actionButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
       const action = this.getAttribute('title').toLowerCase();
-      // Placeholder for idea actions
-      console.log('Idea action:', action);
+      if (action === 'pin') {
+        // TODO: Implement pin functionality
+        console.log('Pin functionality to be implemented');
+      }
     });
   });
 });

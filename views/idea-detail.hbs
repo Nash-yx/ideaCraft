@@ -1,0 +1,411 @@
+<div class="home-wrapper">
+  {{> sidebar}}
+  {{> messages}}
+  
+  <!-- Main Content -->
+  <div class="home-main">
+    <!-- Header -->
+    <div class="home-header">
+      <div class="header-left">
+        <a href="/ideas" class="back-link">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back to Ideas</span>
+        </a>
+        <h1 class="page-title">{{idea.title}}</h1>
+      </div>
+      <div class="header-right">
+        <button class="edit-idea-btn" data-id="{{idea.id}}">
+          <i class="fas fa-pencil-alt"></i>
+          <span>Edit</span>
+        </button>
+        <button class="delete-idea-btn" data-id="{{idea.id}}">
+          <i class="fas fa-trash"></i>
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Idea Content -->
+    <div class="idea-detail-content">
+      <div class="idea-detail-card">
+        <div class="idea-detail-header">
+          <div class="idea-meta">
+            <span class="idea-date">
+              <i class="fas fa-calendar"></i>
+              Created {{formatDate idea.createdAt}}
+            </span>
+            {{#if idea.updatedAt}}
+            <span class="idea-date">
+              <i class="fas fa-edit"></i>
+              Updated {{formatDate idea.updatedAt}}
+            </span>
+            {{/if}}
+          </div>
+          <div class="idea-visibility">
+            {{#if idea.isPublic}}
+            <span class="visibility-tag public">
+              <i class="fas fa-globe"></i> Public
+            </span>
+            {{#if idea.shareLink}}
+            <button class="share-btn" data-link="{{idea.shareLink}}" title="Copy share link">
+              <i class="fas fa-share"></i>
+            </button>
+            {{/if}}
+            {{else}}
+            <span class="visibility-tag private">
+              <i class="fas fa-lock"></i> Private
+            </span>
+            {{/if}}
+          </div>
+        </div>
+        
+        <div class="idea-detail-body">
+          <div class="idea-content">
+            {{#if idea.content}}
+            <pre class="idea-text">{{idea.content}}</pre>
+            {{else}}
+            <p class="idea-empty">No content provided.</p>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Idea Modal (reuse from home.hbs) -->
+<div id="editIdeaModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Idea</h2>
+      <button class="modal-close" aria-label="Close modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="editIdeaForm" class="modal-body" method="PUT">
+      <input type="hidden" id="editIdeaId" name="ideaId">
+      <div class="form-group">
+        <label for="editIdeaTitle" class="form-label">Title</label>
+        <input 
+          type="text" 
+          id="editIdeaTitle" 
+          name="title" 
+          class="form-input" 
+          placeholder="Enter your idea title..."
+          required
+          maxlength="255"
+        >
+      </div>
+      
+      <div class="form-group">
+        <label for="editIdeaContent" class="form-label">Content</label>
+        <textarea 
+          id="editIdeaContent" 
+          name="content" 
+          class="form-textarea" 
+          placeholder="Describe your idea in detail..."
+          rows="10"
+          required
+        ></textarea>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="editIdeaPublic" name="isPublic" value="true">
+          <label for="editIdeaPublic" class="checkbox-label">
+            <span class="checkbox-text">Make this idea public</span>
+            <span class="checkbox-hint">Public ideas can be discovered and shared with others</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i>
+          Update Idea
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--neutral-600);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--blue-500);
+}
+
+.idea-detail-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.idea-detail-card {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--neutral-200);
+}
+
+.idea-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--neutral-200);
+}
+
+.idea-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.idea-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--neutral-500);
+  font-size: 0.9rem;
+}
+
+.idea-detail-body {
+  line-height: 1.6;
+}
+
+.idea-text {
+  white-space: pre-wrap;
+  font-family: inherit;
+  margin: 0;
+  color: var(--neutral-700);
+}
+
+.idea-empty {
+  color: var(--neutral-400);
+  font-style: italic;
+}
+
+.edit-idea-btn, .delete-idea-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--neutral-300);
+  background: var(--bg-primary);
+  color: var(--neutral-600);
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.edit-idea-btn:hover {
+  background: var(--blue-50);
+  color: var(--blue-600);
+  border-color: var(--blue-300);
+}
+
+.delete-idea-btn:hover {
+  background: var(--red-50);
+  color: var(--red-600);
+  border-color: var(--red-300);
+}
+
+.share-btn {
+  background: none;
+  border: none;
+  color: var(--blue-500);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.share-btn:hover {
+  background: var(--blue-100);
+}
+
+@media (max-width: 768px) {
+  .idea-detail-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .header-right {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Edit button functionality (reuse from home.js)
+  const editBtn = document.querySelector('.edit-idea-btn');
+  if (editBtn) {
+    editBtn.addEventListener('click', function() {
+      const ideaId = this.getAttribute('data-id');
+      
+      // Fetch idea data and open edit modal
+      fetch(`/ideas/${ideaId}`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const idea = data.idea;
+          
+          // Fill form with idea data
+          document.getElementById('editIdeaId').value = idea.id;
+          document.getElementById('editIdeaTitle').value = idea.title;
+          document.getElementById('editIdeaContent').value = idea.content;
+          document.getElementById('editIdeaPublic').checked = idea.isPublic;
+          
+          // Open modal
+          document.getElementById('editIdeaModal').classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to load idea data');
+      });
+    });
+  }
+  
+  // Delete button functionality
+  const deleteBtn = document.querySelector('.delete-idea-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', function() {
+      const ideaId = this.getAttribute('data-id');
+      const ideaTitle = document.querySelector('.page-title').textContent;
+      
+      const confirmed = confirm(`Are you sure you want to delete "${ideaTitle}"?\n\nThis action cannot be undone.`);
+      
+      if (confirmed) {
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        
+        fetch(`/ideas/${ideaId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Idea deleted successfully!');
+            window.location.href = '/ideas';
+          } else {
+            throw new Error(data.message || 'Failed to delete idea');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert(`Failed to delete idea: ${error.message}`);
+          this.disabled = false;
+          this.innerHTML = '<i class="fas fa-trash"></i> Delete';
+        });
+      }
+    });
+  }
+  
+  // Share button functionality
+  const shareBtn = document.querySelector('.share-btn');
+  if (shareBtn) {
+    shareBtn.addEventListener('click', function() {
+      const shareLink = this.getAttribute('data-link');
+      const fullUrl = `${window.location.origin}/share/${shareLink}`;
+      
+      navigator.clipboard.writeText(fullUrl).then(() => {
+        alert('Share link copied to clipboard!');
+      }).catch(() => {
+        prompt('Copy this link:', fullUrl);
+      });
+    });
+  }
+  
+  // Modal functionality (reuse from home.js)
+  const editModal = document.getElementById('editIdeaModal');
+  const modalClose = editModal.querySelector('.modal-close');
+  const modalCancel = editModal.querySelector('.modal-cancel');
+  const editForm = document.getElementById('editIdeaForm');
+  
+  function closeModal() {
+    editModal.classList.remove('show');
+    document.body.style.overflow = '';
+    editForm.reset();
+  }
+  
+  if (modalClose) modalClose.addEventListener('click', closeModal);
+  if (modalCancel) modalCancel.addEventListener('click', closeModal);
+  
+  editModal.addEventListener('click', function(e) {
+    if (e.target === editModal) closeModal();
+  });
+  
+  // Edit form submission
+  if (editForm) {
+    editForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const ideaId = document.getElementById('editIdeaId').value;
+      const formData = new FormData(this);
+      const submitButton = this.querySelector('button[type="submit"]');
+      const originalText = submitButton.innerHTML;
+      
+      const params = new URLSearchParams();
+      for (const [key, value] of formData.entries()) {
+        if (key !== 'ideaId') {
+          params.append(key, value);
+        }
+      }
+      
+      submitButton.disabled = true;
+      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+      
+      fetch(`/ideas/${ideaId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: params.toString()
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          closeModal();
+          alert('Idea updated successfully!');
+          window.location.reload();
+        } else {
+          throw new Error(data.message || 'Failed to update idea');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert(`Failed to update idea: ${error.message}`);
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+      });
+    });
+  }
+});
+</script>

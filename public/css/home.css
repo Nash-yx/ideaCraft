@@ -770,6 +770,145 @@
   padding-right: var(--spacing-xl);
 }
 
+.idea-title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.idea-title-link:hover {
+  color: var(--primary-500);
+}
+
+.idea-title-full-link {
+  color: var(--neutral-400);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  margin-left: 0.5rem;
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.idea-card:hover .idea-title-full-link {
+  opacity: 1;
+}
+
+.idea-title-full-link:hover {
+  color: var(--primary-500);
+}
+
+/* Idea Preview Modal Styles */
+.idea-preview-content {
+  max-width: 700px;
+  max-height: 80vh;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  color: var(--neutral-500);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.expand-btn:hover {
+  background: var(--neutral-100);
+  color: var(--primary-500);
+}
+
+.idea-preview-body {
+  padding: 0;
+}
+
+.idea-preview-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--neutral-200);
+  background: var(--neutral-50);
+}
+
+.meta-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.meta-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.quick-edit-btn, .quick-delete-btn {
+  background: none;
+  border: 1px solid var(--neutral-300);
+  color: var(--neutral-600);
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.quick-edit-btn:hover {
+  background: var(--blue-50);
+  color: var(--blue-600);
+  border-color: var(--blue-300);
+}
+
+.quick-delete-btn:hover {
+  background: var(--red-50);
+  color: var(--red-600);
+  border-color: var(--red-300);
+}
+
+.idea-preview-content-wrapper {
+  padding: 1.5rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.idea-preview-text {
+  white-space: pre-wrap;
+  font-family: inherit;
+  margin: 0;
+  color: var(--neutral-700);
+  line-height: 1.6;
+  font-size: var(--font-size-base);
+}
+
+/* Mobile responsive for preview modal */
+@media (max-width: 768px) {
+  .idea-preview-content {
+    max-width: 95vw;
+    max-height: 90vh;
+    margin: 1rem;
+  }
+  
+  .idea-preview-meta {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .meta-right {
+    align-self: flex-end;
+  }
+}
+
 /* Card description */
 .idea-description {
   font-size: var(--font-size-sm);

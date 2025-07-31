@@ -95,13 +95,18 @@
           {{#if ideas.length}}
           <div class="ideas-grid">
             {{#each ideas}}
-            <div class="idea-card" data-border="{{getBorderColor @index}}">
+            <div class="idea-card" data-border="{{getBorderColor @index}}" data-id="{{id}}" style="cursor: pointer;">
               <div class="idea-actions">
                 <button class="action-btn" title="Pin">
                   <i class="fas fa-thumbtack"></i>
                 </button>
               </div>
-              <h3 class="idea-title">{{title}}</h3>
+              <h3 class="idea-title">
+                {{title}}
+                <a href="/ideas/{{id}}" class="idea-title-full-link" title="Open in full page" onclick="event.stopPropagation();">
+                  <i class="fas fa-external-link-alt"></i>
+                </a>
+              </h3>
               <p class="idea-description">{{truncate content 80}}</p>
               {{#if isPublic}}
               <div class="idea-visibility">
@@ -196,6 +201,102 @@
         <button type="submit" class="btn btn-primary">
           <i class="fas fa-plus"></i>
           Create Idea
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Idea Preview Modal -->
+<div id="ideaPreviewModal" class="modal">
+  <div class="modal-content idea-preview-content">
+    <div class="modal-header">
+      <h2 class="modal-title" id="previewIdeaTitle"></h2>
+      <div class="modal-actions">
+        <button class="expand-btn" id="expandToFullPage" title="Open in full page">
+          <i class="fas fa-expand"></i>
+        </button>
+        <button class="modal-close" aria-label="Close modal">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body idea-preview-body">
+      <div class="idea-preview-meta">
+        <div class="meta-left">
+          <span class="idea-date">
+            <i class="fas fa-calendar"></i>
+            <span id="previewIdeaDate"></span>
+          </span>
+          <span class="idea-visibility" id="previewIdeaVisibility"></span>
+        </div>
+        <div class="meta-right">
+          <button class="quick-edit-btn" id="quickEditBtn" title="Quick Edit">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button class="quick-delete-btn" id="quickDeleteBtn" title="Delete">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      <div class="idea-preview-content-wrapper">
+        <pre class="idea-preview-text" id="previewIdeaContent"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Idea Modal -->
+<div id="editIdeaModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Edit Idea</h2>
+      <button class="modal-close" aria-label="Close modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <form id="editIdeaForm" class="modal-body" method="PUT">
+      <input type="hidden" id="editIdeaId" name="ideaId">
+      <div class="form-group">
+        <label for="editIdeaTitle" class="form-label">Title</label>
+        <input 
+          type="text" 
+          id="editIdeaTitle" 
+          name="title" 
+          class="form-input" 
+          placeholder="Enter your idea title..."
+          required
+          maxlength="255"
+        >
+      </div>
+      
+      <div class="form-group">
+        <label for="editIdeaContent" class="form-label">Content</label>
+        <textarea 
+          id="editIdeaContent" 
+          name="content" 
+          class="form-textarea" 
+          placeholder="Describe your idea in detail..."
+          rows="6"
+          required
+        ></textarea>
+      </div>
+      
+      <div class="form-group">
+        <div class="checkbox-group">
+          <input type="checkbox" id="editIdeaPublic" name="isPublic" value="true">
+          <label for="editIdeaPublic" class="checkbox-label">
+            <span class="checkbox-text">Make this idea public</span>
+            <span class="checkbox-hint">Public ideas can be discovered and shared with others</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary modal-cancel">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i>
+          Update Idea
         </button>
       </div>
     </form>

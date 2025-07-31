@@ -25,11 +25,6 @@ const handlebarsHelpers = {
     return a === b
   },
 
-  // Current year helper
-  currentYear: () => {
-    return new Date().getFullYear()
-  },
-
   // Conditional helper
   ifCond: function (conditional, options) {
     if (conditional) {
@@ -37,29 +32,6 @@ const handlebarsHelpers = {
     } else {
       return options.inverse(this)
     }
-  },
-
-  // Unless helper
-  unless: function (conditional, options) {
-    if (!conditional) {
-      return options.fn(this)
-    } else {
-      return options.inverse(this)
-    }
-  },
-
-  // Each helper with index
-  eachWithIndex: function (array, options) {
-    let result = ''
-    for (let i = 0; i < array.length; i++) {
-      result += options.fn({
-        ...array[i],
-        index: i,
-        first: i === 0,
-        last: i === array.length - 1
-      })
-    }
-    return result
   },
 
   // Default avatar helper
