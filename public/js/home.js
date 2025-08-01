@@ -35,20 +35,30 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function updateCSSVariables(isDark) {
     if (isDark) {
-      // Dark mode colors
-      root.style.setProperty('--bg-primary', '#1F2937');
-      root.style.setProperty('--bg-secondary', '#111827');
-      root.style.setProperty('--bg-tertiary', '#374151');
-      root.style.setProperty('--neutral-50', '#374151');
-      root.style.setProperty('--neutral-100', '#4B5563');
-      root.style.setProperty('--neutral-200', '#6B7280');
-      root.style.setProperty('--neutral-300', '#9CA3AF');
-      root.style.setProperty('--neutral-400', '#D1D5DB');
-      root.style.setProperty('--neutral-500', '#E5E7EB');
-      root.style.setProperty('--neutral-600', '#F3F4F6');
-      root.style.setProperty('--neutral-700', '#F9FAFB');
-      root.style.setProperty('--neutral-800', '#FFFFFF');
-      root.style.setProperty('--neutral-900', '#FFFFFF');
+      // Dark mode colors (authentic shadcn/ui warmer tones)
+      root.style.setProperty('--bg-primary', '#1f1f1f');        // Card backgrounds (warmer gray for authenticity)
+      root.style.setProperty('--bg-secondary', '#0a0a0a');      // Body background (deepest)
+      root.style.setProperty('--bg-tertiary', '#111111');      // Main content areas (warmer middle layer)
+      root.style.setProperty('--neutral-50', '#262626');       // Dark surfaces (warmer)
+      root.style.setProperty('--neutral-100', '#2d2d2d');      // Slightly lighter surfaces  
+      root.style.setProperty('--neutral-200', '#3f3f3f');      // Borders and dividers (warmer)
+      root.style.setProperty('--neutral-300', '#525252');      // Disabled elements
+      root.style.setProperty('--neutral-400', '#6b6b6b');      // Placeholder text (shadcn/ui authentic)
+      root.style.setProperty('--neutral-500', '#909090');      // Secondary text (better contrast)
+      root.style.setProperty('--neutral-600', '#d1d1d1');      // Primary text (refined)
+      root.style.setProperty('--neutral-700', '#e4e4e4');      // Primary text (medium)
+      root.style.setProperty('--neutral-800', '#f4f4f4');      // Primary text (bright)
+      root.style.setProperty('--neutral-900', '#ffffff');      // Pure white for maximum contrast
+      
+      // Additional shadcn/ui inspired variables
+      root.style.setProperty('--primary-500', '#3b82f6');      // Primary blue
+      root.style.setProperty('--primary-600', '#2563eb');      // Darker primary blue
+      
+      // Dark mode card-specific variables (refined shadcn/ui style)
+      root.style.setProperty('--card-border-dark', 'rgba(255, 255, 255, 0.04)');  // More subtle borders
+      root.style.setProperty('--card-shadow-dark', '0 2px 8px rgba(0, 0, 0, 0.25)');  // Refined shadows
+      root.style.setProperty('--card-hover-bg', '#252525');     // Warmer hover background
+      root.style.setProperty('--card-hover-shadow', '0 4px 16px rgba(0, 0, 0, 0.35)');  // Elegant hover shadow
     } else {
       // Light mode colors (reset to defaults)
       root.style.setProperty('--bg-primary', '#FFFFFF');
@@ -64,6 +74,10 @@ document.addEventListener('DOMContentLoaded', function() {
       root.style.setProperty('--neutral-700', '#374151');
       root.style.setProperty('--neutral-800', '#1F2937');
       root.style.setProperty('--neutral-900', '#111827');
+      
+      // Additional variables for light mode
+      root.style.setProperty('--primary-500', '#3b82f6');      // Primary blue
+      root.style.setProperty('--primary-600', '#2563eb');      // Darker primary blue
     }
   }
   
@@ -311,10 +325,17 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // Edit idea buttons
-  const editButtons = document.querySelectorAll('.footer-btn[title="Edit"]');
+  const editButtons = document.querySelectorAll('.edit-item');
   editButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
+      
+      // Close dropdown menu first
+      const dropdown = this.closest('.idea-dropdown-menu');
+      if (dropdown) {
+        dropdown.classList.remove('show');
+      }
+      
       const ideaId = this.getAttribute('data-id');
       
       // Fetch idea data
@@ -488,7 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closePreviewModal();
         
         // Trigger edit functionality for current idea
-        const editButton = document.querySelector(`.footer-btn[title="Edit"][data-id="${currentPreviewIdeaId}"]`);
+        const editButton = document.querySelector(`.edit-item[data-id="${currentPreviewIdeaId}"]`);
         if (editButton) {
           editButton.click();
         }
@@ -505,7 +526,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closePreviewModal();
         
         // Trigger delete functionality for current idea
-        const deleteButton = document.querySelector(`.footer-btn[title="Delete"][data-id="${currentPreviewIdeaId}"]`);
+        const deleteButton = document.querySelector(`.delete-item[data-id="${currentPreviewIdeaId}"]`);
         if (deleteButton) {
           deleteButton.click();
         }
@@ -564,10 +585,17 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Delete idea buttons
-  const deleteButtons = document.querySelectorAll('.footer-btn[title="Delete"]');
+  const deleteButtons = document.querySelectorAll('.delete-item');
   deleteButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
+      
+      // Close dropdown menu first
+      const dropdown = this.closest('.idea-dropdown-menu');
+      if (dropdown) {
+        dropdown.classList.remove('show');
+      }
+      
       const ideaId = this.getAttribute('data-id');
       const ideaCard = this.closest('.idea-card');
       const ideaTitle = ideaCard.querySelector('.idea-title').textContent;
@@ -621,16 +649,44 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Pin action buttons (placeholder for future pin functionality)
-  const actionButtons = document.querySelectorAll('.action-btn');
-  actionButtons.forEach(btn => {
+  // Dropdown menu functionality
+  const menuButtons = document.querySelectorAll('.idea-menu-btn');
+  const dropdownMenus = document.querySelectorAll('.idea-dropdown-menu');
+  
+  // Toggle dropdown menu
+  menuButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
-      const action = this.getAttribute('title').toLowerCase();
-      if (action === 'pin') {
-        // TODO: Implement pin functionality
-        console.log('Pin functionality to be implemented');
-      }
+      const ideaId = this.getAttribute('data-id');
+      const dropdown = document.querySelector(`.idea-dropdown-menu[data-id="${ideaId}"]`);
+      
+      // Close all other dropdowns first
+      dropdownMenus.forEach(menu => {
+        if (menu !== dropdown) {
+          menu.classList.remove('show');
+        }
+      });
+      
+      // Toggle current dropdown
+      dropdown.classList.toggle('show');
     });
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.idea-menu-wrapper')) {
+      dropdownMenus.forEach(menu => {
+        menu.classList.remove('show');
+      });
+    }
+  });
+  
+  // Close dropdown on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      dropdownMenus.forEach(menu => {
+        menu.classList.remove('show');
+      });
+    }
   });
 });

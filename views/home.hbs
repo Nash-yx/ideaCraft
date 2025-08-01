@@ -97,39 +97,37 @@
             {{#each ideas}}
             <div class="idea-card" data-border="{{getBorderColor @index}}" data-id="{{id}}" style="cursor: pointer;">
               <div class="idea-actions">
-                <button class="action-btn" title="Pin">
-                  <i class="fas fa-thumbtack"></i>
-                </button>
-              </div>
-              <h3 class="idea-title">
-                {{title}}
-                <a href="/ideas/{{id}}" class="idea-title-full-link" title="Open in full page" onclick="event.stopPropagation();">
-                  <i class="fas fa-external-link-alt"></i>
-                </a>
-              </h3>
-              <p class="idea-description">{{truncate content 80}}</p>
-              {{#if isPublic}}
-              <div class="idea-visibility">
-                <span class="visibility-tag public">
-                  <i class="fas fa-globe"></i> Public
-                </span>
-              </div>
-              {{else}}
-              <div class="idea-visibility">
-                <span class="visibility-tag private">
-                  <i class="fas fa-lock"></i> Private
-                </span>
-              </div>
-              {{/if}}
-              <div class="idea-footer">
-                <span class="idea-date">{{formatDate createdAt}}</span>
-                <div class="idea-footer-actions">
-                  <button class="footer-btn" title="Edit" data-id="{{id}}">
-                    <i class="fas fa-pencil-alt"></i>
+                <div class="idea-menu-wrapper">
+                  <button class="idea-menu-btn" title="More options" data-id="{{id}}">
+                    <i class="fas fa-ellipsis-h"></i>
                   </button>
-                  <button class="footer-btn" title="Delete" data-id="{{id}}">
-                    <i class="fas fa-trash"></i>
-                  </button>
+                  <div class="idea-dropdown-menu" data-id="{{id}}">
+                    <button class="dropdown-item edit-item" data-id="{{id}}">
+                      <i class="fas fa-pencil-alt"></i>
+                      <span>Edit</span>
+                    </button>
+                    <button class="dropdown-item delete-item" data-id="{{id}}">
+                      <i class="fas fa-trash"></i>
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="idea-color-bar" data-color="{{getBorderColor @index}}"></div>
+              
+              <div class="idea-content">
+                <h3 class="idea-title">{{title}}</h3>
+                <p class="idea-description">{{truncate content 100}}</p>
+                <div class="idea-footer">
+                  <span class="idea-date">{{formatDate createdAt}}</span>
+                  <div class="idea-status">
+                    {{#if isPublic}}
+                      <span class="status-indicator public">Public</span>
+                    {{else}}
+                      <span class="status-indicator private">Private</span>
+                    {{/if}}
+                  </div>
                 </div>
               </div>
             </div>

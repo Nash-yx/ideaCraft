@@ -398,6 +398,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
+  grid-auto-rows: 180px; /* Fixed row height to match card height */
 }
 
 /* Responsive Design for Statistics */
@@ -431,6 +432,7 @@
   .ideas-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: var(--spacing-md);
+    grid-auto-rows: 180px;
   }
   
   .search-container {
@@ -471,11 +473,13 @@
   .ideas-grid {
     grid-template-columns: 1fr;
     gap: var(--spacing-md);
+    grid-auto-rows: 180px;
   }
   
   .idea-card {
-    height: auto;
-    min-height: 240px;
+    height: 180px !important;
+    min-height: 180px !important;
+    max-height: 180px !important;
   }
   
   .search-container {
@@ -687,57 +691,70 @@
   gap: var(--spacing-lg);
 }
 
-/* New Idea Card Design */
+/* Card Design - Enhanced Visual Contrast with Dark Mode Support */
 .idea-card {
   background: var(--bg-primary);
-  border: 1px solid var(--neutral-200);
-  border-radius: 16px;
-  padding: var(--spacing-lg);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
   position: relative;
-  transition: all var(--duration-normal) var(--easing-default);
+  transition: all 0.2s ease;
   cursor: pointer;
-  height: 280px;
+  width: 100%;
+  height: 180px !important; /* Fixed height - force override */
+  min-height: 180px !important; /* Ensure minimum */
+  max-height: 180px !important; /* Ensure maximum */
   display: flex;
   flex-direction: column;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow for better contrast */
+  overflow: hidden; /* Prevent content overflow */
+  box-sizing: border-box; /* Include padding in size calculation */
 }
 
-/* Colored top border */
-.idea-card[data-border="purple"] {
-  border-top: 4px solid #8B5CF6;
+/* Color bar inside card - short line */
+.idea-color-bar {
+  width: 60px; /* Short line length like in screenshot */
+  height: 4px;
+  border-radius: 2px;
+  margin-bottom: 12px;
 }
 
-.idea-card[data-border="green"] {
-  border-top: 4px solid #10B981;
+.idea-color-bar[data-color="purple"] {
+  background: #8B5CF6;
 }
 
-.idea-card[data-border="red"] {
-  border-top: 4px solid #EF4444;
+.idea-color-bar[data-color="green"] {
+  background: #7ED321;
 }
 
-.idea-card[data-border="blue"] {
-  border-top: 4px solid #3B82F6;
+.idea-color-bar[data-color="red"] {
+  background: #E74C3C;
 }
 
-.idea-card[data-border="orange"] {
-  border-top: 4px solid #F97316;
+.idea-color-bar[data-color="blue"] {
+  background: #4DD0E1;
 }
 
-.idea-card[data-border="teal"] {
-  border-top: 4px solid #14B8A6;
+.idea-color-bar[data-color="orange"] {
+  background: #FFB74D;
+}
+
+.idea-color-bar[data-color="teal"] {
+  background: #4DD0E1;
 }
 
 .idea-card:hover {
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Enhanced hover shadow */
   transform: translateY(-2px);
 }
 
-/* Top-right close button */
+/* Top-right menu button */
 .idea-actions {
   position: absolute;
-  top: var(--spacing-md);
-  right: var(--spacing-md);
+  top: 16px;
+  right: 16px;
   display: flex;
-  gap: var(--spacing-xs);
+  z-index: 10;
 }
 
 .action-btn {
@@ -760,14 +777,25 @@
   color: var(--neutral-600);
 }
 
-/* Card title */
+/* Card content layout */
+.idea-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 16px); /* Account for color bar margin */
+  min-height: 0; /* Allow flex shrinking */
+}
+
 .idea-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
+  font-size: 16px;
+  font-weight: 500;
   color: var(--neutral-900);
-  margin: 0 0 var(--spacing-lg) 0;
-  line-height: 1.3;
-  padding-right: var(--spacing-xl);
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+  padding-right: 40px; /* Space for menu button */
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis; /* Truncate long titles */
 }
 
 .idea-title-link {
@@ -911,11 +939,70 @@
 
 /* Card description */
 .idea-description {
-  font-size: var(--font-size-sm);
+  font-size: 14px;
   color: var(--neutral-600);
-  line-height: 1.4;
-  margin: var(--spacing-xs) 0 var(--spacing-md) 0;
-  flex-grow: 1;
+  line-height: 1.4; /* Tighter line height for better fit */
+  margin: 0 0 8px 0; /* Small bottom margin */
+  flex: 1; /* Take up middle space */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Reduce to 2 lines for better fit */
+  -webkit-box-orient: vertical;
+  word-break: break-word; /* Handle long words */
+}
+
+/* Footer with date at bottom left and status at bottom right */
+.idea-footer {
+  margin-top: auto; /* Push to bottom */
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Space between date and status */
+  flex-shrink: 0; /* Don't shrink footer */
+  height: 20px; /* Fixed height for consistency */
+}
+
+.idea-date {
+  font-size: 12px;
+  color: var(--neutral-500);
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* Status indicator styles */
+.idea-status {
+  display: flex;
+  align-items: center;
+}
+
+.status-indicator {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.status-indicator.public {
+  background-color: #E7F5E7;
+  color: #2D7D2D;
+}
+
+.status-indicator.private {
+  background-color: #FFF3E0;
+  color: #E65100;
+}
+
+/* Dark mode status indicators */
+.dark-mode .status-indicator.public {
+  background-color: rgba(45, 125, 45, 0.2);
+  color: #4ADE80;
+}
+
+.dark-mode .status-indicator.private {
+  background-color: rgba(230, 81, 0, 0.2);
+  color: #FB923C;
 }
 
 /* Platform tags */
@@ -1007,53 +1094,7 @@
 }
 
 /* Visibility indicator */
-.idea-visibility {
-  margin-top: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-}
-
-.visibility-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.visibility-tag.public {
-  background-color: var(--secondary-green);
-  color: white;
-}
-
-.visibility-tag.private {
-  background-color: var(--neutral-400);
-  color: white;
-}
-
-/* Footer with date and actions */
-.idea-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: var(--spacing-sm);
-  border-top: 1px solid var(--neutral-200);
-}
-
-.idea-date {
-  font-size: var(--font-size-sm);
-  color: var(--neutral-500);
-  font-weight: var(--font-weight-medium);
-}
-
-.idea-footer-actions {
-  display: flex;
-  gap: var(--spacing-xs);
-}
+/* Visibility and footer styles removed - using new card design */
 
 .footer-btn {
   width: 28px;
@@ -1880,5 +1921,135 @@ body:has(.home-wrapper) .container-fluid {
 .create-task-btn:hover {
   background-color: var(--primary-600);
   transform: translateY(-1px);
+}
+
+/* Idea Card Dropdown Menu Styles */
+.idea-menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.idea-menu-btn {
+  background: none;
+  border: none;
+  color: var(--neutral-400);
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-normal) var(--easing-default);
+  font-size: var(--font-size-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.idea-menu-btn:hover {
+  background: var(--neutral-100);
+  color: var(--neutral-600);
+}
+
+.idea-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  padding: var(--spacing-sm);
+  min-width: 140px;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all var(--duration-normal) var(--easing-default);
+  border: 1px solid var(--neutral-200);
+}
+
+.idea-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  background: none;
+  border: none;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--neutral-700);
+  cursor: pointer;
+  border-radius: var(--spacing-sm);
+  transition: all var(--duration-fast) var(--easing-default);
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: var(--neutral-50);
+  color: var(--neutral-800);
+}
+
+.dropdown-item.delete-item:hover {
+  background: #FEF2F2;
+  color: #DC2626;
+}
+
+/* Dark mode dropdown delete item */
+.dark-mode .dropdown-item.delete-item:hover {
+  background: rgba(220, 38, 38, 0.2);
+  color: #FCA5A5;
+}
+
+.dropdown-item i {
+  font-size: var(--font-size-sm);
+  width: 16px;
+  text-align: center;
+}
+
+/* Update existing idea-actions positioning to ensure dropdown is properly positioned */
+.idea-actions {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  display: flex;
+  z-index: 10;
+}
+
+/* Ensure idea cards don't overflow dropdown menus */
+.ideas-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.idea-card {
+  overflow: visible;
+}
+
+/* Dark Mode Card Enhancements */
+.dark-mode .idea-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--card-border-dark, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--card-shadow-dark, 0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+.dark-mode .idea-card:hover {
+  background: var(--card-hover-bg, #181818);
+  box-shadow: var(--card-hover-shadow, 0 8px 24px rgba(0, 0, 0, 0.5));
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Dark mode background hierarchy */
+.dark-mode .home-container {
+  background-color: var(--bg-secondary);
+}
+
+.dark-mode .home-main {
+  background-color: var(--bg-tertiary);
 }
 
