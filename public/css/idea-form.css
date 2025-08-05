@@ -1,0 +1,333 @@
+/* Base layout styles from idea-detail.hbs */
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--neutral-600);
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.back-link:hover {
+  color: var(--blue-500);
+}
+
+.idea-detail-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--spacing-lg) 0;
+}
+
+.idea-detail-structured {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--neutral-200);
+  min-height: 600px;
+}
+
+/* Section layout */
+.section-group {
+  margin-bottom: var(--spacing-xl);
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--neutral-500);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--spacing-lg) 0;
+}
+
+.form-field {
+  margin-bottom: 2rem;
+}
+
+.field-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--neutral-700);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Form input styles */
+.field-input, .field-textarea {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  font-size: 14px;
+  color: var(--neutral-800);
+  line-height: 1.5;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.field-input:focus, .field-textarea:focus {
+  outline: none;
+  border-color: var(--blue-400);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.field-textarea {
+  min-height: 180px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  font-size: 15px;
+  resize: vertical;
+}
+
+/* Metadata Row */
+.metadata-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metadata-field {
+  /* Individual metadata field styling */
+}
+
+/* Tags input */
+.field-input-container {
+  position: relative;
+}
+
+.field-input-tags {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  font-size: 14px;
+  color: var(--neutral-800);
+  line-height: 1.5;
+}
+
+.field-input-tags:disabled {
+  background: var(--neutral-100);
+  color: var(--neutral-400);
+  cursor: not-allowed;
+}
+
+/* Toggle Switch Styles - Scoped to visibility toggle only */
+.visibility-toggle-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.visibility-toggle-container .toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 30px;
+  background: var(--neutral-300);
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.visibility-toggle-container .toggle-switch.active {
+  background: var(--blue-500);
+}
+
+.visibility-toggle-container .toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.visibility-toggle-container .toggle-switch.active .toggle-slider {
+  transform: translateX(30px);
+}
+
+.toggle-labels {
+  display: flex;
+  gap: 1rem;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 14px;
+  color: var(--neutral-500);
+  transition: color 0.2s ease;
+}
+
+.toggle-label.active {
+  color: var(--neutral-700);
+  font-weight: 500;
+}
+
+.toggle-label i {
+  font-size: 12px;
+}
+
+.toggle-hint {
+  position: relative;
+  min-height: 1.2em;
+}
+
+.toggle-hint span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 12px;
+  color: var(--neutral-500);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.toggle-hint span.active {
+  opacity: 1;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--neutral-200);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  background: var(--bg-primary);
+  color: var(--neutral-600);
+  border: 1px solid var(--neutral-300);
+}
+
+.btn-secondary:hover {
+  background: var(--neutral-50);
+  color: var(--neutral-700);
+  border-color: var(--neutral-400);
+}
+
+.btn-primary {
+  background: var(--blue-600);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--blue-700);
+}
+
+.btn-primary:disabled {
+  background: var(--neutral-400);
+  cursor: not-allowed;
+}
+
+/* Dark mode styles */
+.dark-mode .idea-detail-structured {
+  background: #262626;
+  border-color: #404040;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.dark-mode .section-title {
+  color: #737373;
+}
+
+.dark-mode .field-label {
+  color: #a3a3a3;
+}
+
+.dark-mode .field-input,
+.dark-mode .field-textarea,
+.dark-mode .field-input-tags {
+  background: #171717;
+  border-color: #404040;
+  color: #e5e5e5;
+}
+
+.dark-mode .field-input:focus,
+.dark-mode .field-textarea:focus {
+  border-color: #3b82f6;
+}
+
+.dark-mode .field-input-tags:disabled {
+  background: #0a0a0a;
+  color: #525252;
+}
+
+.dark-mode .visibility-toggle-container .toggle-switch {
+  background: #404040;
+}
+
+.dark-mode .visibility-toggle-container .toggle-switch.active {
+  background: var(--blue-500);
+}
+
+.dark-mode .toggle-label {
+  color: #737373;
+}
+
+.dark-mode .toggle-label.active {
+  color: #d4d4d4;
+}
+
+.dark-mode .toggle-hint span {
+  color: #737373;
+}
+
+.dark-mode .form-actions {
+  border-color: #404040;
+}
+
+.dark-mode .btn-secondary {
+  background: #262626;
+  color: #a3a3a3;
+  border-color: #404040;
+}
+
+.dark-mode .btn-secondary:hover {
+  background: #171717;
+  color: #d4d4d4;
+  border-color: #525252;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .idea-detail-structured {
+    padding: var(--spacing-lg);
+  }
+}

@@ -54,6 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
       root.style.setProperty('--primary-500', '#3b82f6');      // Primary blue
       root.style.setProperty('--primary-600', '#2563eb');      // Darker primary blue
       
+      // Blue and red color palette for dark mode
+      root.style.setProperty('--blue-50', '#1e3a8a');          // Dark blue background for hover
+      root.style.setProperty('--blue-500', '#3b82f6');         // Primary blue
+      root.style.setProperty('--blue-600', '#2563eb');         // Darker blue
+      root.style.setProperty('--blue-700', '#1d4ed8');         // Even darker blue
+      root.style.setProperty('--red-50', '#7f1d1d');           // Dark red background for hover
+      root.style.setProperty('--red-600', '#dc2626');          // Primary red
+      
       // Dark mode card-specific variables (refined shadcn/ui style)
       root.style.setProperty('--card-border-dark', 'rgba(255, 255, 255, 0.04)');  // More subtle borders
       root.style.setProperty('--card-shadow-dark', '0 2px 8px rgba(0, 0, 0, 0.25)');  // Refined shadows
@@ -78,6 +86,14 @@ document.addEventListener('DOMContentLoaded', function() {
       // Additional variables for light mode
       root.style.setProperty('--primary-500', '#3b82f6');      // Primary blue
       root.style.setProperty('--primary-600', '#2563eb');      // Darker primary blue
+      
+      // Blue and red color palette for light mode (reset to defaults)
+      root.style.setProperty('--blue-50', '#EFF6FF');          // Light blue background for hover
+      root.style.setProperty('--blue-500', '#3B82F6');         // Primary blue
+      root.style.setProperty('--blue-600', '#2563EB');         // Darker blue
+      root.style.setProperty('--blue-700', '#1D4ED8');         // Even darker blue
+      root.style.setProperty('--red-50', '#FEF2F2');           // Light red background for hover
+      root.style.setProperty('--red-600', '#DC2626');          // Primary red
     }
   }
   
@@ -114,148 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  // Modal functionality
-  const modal = document.getElementById('createIdeaModal');
-  const createIdeaBtn = document.querySelector('.create-idea-btn');
-  const emptyStateBtn = document.querySelector('.empty-state-btn');
-  const modalClose = document.querySelector('.modal-close');
-  const modalCancel = document.querySelector('.modal-cancel');
-  const createIdeaForm = document.getElementById('createIdeaForm');
-  
-  // Open modal function
-  function openModal() {
-    modal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-    // Focus on title input
-    setTimeout(() => {
-      document.getElementById('ideaTitle').focus();
-    }, 100);
-  }
-  
-  // Close modal function
-  function closeModal() {
-    modal.classList.remove('show');
-    document.body.style.overflow = '';
-    // Reset form
-    createIdeaForm.reset();
-  }
-  
-  // Show success message function
-  function showSuccessMessage(message) {
-    // Create message element
-    const messageEl = document.createElement('div');
-    messageEl.className = 'flash-message success-message';
-    messageEl.innerHTML = `
-      <div class="flash-content">
-        <i class="fas fa-check-circle"></i>
-        <span>${message}</span>
-      </div>
-    `;
-    
-    // Add to page
-    document.body.appendChild(messageEl);
-    
-    // Show with animation
-    setTimeout(() => {
-      messageEl.classList.add('show');
-    }, 100);
-    
-    // Auto remove after 3 seconds
-    setTimeout(() => {
-      messageEl.classList.remove('show');
-      setTimeout(() => {
-        if (messageEl.parentNode) {
-          messageEl.parentNode.removeChild(messageEl);
-        }
-      }, 300);
-    }, 3000);
-  }
-  
-  // Event listeners for opening modal
-  if (createIdeaBtn) {
-    createIdeaBtn.addEventListener('click', openModal);
-  }
-  
-  if (emptyStateBtn) {
-    emptyStateBtn.addEventListener('click', openModal);
-  }
-  
-  // Event listeners for closing modal
-  if (modalClose) {
-    modalClose.addEventListener('click', closeModal);
-  }
-  
-  if (modalCancel) {
-    modalCancel.addEventListener('click', closeModal);
-  }
-  
-  // Close modal when clicking outside
-  modal.addEventListener('click', function(e) {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-  
-  // Close modal with Escape key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && modal.classList.contains('show')) {
-      closeModal();
-    }
-  });
-  
-  // Form submission
-  if (createIdeaForm) {
-    createIdeaForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-      const submitButton = this.querySelector('button[type="submit"]');
-      const originalText = submitButton.innerHTML;
-      
-      // Convert FormData to URLSearchParams for proper encoding
-      const params = new URLSearchParams();
-      for (const [key, value] of formData.entries()) {
-        params.append(key, value);
-      }
-      
-      // Show loading state
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
-      
-      // Submit form
-      fetch('/ideas', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: params.toString()
-      })
-      .then(response => {
-        if (response.redirected || response.ok) {
-          // Close modal first
-          closeModal();
-          
-          // Show success message
-          showSuccessMessage('Idea created successfully!');
-          
-          // Wait a bit then redirect to refresh data
-          setTimeout(() => {
-            window.location.href = '/ideas';
-          }, 1000);
-        } else {
-          throw new Error('Failed to create idea');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to create idea. Please try again.');
-        
-        // Reset button state
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
-      });
-    });
-  }
   
   // Search functionality (placeholder - to be implemented)
   const searchInput = document.querySelector('.search-input');
@@ -414,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function() {
           closeEditModal();
           
           // Show success message
-          showSuccessMessage('Idea updated successfully!');
+          alert('Idea updated successfully!');
           
           // Wait a bit then redirect to refresh data
           setTimeout(() => {
@@ -435,37 +309,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  // Idea Preview Modal functionality
-  const previewModal = document.getElementById('ideaPreviewModal');
-  const previewModalClose = previewModal.querySelector('.modal-close');
-  const expandBtn = document.getElementById('expandToFullPage');
-  let currentPreviewIdeaId = null;
 
-  // Open preview modal function
-  function openPreviewModal(ideaData) {
-    document.getElementById('previewIdeaTitle').textContent = ideaData.title;
-    document.getElementById('previewIdeaContent').textContent = ideaData.content || 'No content provided.';
-    document.getElementById('previewIdeaDate').textContent = formatDate(ideaData.createdAt);
-    
-    // Set visibility status
-    const visibilityElement = document.getElementById('previewIdeaVisibility');
-    if (ideaData.isPublic) {
-      visibilityElement.innerHTML = '<span class="visibility-tag public"><i class="fas fa-globe"></i> Public</span>';
-    } else {
-      visibilityElement.innerHTML = '<span class="visibility-tag private"><i class="fas fa-lock"></i> Private</span>';
-    }
-    
-    currentPreviewIdeaId = ideaData.id;
-    previewModal.classList.add('show');
-    document.body.style.overflow = 'hidden';
-  }
-
-  // Close preview modal function
-  function closePreviewModal() {
-    previewModal.classList.remove('show');
-    document.body.style.overflow = '';
-    currentPreviewIdeaId = null;
-  }
 
   // Format date helper function
   function formatDate(dateString) {
@@ -479,110 +323,16 @@ document.addEventListener('DOMContentLoaded', function() {
     return date.toLocaleDateString();
   }
 
-  // Event listeners for preview modal
-  if (previewModalClose) {
-    previewModalClose.addEventListener('click', closePreviewModal);
-  }
-
-  // Close preview modal when clicking outside
-  previewModal.addEventListener('click', function(e) {
-    if (e.target === previewModal) {
-      closePreviewModal();
-    }
-  });
-
-  // Expand to full page functionality
-  if (expandBtn) {
-    expandBtn.addEventListener('click', function() {
-      if (currentPreviewIdeaId) {
-        window.location.href = `/ideas/${currentPreviewIdeaId}`;
-      }
+  // Format actual date helper function
+  function formatActualDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
     });
   }
 
-  // Quick edit functionality
-  const quickEditBtn = document.getElementById('quickEditBtn');
-  if (quickEditBtn) {
-    quickEditBtn.addEventListener('click', function() {
-      if (currentPreviewIdeaId) {
-        // Close preview modal first
-        closePreviewModal();
-        
-        // Trigger edit functionality for current idea
-        const editButton = document.querySelector(`.edit-item[data-id="${currentPreviewIdeaId}"]`);
-        if (editButton) {
-          editButton.click();
-        }
-      }
-    });
-  }
-
-  // Quick delete functionality
-  const quickDeleteBtn = document.getElementById('quickDeleteBtn');
-  if (quickDeleteBtn) {
-    quickDeleteBtn.addEventListener('click', function() {
-      if (currentPreviewIdeaId) {
-        // Close preview modal first
-        closePreviewModal();
-        
-        // Trigger delete functionality for current idea
-        const deleteButton = document.querySelector(`.delete-item[data-id="${currentPreviewIdeaId}"]`);
-        if (deleteButton) {
-          deleteButton.click();
-        }
-      }
-    });
-  }
-
-  // Idea card click functionality for preview
-  const previewIdeaCards = document.querySelectorAll('.idea-card');
-  previewIdeaCards.forEach(card => {
-    card.addEventListener('click', function(e) {
-      // Don't trigger if clicking on action buttons
-      if (e.target.closest('.idea-actions') || e.target.closest('.idea-footer-actions')) {
-        return;
-      }
-      
-      const ideaId = this.getAttribute('data-id');
-      
-      // Fetch idea data and show preview
-      fetch(`/ideas/${ideaId}`, {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          openPreviewModal(data.idea);
-        } else {
-          alert('Failed to load idea');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to load idea');
-      });
-    });
-  });
-
-  // Keyboard shortcuts for preview modal
-  document.addEventListener('keydown', function(e) {
-    if (previewModal.classList.contains('show')) {
-      if (e.key === 'Escape') {
-        closePreviewModal();
-      } else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-        // Ctrl+Enter to expand to full page
-        if (currentPreviewIdeaId) {
-          window.location.href = `/ideas/${currentPreviewIdeaId}`;
-        }
-      } else if (e.key === 'e' && (e.ctrlKey || e.metaKey)) {
-        // Ctrl+E to edit
-        e.preventDefault();
-        if (quickEditBtn) quickEditBtn.click();
-      }
-    }
-  });
 
   // Delete idea buttons
   const deleteButtons = document.querySelectorAll('.delete-item');
@@ -627,12 +377,12 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
           if (data.success) {
             // 顯示成功訊息
-            showSuccessMessage('Idea deleted successfully!');
+            alert('Idea deleted successfully!');
             
             // 短暫延遲後刷新頁面以更新統計數據
             setTimeout(() => {
               window.location.reload();
-            }, 1000);
+            }, 500);
           } else {
             throw new Error(data.message || 'Failed to delete idea');
           }
@@ -656,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Toggle dropdown menu
   menuButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
+      e.preventDefault(); // Prevent default link navigation
       e.stopPropagation();
       const ideaId = this.getAttribute('data-id');
       const dropdown = document.querySelector(`.idea-dropdown-menu[data-id="${ideaId}"]`);

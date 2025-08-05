@@ -1,0 +1,97 @@
+<!-- Edit Form Content -->
+<div class="idea-detail-content">
+  <div class="idea-detail-structured">
+    <form id="editIdeaForm" method="POST" action="/ideas/{{idea.id}}?_method=PUT">
+      <input type="hidden" name="_method" value="PUT">
+      
+      <!-- Idea Details Section -->
+      <div class="section-group">
+        <h3 class="section-title">IDEA DETAILS</h3>
+        
+        <!-- Title Field -->
+        <div class="form-field">
+          <label class="field-label">Title</label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            class="field-input" 
+            placeholder="Enter your idea title..."
+            value="{{idea.title}}"
+            required
+            maxlength="255"
+          >
+        </div>
+        
+        <!-- Content Field -->
+        <div class="form-field">
+          <label class="field-label">Content</label>
+          <textarea 
+            id="content" 
+            name="content" 
+            class="field-textarea" 
+            placeholder="Describe your idea in detail..."
+            rows="12"
+            required
+          >{{idea.content}}</textarea>
+        </div>
+        
+        <!-- Tags Row -->
+        <div class="metadata-row">
+          <div class="metadata-field">
+            <label class="field-label">Tags</label>
+            <div class="field-input-container">
+              <input 
+                type="text" 
+                id="tags" 
+                name="tags" 
+                class="field-input-tags" 
+                placeholder="Add tags (coming soon...)"
+                disabled
+              >
+            </div>
+          </div>
+        </div>
+        
+        <!-- Visibility Row -->
+        <div class="metadata-row">
+          <div class="metadata-field">
+            <label class="field-label">Visibility</label>
+            <div class="visibility-toggle-container">
+              <input type="hidden" id="isPublic" name="isPublic" value="{{#if idea.isPublic}}true{{else}}false{{/if}}">
+              <div class="toggle-switch {{#if idea.isPublic}}active{{/if}}" id="visibilityToggle">
+                <div class="toggle-slider"></div>
+              </div>
+              <div class="toggle-labels">
+                <span class="toggle-label private-label {{#unless idea.isPublic}}active{{/unless}}">
+                  <i class="fas fa-lock"></i>
+                  Private
+                </span>
+                <span class="toggle-label public-label {{#if idea.isPublic}}active{{/if}}">
+                  <i class="fas fa-globe"></i>
+                  Public
+                </span>
+              </div>
+              <div class="toggle-hint">
+                <span class="private-hint {{#unless idea.isPublic}}active{{/unless}}">Only you can see this idea</span>
+                <span class="public-hint {{#if idea.isPublic}}active{{/if}}">Anyone can discover and view this idea</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <a href="/ideas/{{idea.id}}" class="btn btn-secondary">
+            <i class="fas fa-times"></i>
+            Cancel
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            Update Idea
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
