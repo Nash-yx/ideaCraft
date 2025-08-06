@@ -24,6 +24,44 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Prevent dark mode flash of unstyled content -->
+    <script>
+      (function() {
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'enabled') {
+          document.documentElement.classList.add('dark-mode');
+          
+          // Apply dark mode CSS variables immediately
+          const root = document.documentElement;
+          root.style.setProperty('--bg-primary', '#1f1f1f');
+          root.style.setProperty('--bg-secondary', '#0a0a0a');
+          root.style.setProperty('--bg-tertiary', '#111111');
+          root.style.setProperty('--neutral-50', '#262626');
+          root.style.setProperty('--neutral-100', '#2d2d2d');
+          root.style.setProperty('--neutral-200', '#3f3f3f');
+          root.style.setProperty('--neutral-300', '#525252');
+          root.style.setProperty('--neutral-400', '#6b6b6b');
+          root.style.setProperty('--neutral-500', '#909090');
+          root.style.setProperty('--neutral-600', '#d1d1d1');
+          root.style.setProperty('--neutral-700', '#e4e4e4');
+          root.style.setProperty('--neutral-800', '#f4f4f4');
+          root.style.setProperty('--neutral-900', '#ffffff');
+          root.style.setProperty('--primary-500', '#3b82f6');
+          root.style.setProperty('--primary-600', '#2563eb');
+          root.style.setProperty('--blue-50', '#1e3a8a');
+          root.style.setProperty('--blue-500', '#3b82f6');
+          root.style.setProperty('--blue-600', '#2563eb');
+          root.style.setProperty('--blue-700', '#1d4ed8');
+          root.style.setProperty('--red-50', '#7f1d1d');
+          root.style.setProperty('--red-600', '#dc2626');
+          root.style.setProperty('--card-border-dark', 'rgba(255, 255, 255, 0.04)');
+          root.style.setProperty('--card-shadow-dark', '0 2px 8px rgba(0, 0, 0, 0.25)');
+          root.style.setProperty('--card-hover-bg', '#252525');
+          root.style.setProperty('--card-hover-shadow', '0 4px 16px rgba(0, 0, 0, 0.35)');
+        }
+      })();
+    </script>
   </head>
   <body class="d-flex flex-column min-vh-100">
     
@@ -37,6 +75,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- Custom JavaScript -->
+    <script src="/js/dark-mode.js"></script>
     <script src="/js/login.js"></script>
     <script src="/js/home.js"></script>
 
