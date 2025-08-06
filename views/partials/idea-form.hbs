@@ -1,8 +1,12 @@
-<!-- Edit Form Content -->
+<!-- Form Content -->
 <div class="idea-detail-content">
   <div class="idea-detail-structured">
-    <form id="editIdeaForm" method="POST" action="/ideas/{{idea.id}}?_method=PUT">
+    <form id="{{#if isEdit}}editIdeaForm{{else}}createIdeaForm{{/if}}" 
+          method="POST" 
+          action="{{#if isEdit}}/ideas/{{idea.id}}?_method=PUT{{else}}/ideas{{/if}}">
+      {{#if isEdit}}
       <input type="hidden" name="_method" value="PUT">
+      {{/if}}
       
       <!-- Idea Details Section -->
       <div class="section-group">
@@ -82,13 +86,13 @@
         
         <!-- Form Actions -->
         <div class="form-actions">
-          <a href="/ideas/{{idea.id}}" class="btn btn-secondary">
+          <a href="{{#if isEdit}}/ideas/{{idea.id}}{{else}}/ideas{{/if}}" class="btn btn-secondary">
             <i class="fas fa-times"></i>
             Cancel
           </a>
           <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i>
-            Update Idea
+            <i class="fas fa-{{#if isEdit}}save{{else}}plus{{/if}}"></i>
+            {{#if isEdit}}Update Idea{{else}}Create Idea{{/if}}
           </button>
         </div>
       </div>

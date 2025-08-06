@@ -97,26 +97,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // View toggle functionality (Grid vs List)
-  const viewButtons = document.querySelectorAll('.view-btn');
-  const ideasGrid = document.querySelector('.ideas-grid');
-  
-  viewButtons.forEach(button => {
-    button.addEventListener('click', function() {
-      // Remove active class from all view buttons
-      viewButtons.forEach(btn => btn.classList.remove('active'));
-      // Add active class to clicked button
-      this.classList.add('active');
-      
-      // Toggle grid/list view
-      const viewType = this.getAttribute('data-view');
-      if (viewType === 'list') {
-        ideasGrid.classList.add('list-view');
-      } else {
-        ideasGrid.classList.remove('list-view');
-      }
-    });
-  });
   
   // Idea card hover effects
   const ideaCards = document.querySelectorAll('.idea-card');
@@ -131,77 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   
-  // Search functionality (placeholder - to be implemented)
-  const searchInput = document.querySelector('.search-input');
-  if (searchInput) {
-    searchInput.addEventListener('input', function() {
-      const searchTerm = this.value.toLowerCase();
-      // TODO: Implement search functionality
-    });
-  }
   
-  // Filter functionality (placeholder - to be implemented)
-  const tagFilter = document.getElementById('tagFilter');
-  const sortFilter = document.getElementById('sortFilter');
-  
-  if (tagFilter) {
-    tagFilter.addEventListener('change', function() {
-      const selectedTag = this.value;
-      // TODO: Implement tag filtering
-    });
-  }
-  
-  if (sortFilter) {
-    sortFilter.addEventListener('change', function() {
-      const sortBy = this.value;
-      // TODO: Implement sorting functionality
-    });
-  }
-  
-  // Edit functionality
-  const editModal = document.getElementById('editIdeaModal');
-  const editModalClose = editModal.querySelector('.modal-close');
-  const editModalCancel = editModal.querySelector('.modal-cancel');
-  const editIdeaForm = document.getElementById('editIdeaForm');
-  
-  // Open edit modal function
-  function openEditModal() {
-    editModal.classList.add('show');
-    document.body.style.overflow = 'hidden'; // 防止背景滾動
-    // Focus on title input
-    setTimeout(() => {
-      document.getElementById('editIdeaTitle').focus();
-    }, 100);
-  }
-  
-  // Close edit modal function
-  function closeEditModal() {
-    editModal.classList.remove('show');
-    document.body.style.overflow = '';  // 恢復背景滾動
-    // Reset form
-    editIdeaForm.reset();
-  }
-  
-  // Event listeners for closing edit modal
-  if (editModalClose) {
-    editModalClose.addEventListener('click', closeEditModal);
-  }
-  
-  if (editModalCancel) {
-    editModalCancel.addEventListener('click', closeEditModal);
-  }
-  
-  // Close edit modal when clicking outside
-  editModal.addEventListener('click', function(e) {
-    if (e.target === editModal) {
-      closeEditModal();
-    }
-  });
-  
-  // Edit idea buttons
+  // Edit functionality - navigate to edit page
   const editButtons = document.querySelectorAll('.edit-item');
   editButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
+      e.preventDefault();
       e.stopPropagation();
       
       // Close dropdown menu first
@@ -212,132 +127,20 @@ document.addEventListener('DOMContentLoaded', function() {
       
       const ideaId = this.getAttribute('data-id');
       
-      // Fetch idea data
-      fetch(`/ideas/${ideaId}`, {
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            const idea = data.idea;
-            
-            // Fill form with idea data
-            document.getElementById('editIdeaId').value = idea.id;
-            document.getElementById('editIdeaTitle').value = idea.title;
-            document.getElementById('editIdeaContent').value = idea.content;
-            document.getElementById('editIdeaPublic').checked = idea.isPublic;
-            
-            // Open modal
-            openEditModal();
-          } else {
-            alert('Failed to load idea data');
-          }
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          alert('Failed to load idea data');
-        });
+      // Navigate to edit page
+      window.location.href = `/ideas/${ideaId}/edit`;
     });
   });
   
-  // Handle edit form submission
-  if (editIdeaForm) {
-    editIdeaForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const ideaId = document.getElementById('editIdeaId').value;
-      const formData = new FormData(this);
-      const submitButton = this.querySelector('button[type="submit"]');
-      const originalText = submitButton.innerHTML;
-      
-      // Convert FormData to URLSearchParams for proper encoding
-      const params = new URLSearchParams();
-      for (const [key, value] of formData.entries()) {
-        if (key !== 'ideaId') { // Skip the ideaId from body
-          params.append(key, value);
-        }
-      }
-      
-      // Show loading state
-      submitButton.disabled = true;
-      submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-      
-      // Submit form
-      fetch(`/ideas/${ideaId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: params.toString()
-      })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return response.json().then(data => {
-            throw new Error(data.message || 'Failed to update idea');
-          });
-        }
-      })
-      .then(data => {
-        if (data.success) {
-          // Close modal first
-          closeEditModal();
-          
-          // Show success message
-          alert('Idea updated successfully!');
-          
-          // Wait a bit then redirect to refresh data
-          setTimeout(() => {
-            window.location.href = '/ideas';
-          }, 1000);
-        } else {
-          throw new Error(data.message || 'Failed to update idea');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert(`Failed to update idea: ${error.message}`);
-        
-        // Reset button state
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalText;
-      });
-    });
-  }
-  
 
 
-  // Format date helper function
-  function formatDate(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString();
-  }
-
-  // Format actual date helper function
-  function formatActualDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  }
 
 
   // Delete idea buttons
   const deleteButtons = document.querySelectorAll('.delete-item');
   deleteButtons.forEach(btn => {
     btn.addEventListener('click', function(e) {
+      e.preventDefault();
       e.stopPropagation();
       
       // Close dropdown menu first
@@ -376,13 +179,8 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
           if (data.success) {
-            // 顯示成功訊息
-            alert('Idea deleted successfully!');
-            
-            // 短暫延遲後刷新頁面以更新統計數據
-            setTimeout(() => {
-              window.location.reload();
-            }, 500);
+            // 直接重定向到 /ideas 頁面，讓後端 flash message 處理成功訊息
+            window.location.href = '/ideas';
           } else {
             throw new Error(data.message || 'Failed to delete idea');
           }

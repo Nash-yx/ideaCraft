@@ -30,7 +30,17 @@ const ideaController = {
   },
   getNewIdea: async (req, res, next) => {
     try {
-      return res.render('idea-create', { activePage: 'create' })
+      // Provide default values for create form
+      const idea = {
+        title: '',
+        content: '',
+        isPublic: false
+      }
+      return res.render('idea-create', {
+        idea,
+        isEdit: false,
+        activePage: 'create'
+      })
     } catch (err) {
       req.flash('error_msg', err.message)
       return res.redirect('/ideas')
@@ -39,7 +49,11 @@ const ideaController = {
   getEditIdea: async (req, res, next) => {
     try {
       const idea = await ideaServices.getIdea(req)
-      return res.render('idea-edit', { idea, activePage: 'ideas' })
+      return res.render('idea-edit', {
+        idea,
+        isEdit: true,
+        activePage: 'ideas'
+      })
     } catch (err) {
       req.flash('error_msg', err.message)
       return res.redirect('/ideas')
@@ -62,12 +76,14 @@ const ideaController = {
       // 檢查請求是否為 AJAX
       const isAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' || (req.headers.accept && req.headers.accept.includes('application/json'))
 
+      // 統一設置 flash message
+      req.flash('success_msg', 'Idea deleted successfully')
+
       if (isAjax) {
         return res.json({ success: true, message: 'Idea deleted successfully' })
       }
 
-      req.flash('success_msg', 'Idea deleted successfully')
-      return res.redirect('/')
+      return res.redirect('/ideas')
     } catch (err) {
       // 檢查請求是否為 AJAX
       const isAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' || (req.headers.accept && req.headers.accept.includes('application/json'))
@@ -77,7 +93,7 @@ const ideaController = {
       }
 
       req.flash('error_msg', err.message)
-      return res.redirect('/')
+      return res.redirect('/ideas')
     }
   }
 }

@@ -92,7 +92,6 @@ const ideaServices = {
 
     // 執行刪除
     await idea.destroy()
-    return { message: 'Idea deleted successfully' }
   }
 }
 
