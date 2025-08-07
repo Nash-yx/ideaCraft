@@ -29,13 +29,13 @@
     {{#unless isOwner}}
     <!-- Author Info Section for non-owner views -->
     <div class="author-info-section">
-      <div class="author-info-card">
+      <a href="/author/{{idea.User.id}}" class="author-info-card author-info-link">
         <img src="{{defaultAvatar idea.User.avatar}}" alt="{{idea.User.name}}" class="author-info-avatar">
         <div class="author-info-details">
           <span class="author-info-label">Created by</span>
           <span class="author-info-name">{{idea.User.name}}</span>
         </div>
-      </div>
+      </a>
     </div>
     {{/unless}}
 

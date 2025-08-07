@@ -45,6 +45,23 @@
   gap: 8px;
 }
 
+.author-clickable {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  border-radius: 4px;
+  padding: 2px;
+  margin: -2px;
+}
+
+.author-clickable:hover {
+  opacity: 0.8;
+  background-color: rgba(59, 130, 246, 0.08);
+}
+
+.dark-mode .author-clickable:hover {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
 .author-avatar {
   width: 24px;
   height: 24px;

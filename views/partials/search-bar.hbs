@@ -1,0 +1,19 @@
+{{!-- Reusable search bar component --}}
+{{!-- Usage: {{> search-bar placeholder="Search ideas..." inputId="searchInput"}} --}}
+<div class="search-container">
+  <div class="search-wrapper">
+    <div class="search-input-container">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        id="{{inputId}}"
+        class="search-input" 
+        placeholder="{{placeholder}}"
+        autocomplete="off"
+      >
+    </div>
+    <button class="filter-btn" title="Filter">
+      <i class="fas fa-filter"></i>
+    </button>
+  </div>
+</div>

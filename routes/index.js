@@ -34,6 +34,8 @@ router.get('/logout', userController.logout)
 router.get('/users/:id', requireAuth, userController.getUser)
 router.put('/users/:id', requireAuth, upload.single('avatar'), userController.putUser)
 
+router.get('/author/:id', requireAuth, userController.getAuthor)
+
 router.get('/ideas', requireAuth, ideaController.getIdeas)
 router.get('/ideas/new', requireAuth, ideaController.getNewIdeaPage)
 router.post('/ideas', requireAuth, ideaController.postIdea)

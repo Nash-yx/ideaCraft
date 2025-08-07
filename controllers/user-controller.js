@@ -41,6 +41,14 @@ const userController = {
     } catch (err) {
       next(err)
     }
+  },
+  getAuthor: async (req, res) => {
+    const id = req.params.id
+    const user = await User.findByPk(id, { raw: true })
+    if (!user) {
+      return res.status(404).render('error', { message: 'User not found' })
+    }
+    return res.render('author', { user, activePage: 'explore' })
   }
 }
 

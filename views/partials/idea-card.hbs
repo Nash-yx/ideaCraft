@@ -29,7 +29,7 @@
     <div class="idea-footer">
       {{#if showAuthor}}
         <!-- Explore mode: show author with avatar -->
-        <div class="idea-author-info">
+        <div class="idea-author-info author-clickable" data-user-id="{{User.id}}">
           <img src="{{defaultAvatar User.avatar}}" alt="{{User.name}}" class="author-avatar">
           <span class="author-name">{{User.name}}</span>
         </div>

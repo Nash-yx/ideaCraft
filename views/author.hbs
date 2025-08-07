@@ -1,0 +1,262 @@
+<div class="home-wrapper">
+  
+  {{> sidebar}}
+  {{> messages}}
+  <!-- Main Author Content -->
+  <div class="home-main">
+    <!-- Author Header -->
+    <div class="profile-header">
+      <div class="header-left">
+        <button onclick="history.back()" class="back-link">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="profile-title">User Profile</h1>
+      </div>
+    </div>
+
+    <!-- Author Profile Content -->
+    <div class="profile-form-container">
+      <div class="profile-content-grid">
+        <!-- Left Column -->
+        <div class="profile-left-section">
+          <!-- Profile Photo Section -->
+          <div class="profile-photo-card">
+            <div class="photo-gradient-container">
+              <div class="gradient-background" style="background: {{#if user.backgroundColor}}{{user.backgroundColor}}{{else}}linear-gradient(135deg, #E879F9 0%, #8B5CF6 25%, #06B6D4 50%, #10B981 75%, #F59E0B 100%){{/if}};">
+              </div>
+              <div class="profile-avatar-container">
+                <img src="{{defaultAvatar user.avatar}}" alt="Profile Avatar" class="profile-avatar-img">
+              </div>
+            </div>
+            <div class="photo-section-content">
+              <h3 class="photo-title">Profile Photo</h3>
+              <p class="photo-description">{{user.name}}'s profile picture</p>
+            </div>
+          </div>
+
+          <!-- Personal Information Section -->
+          <div class="personal-info-card">
+            <h3 class="section-title">Personal Information</h3>
+            
+            <div class="info-field">
+              <label class="field-label">Full Name</label>
+              <div class="info-value">
+                <i class="fas fa-user info-icon"></i>
+                <span>{{user.name}}</span>
+              </div>
+            </div>
+
+            <div class="info-field">
+              <label class="field-label">Email Address</label>
+              <div class="info-value">
+                <i class="fas fa-envelope info-icon"></i>
+                <span>{{#if user.email}}{{user.email}}{{else}}Not provided{{/if}}</span>
+              </div>
+            </div>
+
+            <div class="info-field">
+              <label class="field-label">Role</label>
+              <div class="info-value">
+                <i class="fas fa-briefcase info-icon"></i>
+                <span>{{#if user.role}}{{user.role}}{{else}}Not specified{{/if}}</span>
+              </div>
+            </div>
+
+            <div class="info-field">
+              <label class="field-label">Member Since</label>
+              <div class="info-value">
+                <i class="fas fa-calendar info-icon"></i>
+                <span>{{formatDate user.createdAt}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="profile-right-section">
+          <!-- Bio Section -->
+          <div class="bio-card">
+            <h3 class="section-title">Bio</h3>
+            <div class="bio-content">
+              {{#if user.bio}}
+                <p>{{user.bio}}</p>
+              {{else}}
+                <p class="no-bio">This user hasn't added a bio yet.</p>
+              {{/if}}
+            </div>
+          </div>
+
+          <!-- Statistics Section -->
+          <div class="author-stats-card">
+            <h3 class="section-title">Activity</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <i class="fas fa-lightbulb stat-icon"></i>
+                <div class="stat-info">
+                  <span class="stat-number">--</span>
+                  <span class="stat-label">Ideas</span>
+                </div>
+              </div>
+              <div class="stat-item">
+                <i class="fas fa-calendar stat-icon"></i>
+                <div class="stat-info">
+                  <span class="stat-number">{{formatDate user.createdAt "MMM YYYY"}}</span>
+                  <span class="stat-label">Joined</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: 1px solid var(--neutral-300);
+  border-radius: 8px;
+  color: var(--neutral-600);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-right: 1rem;
+}
+
+.back-link:hover {
+  background: var(--blue-50);
+  color: var(--blue-600);
+  border-color: var(--blue-300);
+}
+
+.dark-mode .back-link {
+  border-color: #404040;
+  color: #a3a3a3;
+}
+
+.dark-mode .back-link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.info-field {
+  margin-bottom: 1.5rem;
+}
+
+.info-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  margin-top: 0.5rem;
+  color: #374151;
+}
+
+.dark-mode .info-value {
+  background: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.info-icon {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.dark-mode .info-icon {
+  color: #9ca3af;
+}
+
+.bio-content {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  min-height: 100px;
+  color: #374151;
+}
+
+.dark-mode .bio-content {
+  background: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
+}
+
+.no-bio {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.dark-mode .no-bio {
+  color: #9ca3af;
+}
+
+.author-stats-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.dark-mode .author-stats-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stat-icon {
+  color: #3b82f6;
+  font-size: 1.2rem;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.dark-mode .stat-number {
+  color: #f3f4f6;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.dark-mode .stat-label {
+  color: #9ca3af;
+}
+</style>
