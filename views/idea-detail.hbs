@@ -7,11 +7,12 @@
     <!-- Header -->
     <div class="home-header">
       <div class="header-left">
-        <a href="/ideas" class="back-link">
+        <a href="{{#if isOwner}}/ideas{{else}}/explore{{/if}}" class="back-link">
           <i class="fas fa-arrow-left"></i>
         </a>
         <h1 class="page-title">{{idea.title}}</h1>
       </div>
+      {{#if isOwner}}
       <div class="header-right">
         <a href="/ideas/{{idea.id}}/edit" class="edit-idea-btn">
           <i class="fas fa-pencil-alt"></i>
@@ -22,7 +23,21 @@
           <span>Delete</span>
         </button>
       </div>
+      {{/if}}
     </div>
+    
+    {{#unless isOwner}}
+    <!-- Author Info Section for non-owner views -->
+    <div class="author-info-section">
+      <div class="author-info-card">
+        <img src="{{defaultAvatar idea.User.avatar}}" alt="{{idea.User.name}}" class="author-info-avatar">
+        <div class="author-info-details">
+          <span class="author-info-label">Created by</span>
+          <span class="author-info-name">{{idea.User.name}}</span>
+        </div>
+      </div>
+    </div>
+    {{/unless}}
 
     <!-- Structured Idea Content -->
     <div class="idea-detail-content">
@@ -117,6 +132,85 @@
 
 .back-link:hover {
   color: var(--blue-500);
+}
+
+/* Author info section */
+.author-info-section {
+  max-width: 800px;
+  margin: 0 auto var(--spacing-lg) auto;
+}
+
+.author-info-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--neutral-200);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.author-info-link:hover {
+  background: var(--blue-50);
+  border-color: var(--blue-200);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.author-info-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--neutral-200);
+}
+
+.author-info-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.author-info-label {
+  font-size: 11px;
+  color: var(--neutral-500);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.author-info-name {
+  font-size: 14px;
+  color: var(--neutral-800);
+  font-weight: 600;
+}
+
+.dark-mode .author-info-card {
+  background: #262626;
+  border-color: #404040;
+}
+
+.dark-mode .author-info-link:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.dark-mode .author-info-avatar {
+  border-color: #404040;
+}
+
+.dark-mode .author-info-label {
+  color: #737373;
+}
+
+.dark-mode .author-info-name {
+  color: #e5e5e5;
 }
 
 .idea-detail-content {
@@ -390,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (shareBtn) {
     shareBtn.addEventListener('click', function() {
       const shareLink = this.getAttribute('data-link');
-      const fullUrl = `${window.location.origin}/share/${shareLink}`;
+      const fullUrl = `${window.location.origin}/explore?share=${shareLink}`;
       
       navigator.clipboard.writeText(fullUrl).then(() => {
         alert('Share link copied to clipboard!');

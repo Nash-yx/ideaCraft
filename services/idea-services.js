@@ -1,4 +1,4 @@
-const { Idea } = require('../models')
+const { Idea, User } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 
 const ideaServices = {
@@ -41,9 +41,21 @@ const ideaServices = {
     return idea
   },
   getIdea: async (req) => {
-    const idea = await Idea.findByPk(req.params.id, { raw: true })
+    const idea = await Idea.findByPk(req.params.id, {
+      include: [{
+        model: User,
+        attributes: ['id', 'name', 'avatar']
+      }],
+      raw: true,
+      nest: true
+    })
+
     if (!idea) throw new Error('Idea not found')
-    if (idea.userId !== req.user.id) throw new Error('Unauthorized access')
+
+    if (idea.userId !== req.user.id) {
+      throw new Error('Unauthorized access')
+    }
+
     return idea
   },
   updateIdea: async (req) => {
@@ -92,6 +104,33 @@ const ideaServices = {
 
     // 執行刪除
     await idea.destroy()
+  },
+  getPublicIdeas: async () => {
+    const ideas = await Idea.findAll({
+      where: { isPublic: true },
+      include: [{
+        model: User,
+        attributes: ['id', 'name', 'avatar']
+      }],
+      order: [['createdAt', 'DESC']],
+      raw: true,
+      nest: true
+    })
+
+    return ideas
+  },
+  getIdeaByShareLink: async (shareLink) => {
+    const idea = await Idea.findOne({
+      where: { shareLink },
+      include: [{
+        model: User,
+        attributes: ['id', 'name', 'avatar']
+      }],
+      raw: true,
+      nest: true
+    })
+    if (!idea) throw new Error('Idea not found')
+    return idea
   }
 }
 

@@ -1,0 +1,88 @@
+<link rel="stylesheet" href="/css/explore.css">
+
+<div class="home-wrapper">
+      
+      {{> sidebar}}
+      {{> messages}}
+      <!-- Main Content -->
+      <div class="home-main">
+        <!-- Header -->
+        <div class="home-header">
+          <div class="header-left">
+            <h1 class="page-title">Explore Ideas</h1>
+            <p class="page-subtitle">Discover inspiring ideas from the community</p>
+          </div>
+        </div>
+
+        <!-- Public Ideas Statistics -->
+        <div class="ideas-stats explore-stats">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Public Ideas</span>
+            </div>
+            <div class="stat-number">{{ideas.length}}</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">This Week</span>
+            </div>
+            <div class="stat-number">{{getThisWeekCount ideas}}</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Contributors</span>
+            </div>
+            <div class="stat-number">{{getUniqueAuthors ideas}}</div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+          <div class="search-wrapper">
+            <div class="search-input-container">
+              <i class="fas fa-search search-icon"></i>
+              <input 
+                type="text" 
+                id="exploreSearch"
+                class="search-input" 
+                placeholder="Search public ideas..."
+                autocomplete="off"
+              >
+            </div>
+            <button class="filter-btn" title="Filter">
+              <i class="fas fa-filter"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ideas Grid -->
+        <div class="ideas-content">
+          {{#if ideas.length}}
+          <div class="ideas-grid" id="exploreIdeasGrid">
+            {{#each ideas}}
+            {{> idea-card showActions=false showAuthor=true exploreTab=true}}
+            {{/each}}
+          </div>
+          {{else}}
+          <!-- Empty State -->
+          <div class="empty-state">
+            <div class="empty-state-content">
+              <div class="empty-state-icon">
+                <i class="fas fa-globe"></i>
+              </div>
+              <h3 class="empty-state-title">No public ideas yet</h3>
+              <p class="empty-state-message">Be the first to share your ideas with the community!</p>
+              <a href="/ideas/new" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Create Your First Public Idea
+              </a>
+            </div>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+
+<script src="/js/explore.js"></script>

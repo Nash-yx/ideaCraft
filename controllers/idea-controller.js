@@ -22,13 +22,18 @@ const ideaController = {
   getIdea: async (req, res, next) => {
     try {
       const idea = await ideaServices.getIdea(req)
-      return res.render('idea-detail', { idea, activePage: 'ideas' })
+      const isOwner = idea.userId === req.user.id
+      return res.render('idea-detail', {
+        idea,
+        isOwner,
+        activePage: 'ideas'
+      })
     } catch (err) {
       req.flash('error_msg', err.message)
       return res.redirect('/ideas')
     }
   },
-  getNewIdea: async (req, res, next) => {
+  getNewIdeaPage: async (req, res, next) => {
     try {
       // Provide default values for create form
       const idea = {
@@ -46,7 +51,7 @@ const ideaController = {
       return res.redirect('/ideas')
     }
   },
-  getEditIdea: async (req, res, next) => {
+  getEditIdeaPage: async (req, res, next) => {
     try {
       const idea = await ideaServices.getIdea(req)
       return res.render('idea-edit', {
@@ -94,6 +99,18 @@ const ideaController = {
 
       req.flash('error_msg', err.message)
       return res.redirect('/ideas')
+    }
+  },
+  getExplorePage: async (req, res, next) => {
+    try {
+      if (req.query.share) {
+        const idea = await ideaServices.getIdeaByShareLink(req.query.share)
+        return res.render('idea-detail', { idea, activePage: 'explore', isOwner: false })
+      }
+      const ideas = await ideaServices.getPublicIdeas()
+      return res.render('explore', { ideas, activePage: 'explore' })
+    } catch (err) {
+      next(err)
     }
   }
 }

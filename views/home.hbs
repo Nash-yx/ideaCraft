@@ -95,42 +95,7 @@
           {{#if ideas.length}}
           <div class="ideas-grid">
             {{#each ideas}}
-            <a href="/ideas/{{id}}" class="idea-card" data-border="{{getBorderColor @index}}">
-              <div class="idea-actions" onclick="event.preventDefault(); event.stopPropagation();">
-                <div class="idea-menu-wrapper">
-                  <button class="idea-menu-btn" title="More options" data-id="{{id}}">
-                    <i class="fas fa-ellipsis-h"></i>
-                  </button>
-                  <div class="idea-dropdown-menu" data-id="{{id}}">
-                    <button class="dropdown-item edit-item" data-id="{{id}}">
-                      <i class="fas fa-pencil-alt"></i>
-                      <span>Edit</span>
-                    </button>
-                    <button class="dropdown-item delete-item" data-id="{{id}}">
-                      <i class="fas fa-trash"></i>
-                      <span>Delete</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="idea-color-bar" data-color="{{getBorderColor @index}}"></div>
-              
-              <div class="idea-content">
-                <h3 class="idea-title">{{title}}</h3>
-                <p class="idea-description">{{truncate content 100}}</p>
-                <div class="idea-footer">
-                  <span class="idea-date">{{formatDate createdAt}}</span>
-                  <div class="idea-status">
-                    {{#if isPublic}}
-                      <span class="status-indicator public">Public</span>
-                    {{else}}
-                      <span class="status-indicator private">Private</span>
-                    {{/if}}
-                  </div>
-                </div>
-              </div>
-            </a>
+            {{> idea-card showActions=true showAuthor=false}}
             {{/each}}
           </div>
           {{else}}

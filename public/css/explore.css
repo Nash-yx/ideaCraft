@@ -1,0 +1,128 @@
+/* Explore Page Specific Styles */
+
+/* ===== PAGE HEADER ===== */
+.page-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 4px 0 0 0;
+  font-weight: 400;
+}
+
+.dark-mode .page-subtitle {
+  color: #9CA3AF;
+}
+
+/* ===== IDEA FOOTER METADATA ===== */
+.idea-metadata {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ===== IDEA AUTHOR ===== */
+.idea-author {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.idea-author i {
+  font-size: 8px;
+}
+
+.dark-mode .idea-author {
+  color: #9CA3AF;
+}
+
+/* ===== EXPLORE PAGE AUTHOR INFO ===== */
+.idea-author-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.author-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #E5E7EB;
+}
+
+.dark-mode .author-avatar {
+  border-color: #374151;
+}
+
+.author-name {
+  font-size: 11px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.dark-mode .author-name {
+  color: #D1D5DB;
+}
+
+/* ===== SEARCH HIGHLIGHTING ===== */
+.idea-card mark {
+  background: rgba(59, 130, 246, 0.2);
+  color: #1d4ed8;
+  padding: 1px 2px;
+  border-radius: 2px;
+  font-weight: 500;
+}
+
+.dark-mode .idea-card mark {
+  background: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+/* ===== SEARCH EMPTY STATE ===== */
+.search-empty-state {
+  margin-top: 2rem;
+}
+
+.search-empty-state .empty-state-icon {
+  font-size: 3rem;
+  color: #9CA3AF;
+  margin-bottom: 1rem;
+}
+
+.dark-mode .search-empty-state .empty-state-icon {
+  color: #6B7280;
+}
+
+/* ===== EXPLORE STATISTICS CUSTOMIZATION ===== */
+.explore-stats .stat-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.dark-mode .explore-stats .stat-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+/* ===== RESPONSIVE DESIGN FOR EXPLORE ===== */
+@media (max-width: 768px) {
+  .page-subtitle {
+    font-size: 0.8rem;
+    margin-top: 2px;
+  }
+  
+  .idea-metadata {
+    gap: 8px;
+  }
+  
+  .idea-author {
+    font-size: 9px;
+  }
+  
+  .idea-author i {
+    font-size: 7px;
+  }
+}

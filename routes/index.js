@@ -35,12 +35,14 @@ router.get('/users/:id', requireAuth, userController.getUser)
 router.put('/users/:id', requireAuth, upload.single('avatar'), userController.putUser)
 
 router.get('/ideas', requireAuth, ideaController.getIdeas)
-router.get('/ideas/new', requireAuth, ideaController.getNewIdea)
+router.get('/ideas/new', requireAuth, ideaController.getNewIdeaPage)
 router.post('/ideas', requireAuth, ideaController.postIdea)
 router.get('/ideas/:id', requireAuth, ideaController.getIdea)
-router.get('/ideas/:id/edit', requireAuth, ideaController.getEditIdea)
+router.get('/ideas/:id/edit', requireAuth, ideaController.getEditIdeaPage)
 router.put('/ideas/:id', requireAuth, ideaController.updateIdea)
 router.delete('/ideas/:id', requireAuth, ideaController.deleteIdea)
+
+router.get('/explore', requireAuth, ideaController.getExplorePage)
 
 router.get('/', (req, res) => {
   if (req.isAuthenticated()) {

@@ -121,6 +121,20 @@ const handlebarsHelpers = {
     }
 
     return null
+  },
+
+  // Count unique authors in ideas
+  getUniqueAuthors: (ideas) => {
+    if (!ideas || !Array.isArray(ideas)) return 0
+    const uniqueUserIds = new Set()
+    ideas.forEach(idea => {
+      if (idea.User && idea.User.id) {
+        uniqueUserIds.add(idea.User.id)
+      } else if (idea.userId) {
+        uniqueUserIds.add(idea.userId)
+      }
+    })
+    return uniqueUserIds.size
   }
 }
 

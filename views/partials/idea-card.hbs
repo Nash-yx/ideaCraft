@@ -1,0 +1,53 @@
+{{!-- Reusable idea card component --}}
+{{!-- Usage: {{> idea-card idea=idea showAuthor=true showActions=false}} --}}
+<a href="{{#if exploreTab}}/explore?share={{shareLink}}{{else}}/ideas/{{id}}{{/if}}" class="idea-card" data-border="{{getBorderColor @index}}">
+  {{#if showActions}}
+  <div class="idea-actions" onclick="event.preventDefault(); event.stopPropagation();">
+    <div class="idea-menu-wrapper">
+      <button class="idea-menu-btn" title="More options" data-id="{{id}}">
+        <i class="fas fa-ellipsis-h"></i>
+      </button>
+      <div class="idea-dropdown-menu" data-id="{{id}}">
+        <button class="dropdown-item edit-item" data-id="{{id}}">
+          <i class="fas fa-pencil-alt"></i>
+          <span>Edit</span>
+        </button>
+        <button class="dropdown-item delete-item" data-id="{{id}}">
+          <i class="fas fa-trash"></i>
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  {{/if}}
+  
+  <div class="idea-color-bar" data-color="{{getBorderColor @index}}"></div>
+  
+  <div class="idea-content">
+    <h3 class="idea-title">{{title}}</h3>
+    <p class="idea-description">{{truncate content 100}}</p>
+    <div class="idea-footer">
+      {{#if showAuthor}}
+        <!-- Explore mode: show author with avatar -->
+        <div class="idea-author-info">
+          <img src="{{defaultAvatar User.avatar}}" alt="{{User.name}}" class="author-avatar">
+          <span class="author-name">{{User.name}}</span>
+        </div>
+      {{else}}
+        <!-- My Ideas mode: show date -->
+        <span class="idea-date">{{formatDate createdAt}}</span>
+      {{/if}}
+      <div class="idea-metadata">
+        <div class="idea-status">
+          {{#if isPublic}}
+            <span class="status-indicator public">Public</span>
+          {{else}}
+            {{#unless showAuthor}}
+            <span class="status-indicator private">Private</span>
+            {{/unless}}
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  </div>
+</a>
