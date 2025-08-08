@@ -105,14 +105,53 @@ const ideaServices = {
     // 執行刪除
     await idea.destroy()
   },
-  getPublicIdeas: async () => {
+  getPublicIdeas: async (searchQuery = '') => {
+    const { Op } = require('sequelize')
+
+    // 安全搜尋函數：驗證和淨化輸入
+    function safeSearch (query) {
+      // 基本驗證
+      if (!query || typeof query !== 'string') {
+        return null
+      }
+
+      const trimmed = query.trim()
+
+      // 長度限制 (1-50 字符)
+      if (trimmed.length < 1 || trimmed.length > 50) {
+        return null
+      }
+
+      // 轉義 LIKE 特殊字符：% _ \
+      return trimmed.replace(/[%_\\]/g, (match) => `\\${match}`)
+    }
+
+    // 基本查詢條件
+    const baseWhere = { isPublic: true }
+
+    // 安全的搜尋條件處理
+    const safeQuery = safeSearch(searchQuery)
+    const searchWhere = safeQuery
+      ? {
+          [Op.or]: [
+            { title: { [Op.like]: `%${safeQuery}%` } },
+            { content: { [Op.like]: `%${safeQuery}%` } },
+            { '$User.name$': { [Op.like]: `%${safeQuery}%` } }
+          ]
+        }
+      : {}
+
+    // 合併查詢條件
+    const whereClause = { ...baseWhere, ...searchWhere }
+
     const ideas = await Idea.findAll({
-      where: { isPublic: true },
+      where: whereClause,
       include: [{
         model: User,
         attributes: ['id', 'name', 'avatar']
       }],
       order: [['createdAt', 'DESC']],
+      limit: 50, // 限制結果數量防止大量資料返回
       raw: true,
       nest: true
     })

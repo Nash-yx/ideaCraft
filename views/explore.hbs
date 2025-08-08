@@ -38,25 +38,13 @@
           </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
-          <div class="search-wrapper">
-            <div class="search-input-container">
-              <i class="fas fa-search search-icon"></i>
-              <input 
-                type="text" 
-                id="exploreSearch"
-                class="search-input" 
-                placeholder="Search public ideas..."
-                autocomplete="off"
-              >
-            </div>
-            <button class="filter-btn" title="Filter">
-              <i class="fas fa-filter"></i>
-            </button>
-          </div>
-        </div>
-
+        <!-- Backend Search -->
+        {{> backend-search-bar 
+            placeholder="Search public ideas..." 
+            currentQuery=searchQuery 
+            hasSearch=hasSearch 
+            searchResultsCount=searchResultsCount}}
+        
         <!-- Ideas Grid -->
         <div class="ideas-content">
           {{#if ideas.length}}
@@ -69,6 +57,18 @@
           <!-- Empty State -->
           <div class="empty-state">
             <div class="empty-state-content">
+              {{#if hasSearch}}
+              <!-- No Search Results -->
+              <div class="empty-state-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <h3 class="empty-state-title">No related public ideas found</h3>
+              <p class="empty-state-message">
+                No public ideas found containing "<strong>{{searchQuery}}</strong>".<br>
+                Try different keywords, or <a href="/explore">browse all public ideas</a>.
+              </p>
+              {{else}}
+              <!-- No Public Ideas -->
               <div class="empty-state-icon">
                 <i class="fas fa-globe"></i>
               </div>
@@ -78,6 +78,7 @@
                 <i class="fas fa-plus"></i>
                 Create Your First Public Idea
               </a>
+              {{/if}}
             </div>
           </div>
           {{/if}}

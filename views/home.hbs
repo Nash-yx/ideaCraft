@@ -72,28 +72,13 @@
           </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="search-container">
-          <div class="search-wrapper">
-            <div class="search-input-container">
-              <i class="fas fa-search search-icon"></i>
-              <input 
-                type="text" 
-                class="search-input" 
-                placeholder="Search ideas..."
-                autocomplete="off"
-              >
-            </div>
-            <button class="filter-btn" title="Filter">
-              <i class="fas fa-filter"></i>
-            </button>
-          </div>
-        </div>
-
+        <!-- Search -->
+        {{> search-bar placeholder="Search my ideas..." inputId="homeSearch"}}
+        
         <!-- Ideas Grid -->
         <div class="ideas-content">
           {{#if ideas.length}}
-          <div class="ideas-grid">
+          <div class="ideas-grid" id="homeIdeasGrid">
             {{#each ideas}}
             {{> idea-card showActions=true showAuthor=false}}
             {{/each}}

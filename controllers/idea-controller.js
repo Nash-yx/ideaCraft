@@ -107,8 +107,21 @@ const ideaController = {
         const idea = await ideaServices.getIdeaByShareLink(req.query.share)
         return res.render('idea-detail', { idea, activePage: 'explore', isOwner: false })
       }
-      const ideas = await ideaServices.getPublicIdeas()
-      return res.render('explore', { ideas, activePage: 'explore' })
+
+      // 獲取搜尋查詢參數
+      const searchQuery = req.query.q || req.query.search || ''
+      const ideas = await ideaServices.getPublicIdeas(searchQuery)
+
+      // 準備模板數據
+      const templateData = {
+        ideas,
+        activePage: 'explore',
+        searchQuery: searchQuery.trim(),
+        hasSearch: searchQuery.trim().length > 0,
+        searchResultsCount: ideas.length
+      }
+
+      return res.render('explore', templateData)
     } catch (err) {
       next(err)
     }

@@ -25,6 +25,14 @@ A modern web application for capturing, organizing, and managing your creative i
   - **Real-time Statistics**: Dynamic counters with trend indicators
   - **Permission Control**: Users can only edit/delete their own ideas
 
+- **Advanced Search & Discovery**
+  - **Hybrid Search Strategy**: Frontend search for personal ideas, backend search for public ideas
+  - **Secure Backend Search**: LIKE injection protection with input validation and sanitization
+  - **Cross-field Search**: Search across titles, content, and author names
+  - **Search State Management**: URL-based search with shareable results
+  - **Performance Optimized**: Result limits and efficient MySQL queries
+  - **Progressive Enhancement**: Loading states, keyboard shortcuts, and visual feedback
+
 - **Modern Interactive UI/UX**
   - **Responsive Design**: Custom CSS with mobile-first approach
   - **Preview Modal System**: Quick idea preview without leaving the list
@@ -34,6 +42,7 @@ A modern web application for capturing, organizing, and managing your creative i
   - **Smart Navigation**: Contextual back links and breadcrumbs
 
 ### Future Enhancements
+- Tag system integration with filtering
 - Email notifications for shared ideas
 - Idea collaboration features
 - Export functionality (PDF, JSON)
@@ -201,8 +210,15 @@ ideaCraft/
 │   ├── partials/
 │   │   ├── sidebar.hbs       # Navigation sidebar
 │   │   ├── messages.hbs      # Flash messages
+│   │   ├── idea-card.hbs     # Reusable idea card component
+│   │   ├── idea-form.hbs     # Unified idea creation/editing form
+│   │   ├── backend-search-bar.hbs # Backend search component
 │   │   └── background-shapes.hbs # Background elements
 │   ├── home.hbs              # Main dashboard
+│   ├── explore.hbs           # Public ideas discovery page
+│   ├── idea-create.hbs       # Idea creation page
+│   ├── idea-edit.hbs         # Idea editing page
+│   ├── idea-detail.hbs       # Idea detail view
 │   ├── profile.hbs           # User profile page
 │   ├── login.hbs             # Login page
 │   ├── signup.hbs            # Registration page
@@ -279,7 +295,7 @@ ideaCraft/
 
 ## 🔄 Development Status
 
-### ✅ Completed (Full CRUD System)
+### ✅ Completed (Full CRUD System + Search & Discovery)
 - **Authentication & User Management**
   - User authentication system (local + OAuth)
   - Profile management with avatar upload
@@ -292,6 +308,14 @@ ideaCraft/
   - Real-time statistics with automatic updates
   - Smart error handling and user feedback
 
+- **Advanced Search & Discovery System**
+  - Secure backend search with LIKE injection protection
+  - Hybrid search strategy (frontend + backend)
+  - Cross-field search (titles, content, authors)
+  - Search state management and URL persistence
+  - Performance-optimized queries with result limits
+  - Progressive enhancement with loading states
+
 - **Advanced Frontend Experience**
   - Modern dual-view system (Modal preview + Detail page)
   - Interactive CRUD operations with AJAX
@@ -301,6 +325,7 @@ ideaCraft/
   - File upload functionality and image processing
 
 ### 🚀 Future Development
+- Tag system integration with filtering
 - Email notification system
 - Collaboration features
 - Advanced analytics dashboard
@@ -323,8 +348,8 @@ This project is licensed under the ISC License.
 
 - Test suite not yet implemented
 - Tag system not yet integrated
-- Search functionality placeholders need implementation
 - Performance optimization for large datasets pending
+- Share link functionality not yet implemented
 
 ## 📞 Support
 

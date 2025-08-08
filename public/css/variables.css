@@ -1,0 +1,171 @@
+/* ================================
+   UNIVERSAL CSS VARIABLES
+   ================================
+   Global design system variables used across all pages
+   Extracted from home.css for universal access
+   ================================ */
+
+:root {
+  /* PRIMARY COLORS */
+  --primary-25: #F8FAFF;
+  --primary-50: #EBF0FF;
+  --primary-100: #D6E0FF;
+  --primary-500: #4169E1;
+  --primary-600: #3355D1;
+  --primary-700: #2541C1;
+
+  /* SECONDARY COLORS */
+  --secondary-blue: #4169E1;
+  --secondary-purple: #7C3AED;
+  --secondary-pink: #EC4899;
+  --secondary-green: #10B981;
+  --secondary-orange: #F59E0B;
+  --secondary-red: #EF4444;
+
+  /* BLUE PALETTE */
+  --blue-50: #EFF6FF;
+  --blue-500: #3B82F6;
+  --blue-600: #2563EB;
+  --blue-700: #1D4ED8;
+
+  /* RED PALETTE */
+  --red-50: #FEF2F2;
+  --red-600: #DC2626;
+
+  /* NEUTRAL PALETTE */
+  --neutral-25: #FDFDFD;
+  --neutral-50: #F9FAFB;
+  --neutral-100: #F3F4F6;
+  --neutral-150: #EAECF0;
+  --neutral-200: #E5E7EB;
+  --neutral-250: #DDE1E6;
+  --neutral-300: #D1D5DB;
+  --neutral-350: #C1C7CD;
+  --neutral-400: #9CA3AF;
+  --neutral-500: #6B7280;
+  --neutral-600: #4B5563;
+  --neutral-700: #374151;
+  --neutral-800: #1F2937;
+  --neutral-900: #111827;
+
+  /* BACKGROUND COLORS */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F7;
+  --bg-tertiary: #FAFAFA;
+
+  /* TYPOGRAPHY */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 32px;
+
+  /* FONT WEIGHTS */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* SPACING */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --spacing-2xl: 24px;
+  --spacing-3xl: 32px;
+  --spacing-4xl: 40px;
+
+  /* BORDER RADIUS */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  --radius-card: 12px;
+
+  /* SHADOWS */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.12);
+
+  /* TRANSITIONS */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* DARK MODE SPECIFIC VARIABLES */
+  --card-border-dark: rgba(255, 255, 255, 0.1);
+  --card-shadow-dark: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --card-hover-bg: #F8FAFF;
+  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ================================
+   DARK MODE OVERRIDES
+   ================================
+   Variables that change in dark mode
+   These work with the existing JavaScript dark mode implementation
+   ================================ */
+
+.dark-mode {
+  /* Background colors for dark mode */
+  --bg-primary: #1f1f1f;
+  --bg-secondary: #0a0a0a; 
+  --bg-tertiary: #111111;
+
+  /* Neutral palette inverted for dark mode */
+  --neutral-50: #262626;
+  --neutral-100: #2d2d2d;
+  --neutral-150: #353535;
+  --neutral-200: #3f3f3f;
+  --neutral-250: #484848;
+  --neutral-300: #525252;
+  --neutral-350: #5c5c5c;
+  --neutral-400: #6b6b6b;
+  --neutral-500: #909090;
+  --neutral-600: #d1d1d1;
+  --neutral-700: #e4e4e4;
+  --neutral-800: #f4f4f4;
+  --neutral-900: #ffffff;
+
+  /* Primary colors (stay same but with darker variants) */
+  --primary-25: rgba(59, 130, 246, 0.05);
+  --primary-100: rgba(59, 130, 246, 0.15);
+
+  /* Blue palette adjusted */
+  --blue-50: #1e3a8a;
+
+  /* Red palette adjusted */
+  --red-50: #7f1d1d;
+
+  /* Dark mode specific overrides */
+  --card-border-dark: rgba(255, 255, 255, 0.04);
+  --card-shadow-dark: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --card-hover-bg: #252525;
+  --card-hover-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+/* ================================
+   FALLBACK VALUES
+   ================================
+   Fallback colors in case variables fail to load
+   ================================ */
+
+/* Ensure text is always readable */
+body {
+  color: var(--neutral-900, #111827);
+  background-color: var(--bg-primary, #FFFFFF);
+}
+
+.dark-mode body {
+  color: var(--neutral-900, #ffffff);
+  background-color: var(--bg-primary, #1f1f1f);
+}

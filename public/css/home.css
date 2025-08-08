@@ -309,7 +309,12 @@
   color: var(--neutral-400);
 }
 
-.filter-btn {
+/* Backend Search Form Styles */
+.search-form {
+  width: 100%;
+}
+
+.search-submit-btn {
   width: 44px;
   height: 44px;
   border: 1px solid var(--neutral-300);
@@ -321,13 +326,68 @@
   justify-content: center;
   cursor: pointer;
   transition: all var(--duration-fast);
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box;
 }
 
-.filter-btn:hover {
+.search-submit-btn:hover {
   border-color: var(--primary-500);
   color: var(--primary-500);
   background-color: var(--primary-50);
 }
+
+.search-submit-btn:focus {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+
+.search-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Search Status Styles */
+.search-status {
+  margin-top: var(--spacing-md);
+}
+
+.search-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--primary-25);
+  border: 1px solid var(--primary-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.search-results-text {
+  color: var(--neutral-700);
+}
+
+.clear-search-link {
+  color: var(--primary-600);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  transition: all var(--duration-fast);
+}
+
+.clear-search-link:hover {
+  color: var(--primary-700);
+  text-decoration: underline;
+}
+
+/* Loading State */
+.search-input.searching {
+  background-color: var(--neutral-50);
+  color: var(--neutral-500);
+}
+
 
 /* Ideas Grid Layout */
 .ideas-grid {
@@ -420,10 +480,6 @@
     gap: var(--spacing-sm);
   }
   
-  .filter-btn {
-    align-self: stretch;
-    height: 44px;
-  }
 }
 
 /* Custom Create Idea Button */

@@ -1,5 +1,30 @@
 // Home page functionality
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize search functionality using SearchManager
+  const homeSearch = new SearchManager({
+    searchInputId: 'homeSearch',
+    gridId: 'homeIdeasGrid',
+    searchFields: ['title', 'description'],
+    emptyMessage: 'No ideas found',
+    emptySubMessage: 'Try different keywords or create a new idea.',
+    debounceDelay: 300
+  });
+  
+  // Listen to search events
+  const searchInput = document.getElementById('homeSearch');
+  if (searchInput) {
+    searchInput.addEventListener('search:search', function(e) {
+      console.log('Home search:', e.detail);
+    });
+    
+    searchInput.addEventListener('search:reset', function(e) {
+      console.log('Home search reset:', e.detail);
+    });
+  }
+  
+  // Store manager instances for potential external access
+  window.homeSearchManager = homeSearch;
+
   // Idea card hover effects
   const ideaCards = document.querySelectorAll('.idea-card');
   ideaCards.forEach(card => {

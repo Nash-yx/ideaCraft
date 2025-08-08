@@ -1,0 +1,36 @@
+{{!-- Backend search bar component for server-side search --}}
+{{!-- Usage: {{> backend-search-bar placeholder="Search..." currentQuery="keyword"}} --}}
+<div class="search-container">
+  <form method="GET" action="/explore" class="search-form">
+    <div class="search-wrapper">
+      <div class="search-input-container">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+          type="text" 
+          name="q"
+          class="search-input" 
+          placeholder="{{placeholder}}"
+          value="{{currentQuery}}"
+          autocomplete="off"
+        >
+      </div>
+      <button type="submit" class="search-submit-btn" title="Search">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+  </form>
+  
+  {{#if hasSearch}}
+  <div class="search-status">
+    <div class="search-info">
+      <span class="search-results-text">
+        Search "<strong>{{currentQuery}}</strong>" found {{searchResultsCount}} results
+      </span>
+      <a href="/explore" class="clear-search-link">
+        <i class="fas fa-times"></i>
+        Clear search
+      </a>
+    </div>
+  </div>
+  {{/if}}
+</div>
