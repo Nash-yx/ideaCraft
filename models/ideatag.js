@@ -14,13 +14,33 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   IdeaTag.init({
-    ideaId: DataTypes.INTEGER,
-    tagId: DataTypes.INTEGER
+    ideaId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Ideas',
+        key: 'id'
+      }
+    },
+    tagId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: 'Tags',
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'IdeaTag',
     tableName: 'IdeaTags',
     underscored: true,
+    indexes: [
+      {
+        unique: true,
+        fields: ['idea_id', 'tag_id']
+      }
+    ]
   })
   return IdeaTag
 }

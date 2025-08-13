@@ -1,4 +1,4 @@
-const { Idea, User } = require('../models')
+const { Idea, User, Tag } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 
 const ideaServices = {
@@ -6,14 +6,21 @@ const ideaServices = {
     const userId = req.user.id
     const ideas = await Idea.findAll({
       where: { userId },
+      include: [{
+        model: Tag,
+        as: 'tags',
+        attributes: ['id', 'name'],
+        through: { attributes: [] } // 不包含關聯表的額外欄位, 不加 => tag: [{ ..., IdeaTag: { ... }, ...}]
+      }],
       order: [['createdAt', 'DESC']],
-      raw: true
+      raw: false,
+      nest: true
     })
 
     return ideas // 回傳空陣列也是正常的
   },
   postIdea: async (req) => {
-    const { title, content, isPublic } = req.body
+    const { title, content, isPublic, tags } = req.body
     const userId = req.user.id
 
     // 輸入驗證
@@ -37,7 +44,31 @@ const ideaServices = {
       ideaData.shareLink = uuidv4()
     }
 
+    // 建立 idea
     const idea = await Idea.create(ideaData)
+
+    // 處理標籤 (如果有提供)
+    if (tags) {
+      let tagNames = []
+
+      // 處理不同格式的標籤輸入
+      if (typeof tags === 'string') {
+        try {
+          // 嘗試解析 JSON 字串 , ex: '["frontend", "react"]'
+          tagNames = JSON.parse(tags)
+        } catch {
+          // 如果不是 JSON，當作逗號分隔的字串處理 , ex: "frontend,react,javascript"
+          tagNames = tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        }
+      } else if (Array.isArray(tags)) {
+        // ex: ["frontend", "react"]
+        tagNames = tags
+      }
+
+      // 關聯 tag 到 idea
+      await ideaServices.associateTagsWithIdea(idea, tagNames)
+    }
+
     return idea
   },
   getIdea: async (req) => {
@@ -45,8 +76,13 @@ const ideaServices = {
       include: [{
         model: User,
         attributes: ['id', 'name', 'avatar']
+      }, {
+        model: Tag,
+        as: 'tags',
+        attributes: ['id', 'name'],
+        through: { attributes: [] }
       }],
-      raw: true,
+      raw: false,
       nest: true
     })
 
@@ -59,7 +95,7 @@ const ideaServices = {
     return idea
   },
   updateIdea: async (req) => {
-    const { title, content, isPublic } = req.body
+    const { title, content, isPublic, tags } = req.body
     const ideaId = req.params.id
     const userId = req.user.id
 
@@ -90,7 +126,35 @@ const ideaServices = {
       updateData.shareLink = null
     }
 
+    // 更新 idea 基本資料
     const updatedIdea = await idea.update(updateData)
+
+    // 處理標籤更新
+    if (tags !== undefined) {
+      let tagNames = []
+
+      // 處理不同格式的標籤輸入
+      if (typeof tags === 'string') {
+        try {
+          // 嘗試解析 JSON 字串
+          tagNames = JSON.parse(tags)
+        } catch {
+          // 如果不是 JSON，當作逗號分隔的字串處理
+          tagNames = tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        }
+      } else if (Array.isArray(tags)) {
+        tagNames = tags
+      }
+
+      // 更新標籤關聯 (會移除舊的關聯並建立新的)
+      await ideaServices.associateTagsWithIdea(idea, tagNames)
+
+      // 清理孤立的標籤 (在背景執行，不等待結果)
+      setTimeout(() => {
+        ideaServices.cleanupOrphanedTags().catch(console.error)
+      }, 1000)
+    }
+
     return updatedIdea
   },
   deleteIdea: async (req) => {
@@ -149,10 +213,15 @@ const ideaServices = {
       include: [{
         model: User,
         attributes: ['id', 'name', 'avatar']
+      }, {
+        model: Tag,
+        as: 'tags',
+        attributes: ['id', 'name'],
+        through: { attributes: [] }
       }],
       order: [['createdAt', 'DESC']],
       limit: 50, // 限制結果數量防止大量資料返回
-      raw: true,
+      raw: false,
       nest: true
     })
 
@@ -161,15 +230,95 @@ const ideaServices = {
   getIdeaByShareLink: async (shareLink) => {
     const idea = await Idea.findOne({
       where: { shareLink },
-      include: [{
-        model: User,
-        attributes: ['id', 'name', 'avatar']
-      }],
-      raw: true,
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name', 'avatar']
+        },
+        {
+          model: Tag,
+          as: 'tags',
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
+        }
+      ],
+      raw: false,
       nest: true
     })
     if (!idea) throw new Error('Idea not found')
     return idea
+  },
+
+  // Tag 相關服務函數
+  createOrFindTags: async (tagNames) => {
+    if (!tagNames || !Array.isArray(tagNames) || tagNames.length === 0) {
+      return []
+    }
+
+    // 限制最多 3 個標籤
+    const limitedTags = tagNames.slice(0, 3)
+
+    // 清理和驗證標籤名稱
+    const cleanTagNames = limitedTags
+      .map(name => name.trim().toLowerCase())
+      .filter(name => name.length > 0 && name.length <= 20)
+      .filter((name, index, arr) => arr.indexOf(name) === index) // 去重複
+    if (cleanTagNames.length === 0) {
+      return []
+    }
+
+    // 使用 findOrCreate 來取得或建立標籤
+    const tagPromises = cleanTagNames.map(name =>
+      Tag.findOrCreate({
+        where: { name },
+        defaults: { name }
+      })
+    )
+
+    const tagResults = await Promise.all(tagPromises)
+    return tagResults.map(([tag]) => tag) // 取得標籤物件 (忽略 created 布林值)
+  },
+
+  associateTagsWithIdea: async (idea, tagNames) => {
+    // bind tags to idea
+    if (!tagNames || tagNames.length === 0) {
+      return
+    }
+
+    // 建立或取得標籤
+    const tags = await ideaServices.createOrFindTags(tagNames)
+
+    // 建立關聯
+    if (tags.length > 0) {
+      await idea.setTags(tags)
+    }
+  },
+
+  cleanupOrphanedTags: async () => {
+    // 清理沒有任何 idea 關聯的孤立標籤
+    const { Op } = require('sequelize')
+
+    const orphanedTags = await Tag.findAll({
+      include: [{
+        model: Idea,
+        as: 'ideas',
+        required: false // 使用 LEFT JOIN，保留沒有關聯的記錄
+      }],
+      where: {
+        '$ideas.id$': null
+      }
+    })
+
+    if (orphanedTags.length > 0) {
+      const orphanedIds = orphanedTags.map(tag => tag.id)
+      await Tag.destroy({
+        where: {
+          id: { [Op.in]: orphanedIds }
+        }
+      })
+    }
+
+    return orphanedTags.length
   }
 }
 
