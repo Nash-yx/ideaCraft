@@ -49,7 +49,7 @@ class TagManager {
   }
   
   showTagInput() {
-    const tagName = prompt('Enter a tag name:');
+    const tagName = prompt('Enter a tag name (max 25 characters):');
     if (tagName) {
       this.addTag(tagName.trim());
     }
@@ -58,7 +58,7 @@ class TagManager {
   addTag(tagName) {
     // Validate tag name
     if (!this.validateTagName(tagName)) {
-      alert('Invalid tag name. Please use only letters, numbers, spaces, and hyphens.');
+      alert('Invalid tag name. Please use only letters, numbers, spaces, and hyphens. Maximum length is 25 characters.');
       return;
     }
     
@@ -123,8 +123,8 @@ class TagManager {
   
   validateTagName(tagName) {
     // Allow letters, numbers, spaces, and hyphens
-    // Length between 1-30 characters
-    const regex = /^[a-zA-Z0-9\s\-]{1,30}$/;
+    // Length between 1-25 characters for better display
+    const regex = /^[a-zA-Z0-9\s\-]{1,25}$/;
     return regex.test(tagName);
   }
   

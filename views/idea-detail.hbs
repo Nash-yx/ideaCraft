@@ -66,9 +66,9 @@
             <div class="metadata-field">
               <label class="field-label">Tags</label>
               {{#if idea.tags.length}}
-                <div class="field-display metadata-display">
+                <div class="field-display metadata-display tag-container">
                   {{#each idea.tags}}
-                    <span class="tag-badge {{getTagColor @index}}">{{name}}</span>
+                    <span class="tag-badge {{getTagColor @index}}" title="{{name}}">{{name}}</span>
                   {{/each}}
                 </div>
               {{else}}
@@ -429,6 +429,50 @@
 
 .dark-mode .tags-placeholder .placeholder-text {
   color: #737373;
+}
+
+/* Enhanced tag display for idea-detail page */
+.metadata-display.tag-container {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-height: 2.5rem;
+  max-height: none; /* Remove height restriction */
+  gap: 0.5rem;
+}
+
+.metadata-display .tag-badge {
+  max-width: 200px; /* Prevent extremely long tags */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: help; /* Indicate there might be more text */
+}
+
+.metadata-display .tag-badge:hover {
+  transform: none; /* Remove hover animation to avoid layout issues */
+  position: relative;
+}
+
+/* Tooltip for long tags */
+.metadata-display .tag-badge[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  margin-bottom: 4px;
+}
+
+.dark-mode .metadata-display .tag-badge[title]:hover::after {
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
 }
 
 /* Responsive design */

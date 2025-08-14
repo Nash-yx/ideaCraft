@@ -580,6 +580,14 @@
   background: #4DD0E1;
 }
 
+.idea-color-bar[data-color="pink"] {
+  background: #F8BBD9;
+}
+
+.idea-color-bar[data-color="indigo"] {
+  background: #7C3AED;
+}
+
 .idea-card:hover {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Enhanced hover shadow */
   transform: translateY(-2px);
@@ -643,14 +651,15 @@
 .idea-description {
   font-size: 14px;
   color: var(--neutral-600);
-  line-height: 1.4; /* Tighter line height for better fit */
-  margin: 0 0 8px 0; /* Small bottom margin */
-  flex: 1; /* Take up middle space */
+  line-height: 1.4;
+  margin: 0 0 8px 0;
+  flex: 1;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* Reduce to 2 lines for better fit */
+  -webkit-line-clamp: 1; /* Single line to save space for tags */
   -webkit-box-orient: vertical;
-  word-break: break-word; /* Handle long words */
+  text-overflow: ellipsis;
+  word-break: break-word;
 }
 
 /* Footer with date at bottom left and status at bottom right */
@@ -705,6 +714,174 @@
 .dark-mode .status-indicator.private {
   background-color: rgba(230, 81, 0, 0.2);
   color: #FB923C;
+}
+
+/* ===============================================
+   IDEA CARD TAG STYLES
+   =============================================== */
+
+/* Tag container for idea cards */
+.idea-tags {
+  margin-top: 4px; /* Even closer to description */
+  margin-bottom: 4px; /* Space between tags and date */
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  max-height: 30px; /* Increased height for larger tags */
+  overflow: hidden;
+}
+
+.idea-tags.inline-tags {
+  margin-top: 0;
+  margin-bottom: 0;
+  max-height: 26px; /* Same height as regular tags */
+  justify-content: flex-end; /* Align to right in footer */
+  flex-wrap: nowrap; /* Keep tags in single line */
+  flex-direction: row; /* Ensure horizontal layout */
+  align-items: center; /* Center align tags vertically */
+  overflow: visible; /* Allow tags to be visible */
+}
+
+/* Tag Badge Base Styles - Optimized for idea cards */
+.idea-card .tag-badge {
+  background: var(--tag-bg-color, #E0F2FE);
+  color: var(--tag-text-color, #0284C7);
+  border-radius: 12px;
+  padding: 4px 10px; /* Increased padding for larger size */
+  font-size: 12px; /* Increased from 11px for better visibility */
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.2s ease;
+  line-height: 1.2;
+  white-space: nowrap;
+  max-width: 80px; /* Strict width limit for card layout */
+  overflow: hidden;
+  /* Removed text-overflow: ellipsis to let truncateTag helper handle truncation */
+}
+
+.idea-card .tag-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Tag Color Variants for idea cards */
+.idea-card .tag-badge.tag-blue {
+  background: #E0F2FE;
+  color: #0284C7;
+}
+
+.idea-card .tag-badge.tag-orange {
+  background: #FEF3E2;
+  color: #EA580C;
+}
+
+.idea-card .tag-badge.tag-green {
+  background: #F0FDF4;
+  color: #16A34A;
+}
+
+.idea-card .tag-badge.tag-purple {
+  background: #F3E8FF;
+  color: #7C3AED;
+}
+
+.idea-card .tag-badge.tag-pink {
+  background: #FDF2F8;
+  color: #EC4899;
+}
+
+/* More tags indicator */
+.more-tags {
+  font-size: 10px; /* Increased to match better with larger tags */
+  color: var(--neutral-500);
+  font-weight: 500;
+  margin-left: 3px;
+}
+
+/* Dark mode tag styles */
+.dark-mode .idea-card .tag-badge.tag-blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93C5FD;
+}
+
+.dark-mode .idea-card .tag-badge.tag-orange {
+  background: rgba(251, 146, 60, 0.15);
+  color: #FCD34D;
+}
+
+.dark-mode .idea-card .tag-badge.tag-green {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86EFAC;
+}
+
+.dark-mode .idea-card .tag-badge.tag-purple {
+  background: rgba(124, 58, 237, 0.15);
+  color: #C4B5FD;
+}
+
+.dark-mode .idea-card .tag-badge.tag-pink {
+  background: rgba(236, 72, 153, 0.15);
+  color: #F9A8D4;
+}
+
+.dark-mode .more-tags {
+  color: #737373;
+}
+
+/* Responsive design for tags */
+@media (max-width: 768px) {
+  .idea-card .tag-badge {
+    font-size: 11px; /* Increased for better visibility on tablet */
+    padding: 3px 8px; /* Increased padding */
+    border-radius: 10px;
+    max-width: 70px; /* Slightly smaller for tablet */
+  }
+  
+  .idea-tags {
+    gap: 4px;
+    max-height: 26px; /* Increased for larger tags */
+    margin-top: 2px; /* Much closer to description on tablet */
+    margin-bottom: 3px;
+  }
+  
+  .idea-tags.inline-tags {
+    gap: 3px; /* Tighter spacing on mobile */
+    flex-wrap: nowrap; /* Ensure no wrapping on mobile */
+  }
+  
+  .more-tags {
+    font-size: 9px;
+  }
+  
+  /* Keep description as single line on mobile too */
+  .idea-description {
+    -webkit-line-clamp: 1;
+    margin: 0 0 6px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .idea-card .tag-badge {
+    font-size: 10px; /* Increased for better readability on mobile */
+    padding: 3px 6px; /* Increased padding */
+    max-width: 60px; /* Even smaller for mobile */
+  }
+  
+  .idea-tags {
+    gap: 3px;
+    margin-top: 2px; /* Very close to description on mobile */
+  }
+  
+  .idea-tags.inline-tags {
+    gap: 2px;
+    flex-wrap: nowrap; /* Ensure no wrapping on very small screens */
+  }
+  
+  .more-tags {
+    font-size: 8px;
+  }
 }
 
 

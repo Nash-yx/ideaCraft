@@ -141,6 +141,29 @@ const handlebarsHelpers = {
   getTagColor: (index) => {
     const colors = ['tag-blue', 'tag-orange', 'tag-green', 'tag-purple', 'tag-pink']
     return colors[index % colors.length]
+  },
+
+  // Array slice helper
+  slice: (array, start, end) => {
+    if (!Array.isArray(array)) return []
+    return array.slice(start, end)
+  },
+
+  // Math subtract helper
+  subtract: (a, b) => {
+    return (parseInt(a) || 0) - (parseInt(b) || 0)
+  },
+
+  // Greater than comparison helper
+  gt: (a, b) => {
+    return (parseInt(a) || 0) > (parseInt(b) || 0)
+  },
+
+  // Truncate tag name for card display
+  truncateTag: (tagName, maxLength = 10) => {
+    if (!tagName) return ''
+    if (tagName.length <= maxLength) return tagName
+    return tagName.substring(0, maxLength - 2) + '...'
   }
 }
 

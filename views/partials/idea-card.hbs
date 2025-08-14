@@ -25,7 +25,16 @@
   
   <div class="idea-content">
     <h3 class="idea-title">{{title}}</h3>
-    <p class="idea-description">{{truncate content 100}}</p>
+    <p class="idea-description">{{truncate content 40}}</p>
+    {{#unless showAuthor}}
+      {{#if tags.length}}
+      <div class="idea-tags">
+        {{#each tags}}
+          <span class="tag-badge {{getTagColor @index}}" title="{{name}}">{{truncateTag name 10}}</span>
+        {{/each}}
+      </div>
+      {{/if}}
+    {{/unless}}
     <div class="idea-footer">
       {{#if showAuthor}}
         <!-- Explore mode: show author with avatar -->
@@ -39,12 +48,23 @@
       {{/if}}
       <div class="idea-metadata">
         <div class="idea-status">
-          {{#if isPublic}}
-            <span class="status-indicator public">Public</span>
+          {{#if exploreTab}}
+            {{#if tags.length}}
+              <div class="idea-tags inline-tags">
+                {{#each (slice tags 0 3)}}
+                  <span class="tag-badge {{getTagColor @index}}" title="{{name}}">{{truncateTag name 8}}</span>
+                {{/each}}
+                {{#if (gt tags.length 3)}}
+                  <span class="more-tags">+{{subtract tags.length 3}}</span>
+                {{/if}}
+              </div>
+            {{/if}}
           {{else}}
-            {{#unless showAuthor}}
-            <span class="status-indicator private">Private</span>
-            {{/unless}}
+            {{#if isPublic}}
+              <span class="status-indicator public">Public</span>
+            {{else}}
+              <span class="status-indicator private">Private</span>
+            {{/if}}
           {{/if}}
         </div>
       </div>

@@ -210,15 +210,18 @@ const ideaServices = {
 
     const ideas = await Idea.findAll({
       where: whereClause,
-      include: [{
-        model: User,
-        attributes: ['id', 'name', 'avatar']
-      }, {
-        model: Tag,
-        as: 'tags',
-        attributes: ['id', 'name'],
-        through: { attributes: [] }
-      }],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'name', 'avatar']
+        },
+        {
+          model: Tag,
+          as: 'tags',
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
+        }
+      ],
       order: [['createdAt', 'DESC']],
       limit: 50, // 限制結果數量防止大量資料返回
       raw: false,
@@ -249,7 +252,7 @@ const ideaServices = {
     return idea.toJSON()
   },
 
-  // Tag 相關服務函數
+  // Tag 相關 service
   createOrFindTags: async (tagNames) => {
     if (!tagNames || !Array.isArray(tagNames) || tagNames.length === 0) {
       return []
