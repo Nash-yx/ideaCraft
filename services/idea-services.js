@@ -195,15 +195,33 @@ const ideaServices = {
 
     // 安全的搜尋條件處理
     const safeQuery = safeSearch(searchQuery)
-    const searchWhere = safeQuery
-      ? {
-          [Op.or]: [
-            { title: { [Op.like]: `%${safeQuery}%` } },
-            { content: { [Op.like]: `%${safeQuery}%` } },
-            { '$User.name$': { [Op.like]: `%${safeQuery}%` } }
-          ]
-        }
-      : {}
+    let searchWhere = {}
+
+    if (safeQuery) {
+      // 構建搜尋條件陣列
+      const orConditions = [
+        { title: { [Op.like]: `%${safeQuery}%` } },
+        { content: { [Op.like]: `%${safeQuery}%` } }
+      ]
+
+      // 搜尋匹配的用戶名稱
+      const matchingUsers = await User.findAll({
+        where: {
+          name: { [Op.like]: `%${safeQuery}%` }
+        },
+        attributes: ['id']
+      })
+
+      // 如果找到匹配的用戶，將其加入搜尋條件
+      if (matchingUsers.length > 0) {
+        const userIds = matchingUsers.map(user => user.id)
+        orConditions.push({ userId: { [Op.in]: userIds } })
+      }
+
+      searchWhere = {
+        [Op.or]: orConditions
+      }
+    }
 
     // 合併查詢條件
     const whereClause = { ...baseWhere, ...searchWhere }
@@ -213,6 +231,7 @@ const ideaServices = {
       include: [
         {
           model: User,
+          as: 'User',
           attributes: ['id', 'name', 'avatar']
         },
         {
