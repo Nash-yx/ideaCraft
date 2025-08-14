@@ -17,7 +17,7 @@ const ideaServices = {
       nest: true
     })
 
-    return ideas // 回傳空陣列也是正常的
+    return ideas.map(idea => idea.toJSON()) // 回傳空陣列也是正常的
   },
   postIdea: async (req) => {
     const { title, content, isPublic, tags } = req.body
@@ -92,7 +92,7 @@ const ideaServices = {
       throw new Error('Unauthorized access')
     }
 
-    return idea
+    return idea.toJSON()
   },
   updateIdea: async (req) => {
     const { title, content, isPublic, tags } = req.body
@@ -225,7 +225,7 @@ const ideaServices = {
       nest: true
     })
 
-    return ideas
+    return ideas.map(idea => idea.toJSON())
   },
   getIdeaByShareLink: async (shareLink) => {
     const idea = await Idea.findOne({
@@ -246,7 +246,7 @@ const ideaServices = {
       nest: true
     })
     if (!idea) throw new Error('Idea not found')
-    return idea
+    return idea.toJSON()
   },
 
   // Tag 相關服務函數

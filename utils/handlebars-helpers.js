@@ -135,6 +135,12 @@ const handlebarsHelpers = {
       }
     })
     return uniqueUserIds.size
+  },
+
+  // Get tag color based on index
+  getTagColor: (index) => {
+    const colors = ['tag-blue', 'tag-orange', 'tag-green', 'tag-purple', 'tag-pink']
+    return colors[index % colors.length]
   }
 }
 

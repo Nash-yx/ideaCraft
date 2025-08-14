@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       Idea.belongsTo(models.User, { foreignKey: 'userId' })
       Idea.belongsToMany(models.Tag, {
         through: models.IdeaTag,
-        foreignKey: 'IdeaId',
+        foreignKey: 'ideaId',
         as: 'tags'
       })
     }

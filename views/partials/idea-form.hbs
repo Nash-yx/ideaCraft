@@ -44,15 +44,19 @@
         <div class="metadata-row">
           <div class="metadata-field">
             <label class="field-label">Tags</label>
-            <div class="field-input-container">
-              <input 
-                type="text" 
-                id="tags" 
-                name="tags" 
-                class="field-input-tags" 
-                placeholder="Add tags (coming soon...)"
-                disabled
-              >
+            <div class="tag-input-container" id="tagInputContainer">
+              <div class="selected-tags" id="selectedTags">
+                {{#if idea.tags}}
+                  {{#each idea.tags}}
+                    <span class="tag-badge {{getTagColor @index}}" data-tag="{{name}}">
+                      {{name}}
+                      <span class="remove-tag" data-action="remove" data-tag="{{name}}">&times;</span>
+                    </span>
+                  {{/each}}
+                {{/if}}
+              </div>
+              <button type="button" class="add-tag-btn" id="addTagBtn">+ Add Tag</button>
+              <input type="hidden" name="tags" id="tagsInput" value="">
             </div>
           </div>
         </div>

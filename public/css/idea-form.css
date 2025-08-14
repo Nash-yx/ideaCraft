@@ -118,6 +118,124 @@
   cursor: not-allowed;
 }
 
+/* Tag Input Component Styles */
+.tag-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-height: 42px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--neutral-200);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tag-input-container:focus-within {
+  border-color: var(--blue-400);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Tag Badge Styles */
+.tag-badge {
+  background: var(--tag-bg-color, #E0F2FE);
+  color: var(--tag-text-color, #0284C7);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s ease;
+}
+
+.tag-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tag-badge .remove-tag {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  margin-left: 2px;
+}
+
+.tag-badge .remove-tag:hover {
+  opacity: 1;
+}
+
+/* Tag Color Variants */
+.tag-badge.tag-blue {
+  background: #E0F2FE;
+  color: #0284C7;
+}
+
+.tag-badge.tag-orange {
+  background: #FEF3E2;
+  color: #EA580C;
+}
+
+.tag-badge.tag-green {
+  background: #F0FDF4;
+  color: #16A34A;
+}
+
+.tag-badge.tag-purple {
+  background: #F3E8FF;
+  color: #7C3AED;
+}
+
+.tag-badge.tag-pink {
+  background: #FDF2F8;
+  color: #EC4899;
+}
+
+/* Add Tag Button */
+.add-tag-btn {
+  background: var(--neutral-50);
+  border: 2px dashed var(--neutral-300);
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--neutral-600);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.add-tag-btn:hover {
+  background: var(--neutral-100);
+  border-color: var(--neutral-400);
+  color: var(--neutral-700);
+  transform: translateY(-1px);
+}
+
+.add-tag-btn:active {
+  transform: translateY(0);
+}
+
+.add-tag-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.add-tag-btn.hidden {
+  display: none;
+}
+
 /* Toggle Switch Styles - Scoped to visibility toggle only */
 .visibility-toggle-container {
   display: flex;
@@ -278,6 +396,53 @@
 .dark-mode .field-input-tags:disabled {
   background: #0a0a0a;
   color: #525252;
+}
+
+/* Dark Mode - Tag Input Component */
+.dark-mode .tag-input-container {
+  background: #171717;
+  border-color: #404040;
+}
+
+.dark-mode .tag-input-container:focus-within {
+  border-color: #3b82f6;
+}
+
+.dark-mode .tag-badge.tag-blue {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93C5FD;
+}
+
+.dark-mode .tag-badge.tag-orange {
+  background: rgba(251, 146, 60, 0.15);
+  color: #FCD34D;
+}
+
+.dark-mode .tag-badge.tag-green {
+  background: rgba(34, 197, 94, 0.15);
+  color: #86EFAC;
+}
+
+.dark-mode .tag-badge.tag-purple {
+  background: rgba(124, 58, 237, 0.15);
+  color: #C4B5FD;
+}
+
+.dark-mode .tag-badge.tag-pink {
+  background: rgba(236, 72, 153, 0.15);
+  color: #F9A8D4;
+}
+
+.dark-mode .add-tag-btn {
+  background: #262626;
+  border-color: #525252;
+  color: #a3a3a3;
+}
+
+.dark-mode .add-tag-btn:hover {
+  background: #171717;
+  border-color: #737373;
+  color: #d4d4d4;
 }
 
 .dark-mode .visibility-toggle-container .toggle-switch {

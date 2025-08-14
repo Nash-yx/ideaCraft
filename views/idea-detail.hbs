@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="/css/idea-form.css">
+
 <div class="home-wrapper">
   {{> sidebar}}
   {{> messages}}
@@ -63,10 +65,18 @@
           <div class="metadata-row">
             <div class="metadata-field">
               <label class="field-label">Tags</label>
-              <div class="field-display metadata-display tags-placeholder">
-                <i class="fas fa-tag"></i>
-                <span class="placeholder-text">No tags yet</span>
-              </div>
+              {{#if idea.tags.length}}
+                <div class="field-display metadata-display">
+                  {{#each idea.tags}}
+                    <span class="tag-badge {{getTagColor @index}}">{{name}}</span>
+                  {{/each}}
+                </div>
+              {{else}}
+                <div class="field-display metadata-display tags-placeholder">
+                  <i class="fas fa-tag"></i>
+                  <span class="placeholder-text">No tags yet</span>
+                </div>
+              {{/if}}
             </div>
             <div class="metadata-field">
               <label class="field-label">Visibility</label>
