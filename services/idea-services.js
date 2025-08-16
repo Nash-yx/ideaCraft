@@ -218,6 +218,31 @@ const ideaServices = {
         orConditions.push({ userId: { [Op.in]: userIds } })
       }
 
+      // 搜尋匹配的標籤
+      const matchingTag = await Tag.findAll({
+        where: {
+          name: { [Op.like]: `%${safeQuery}%` }
+        },
+        attributes: ['id']
+      })
+
+      // 如果找到匹配的標籤，找到擁有這些標籤的 ideas
+      if (matchingTag.length > 0) {
+        const tagId = matchingTag.map(tag => tag.id)
+
+        // 從 IdeaTag 關聯表找到相關的 idea IDs
+        const { IdeaTag } = require('../models')
+        const ideaTagRelations = await IdeaTag.findAll({
+          where: { tagId },
+          attributes: ['ideaId']
+        })
+
+        if (ideaTagRelations.length > 0) {
+          const ideaIds = ideaTagRelations.map(relation => relation.ideaId)
+          orConditions.push({ id: { [Op.in]: ideaIds } })
+        }
+      }
+
       searchWhere = {
         [Op.or]: orConditions
       }

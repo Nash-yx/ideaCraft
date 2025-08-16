@@ -138,8 +138,15 @@ class SearchManager {
     const selectors = {
       'title': '.idea-title',
       'description': '.idea-description',
-      'author': '.author-name, .idea-author'
+      'author': '.author-name, .idea-author',
+      'tags': '.tag-badge'
     };
+    
+    if (field === 'tags') {
+      // Handle multiple tag elements
+      const tagElements = card.querySelectorAll(selectors[field]);
+      return Array.from(tagElements).map(el => el.textContent.trim()).join(' ');
+    }
     
     const element = card.querySelector(selectors[field]);
     return element ? element.textContent : '';

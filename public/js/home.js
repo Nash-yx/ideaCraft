@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const homeSearch = new SearchManager({
     searchInputId: 'homeSearch',
     gridId: 'homeIdeasGrid',
-    searchFields: ['title', 'description'],
+    searchFields: ['title', 'description', 'tags'],
     emptyMessage: 'No ideas found',
     emptySubMessage: 'Try different keywords or create a new idea.',
     debounceDelay: 300
