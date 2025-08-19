@@ -35,6 +35,7 @@
   </p>
 
   <form action="/signup" method="post">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <div class="form-group">
       <input type="text" class="form-input" name="name" placeholder="Full name" required />
       <span class="input-icon"><i class="fa-regular fa-user" style="color: #111;"></i></span>

@@ -47,6 +47,7 @@
   </p>
 
   <form action="/login" method="post">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
     <div class="form-group">
       <input type="email" class="form-input" name="email" placeholder="email address" required />
       <span class="input-icon"><i class="fa-regular fa-envelope" style="color: #111;"></i></span>

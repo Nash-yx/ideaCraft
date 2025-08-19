@@ -7,6 +7,7 @@
       {{#if isEdit}}
       <input type="hidden" name="_method" value="PUT">
       {{/if}}
+      <input type="hidden" name="_csrf" value="{{csrfToken}}">
       
       <!-- Idea Details Section -->
       <div class="section-group">

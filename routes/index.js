@@ -4,12 +4,13 @@ const userController = require('../controllers/user-controller')
 const passport = require('../config/passport')
 const { requireAuth } = require('../middleware/auth')
 const { upload } = require('../middleware/multer')
+const { authLimiter, createContentLimiter } = require('../middleware/rate-limit')
 const ideaController = require('../controllers/idea-controller')
 
 router.get('/signup', userController.signupPage)
-router.post('/signup', userController.signup)
+router.post('/signup', authLimiter, userController.signup)
 router.get('/login', userController.loginPage)
-router.post('/login', passport.authenticate('local', {
+router.post('/login', authLimiter, passport.authenticate('local', {
   failureRedirect: '/login',
   failureFlash: true
 }), userController.login)
@@ -38,10 +39,10 @@ router.get('/author/:id', requireAuth, userController.getAuthor)
 
 router.get('/ideas', requireAuth, ideaController.getIdeas)
 router.get('/ideas/new', requireAuth, ideaController.getNewIdeaPage)
-router.post('/ideas', requireAuth, ideaController.postIdea)
+router.post('/ideas', requireAuth, createContentLimiter, ideaController.postIdea)
 router.get('/ideas/:id', requireAuth, ideaController.getIdea)
 router.get('/ideas/:id/edit', requireAuth, ideaController.getEditIdeaPage)
-router.put('/ideas/:id', requireAuth, ideaController.updateIdea)
+router.put('/ideas/:id', requireAuth, createContentLimiter, ideaController.updateIdea)
 router.delete('/ideas/:id', requireAuth, ideaController.deleteIdea)
 
 router.get('/explore', requireAuth, ideaController.getExplorePage)

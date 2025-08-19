@@ -29,6 +29,7 @@
     <!-- Profile Form Content -->
     <div class="profile-form-container">
       <form id="profile-form" action="/users/{{user.id}}?_method=PUT" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_csrf" value="{{csrfToken}}">
         <input type="hidden" name="backgroundColor" id="backgroundColorInput" value="{{user.backgroundColor}}">
         <div class="profile-content-grid">
         <!-- Left Column -->

@@ -88,11 +88,15 @@ document.addEventListener('DOMContentLoaded', function() {
         this.disabled = true;
         this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         
+        // 獲取 CSRF token
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
         // 發送刪除請求
         fetch(`/ideas/${ideaId}`, {
           method: 'DELETE',
           headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-Token': csrfToken
           }
         })
         .then(response => {
