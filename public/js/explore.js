@@ -75,5 +75,44 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
   
-  console.log('Explore page with backend search initialized');
+  // ===== POPULAR TAGS FUNCTIONALITY =====
+  
+  // Handle popular tag button clicks
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.popular-tag-btn')) {
+      const button = e.target.closest('.popular-tag-btn');
+      const tagName = button.dataset.tag;
+      
+      if (tagName) {
+        // Find the search input and form
+        const searchInput = document.querySelector('input[name="q"]');
+        const searchForm = document.querySelector('.search-form');
+        
+        if (searchInput && searchForm) {
+          // Fill the search input with tag name
+          searchInput.value = tagName;
+          
+          // Add visual feedback
+          button.style.opacity = '0.5';
+          
+          // Submit the form to trigger search
+          searchForm.submit();
+        }
+      }
+    }
+  });
+  
+  // Add hover effects for popular tag buttons
+  const popularTagBtns = document.querySelectorAll('.popular-tag-btn');
+  popularTagBtns.forEach(btn => {
+    btn.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-1px)';
+    });
+    
+    btn.addEventListener('mouseleave', function() {
+      this.style.transform = '';
+    });
+  });
+  
+  console.log('Explore page with backend search and popular tags initialized');
 });

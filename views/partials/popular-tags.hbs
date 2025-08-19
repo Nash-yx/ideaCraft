@@ -1,0 +1,22 @@
+{{!-- Popular Tags Component --}}
+{{!-- Usage: {{> popular-tags popularTags=popularTags}} --}}
+
+{{#if popularTags.length}}
+<div class="popular-tags-container">
+  <div class="popular-tags-header">
+    <h4 class="popular-tags-title">
+      <i class="fas fa-fire"></i>
+      Popular Tags
+    </h4>
+  </div>
+  
+  <div class="popular-tags-list">
+    {{#each popularTags}}
+      <button type="button" class="popular-tag-btn" data-tag="{{name}}" title="Search for {{name}}">
+        <span class="tag-name">{{name}}</span>
+        <span class="tag-count">({{count}})</span>
+      </button>
+    {{/each}}
+  </div>
+</div>
+{{/if}}

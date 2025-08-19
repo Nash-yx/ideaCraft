@@ -143,3 +143,118 @@
     font-size: 7px;
   }
 }
+
+/* ===== POPULAR TAGS ===== */
+.popular-tags-container {
+  margin: 1.5rem 0;
+  padding: 1.25rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.popular-tags-header {
+  margin-bottom: 1rem;
+}
+
+.popular-tags-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.popular-tags-title i {
+  font-size: 0.8rem;
+  color: #f59e0b; /* 火焰圖標橘色 */
+}
+
+.popular-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* 黑白簡潔按鈕設計 */
+.popular-tag-btn {
+  background: transparent;
+  border: 1px solid #4b5563;
+  color: #1f2937;
+  padding: 0.4rem 0.8rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.popular-tag-btn:hover {
+  background: #1f2937;
+  color: #ffffff;
+  border-color: #1f2937;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tag-count {
+  opacity: 0.7;
+  font-weight: 400;
+}
+
+/* ===== DARK MODE SUPPORT ===== */
+.dark-mode .popular-tags-container {
+  background: var(--dark-card-bg);
+  border-color: var(--dark-border-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .popular-tags-title {
+  color: var(--dark-text-color);
+}
+
+.dark-mode .popular-tag-btn {
+  border-color: #9ca3af;
+  color: #d1d5db;
+}
+
+.dark-mode .popular-tag-btn:hover {
+  background: #d1d5db;
+  color: #1f2937;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .popular-tags-container {
+    margin: 1rem 0;
+    padding: 1rem;
+  }
+  
+  .popular-tags-title {
+    font-size: 0.85rem;
+  }
+  
+  .popular-tag-btn {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .popular-tags-list {
+    gap: 0.375rem;
+  }
+  
+  .popular-tag-btn {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.5rem;
+  }
+}

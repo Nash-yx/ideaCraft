@@ -110,11 +110,17 @@ const ideaController = {
 
       // 獲取搜尋查詢參數
       const searchQuery = req.query.q || req.query.search || ''
-      const ideas = await ideaServices.getPublicIdeas(searchQuery)
+
+      // 並行獲取 ideas 和熱門標籤資料
+      const [ideas, popularTags] = await Promise.all([
+        ideaServices.getPublicIdeas(searchQuery),
+        ideaServices.getPopularTags(8)
+      ])
 
       // 準備模板數據
       const templateData = {
         ideas,
+        popularTags,
         activePage: 'explore',
         searchQuery: searchQuery.trim(),
         hasSearch: searchQuery.trim().length > 0,

@@ -366,6 +366,31 @@ const ideaServices = {
     }
 
     return orphanedTags.length
+  },
+
+  getPopularTags: async (limit = 8) => {
+    const { Sequelize } = require('sequelize')
+
+    // 使用原生 SQL 查詢統計熱門標籤
+    const query = `
+      SELECT 
+        t.name,
+        COUNT(it.tag_id) AS count
+      FROM Tags AS t
+      INNER JOIN IdeaTags AS it ON t.id = it.tag_id
+      INNER JOIN Ideas AS i ON it.idea_id = i.id  
+      WHERE i.is_public = 1
+      GROUP BY t.id, t.name
+      ORDER BY count DESC
+      LIMIT ?
+    `
+
+    const results = await Tag.sequelize.query(query, {
+      replacements: [limit],  // replace ? in SQL query by order
+      type: Sequelize.QueryTypes.SELECT
+    })
+
+    return results
   }
 }
 
