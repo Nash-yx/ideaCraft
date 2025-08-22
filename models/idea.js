@@ -17,6 +17,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'ideaId',
         as: 'tags'
       })
+      Idea.hasMany(models.Favorite, { foreignKey: 'ideaId' })
+      Idea.belongsToMany(models.User, {
+        through: models.Favorite,
+        foreignKey: 'ideaId',
+        otherKey: 'userId',
+        as: 'favoriteUsers'
+      })
     }
   }
   Idea.init({

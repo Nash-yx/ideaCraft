@@ -1,4 +1,4 @@
-const { Idea, User, Tag } = require('../models')
+const { Idea, User, Tag, Favorite } = require('../models')
 const { v4: uuidv4 } = require('uuid')
 
 const ideaServices = {
@@ -169,7 +169,7 @@ const ideaServices = {
     // 執行刪除
     await idea.destroy()
   },
-  getPublicIdeas: async (searchQuery = '') => {
+  getPublicIdeas: async (searchQuery = '', userId = null) => {
     const { Op } = require('sequelize')
 
     // 安全搜尋函數：驗證和淨化輸入
@@ -272,7 +272,33 @@ const ideaServices = {
       nest: true
     })
 
-    return ideas.map(idea => idea.toJSON())
+    const ideaResults = ideas.map(idea => idea.toJSON())
+
+    // 如果有用戶ID，批量檢查收藏狀態
+    if (userId && ideaResults.length > 0) {
+      const ideaIds = ideaResults.map(idea => idea.id)
+      const favoriteRecords = await Favorite.findAll({
+        where: {
+          userId,
+          ideaId: { [Op.in]: ideaIds }
+        },
+        attributes: ['ideaId']
+      })
+
+      const favoritedIdeaIds = new Set(favoriteRecords.map(f => f.ideaId))
+
+      // 為每個想法添加收藏狀態
+      ideaResults.forEach(idea => {
+        idea.isFavorited = favoritedIdeaIds.has(idea.id)
+      })
+    } else {
+      // 如果沒有用戶ID，設置為未收藏
+      ideaResults.forEach(idea => {
+        idea.isFavorited = false
+      })
+    }
+
+    return ideaResults
   },
   getIdeaByShareLink: async (shareLink) => {
     const idea = await Idea.findOne({
@@ -391,6 +417,98 @@ const ideaServices = {
     })
 
     return results
+  },
+
+  // Favorites 相關服務
+  addFavorite: async (userId, ideaId) => {
+    // 檢查想法是否存在且為公開
+    const idea = await Idea.findOne({
+      where: {
+        id: ideaId,
+        isPublic: true
+      }
+    })
+
+    if (!idea) {
+      throw new Error('Idea not found or not public')
+    }
+
+    // 檢查用戶是否已收藏（避免重複）
+    const existingFavorite = await Favorite.findOne({
+      where: { userId, ideaId }
+    })
+
+    if (existingFavorite) {
+      throw new Error('Already favorited')
+    }
+
+    // 建立收藏記錄
+    const favorite = await Favorite.create({ userId, ideaId })
+    return favorite
+  },
+
+  removeFavorite: async (userId, ideaId) => {
+    const favorite = await Favorite.findOne({
+      where: { userId, ideaId }
+    })
+
+    if (!favorite) {
+      throw new Error('Favorite not found')
+    }
+
+    await favorite.destroy()
+    return { success: true }
+  },
+
+  getUserFavorites: async (userId, options = {}) => {
+    const { limit = 50, offset = 0 } = options
+
+    const user = await User.findByPk(userId)
+    if (!user) {
+      throw new Error('User not found')
+    }
+
+    // 透過多對多關係查詢用戶收藏的想法
+    const favoriteIdeas = await user.getFavoriteIdeas({
+      include: [
+        {
+          model: User,
+          as: 'User',
+          attributes: ['id', 'name', 'avatar']
+        },
+        {
+          model: Tag,
+          as: 'tags',
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
+        }
+      ],
+      through: {
+        attributes: ['createdAt'], // 包含收藏時間
+        as: 'favoriteInfo'
+      },
+      order: [[{ model: Favorite, as: 'favoriteInfo' }, 'createdAt', 'DESC']],
+      limit,
+      offset
+    })
+
+    return favoriteIdeas.map(idea => {
+      const ideaJson = idea.toJSON()
+      // 將收藏時間移到頂層方便存取
+      ideaJson.favoritedAt = ideaJson.favoriteInfo?.createdAt
+      delete ideaJson.favoriteInfo
+      return ideaJson
+    })
+  },
+
+  checkIfFavorited: async (userId, ideaId) => {
+    if (!userId) return false
+
+    const favorite = await Favorite.findOne({
+      where: { userId, ideaId }
+    })
+
+    return !!favorite
   }
 }
 

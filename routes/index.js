@@ -45,6 +45,11 @@ router.get('/ideas/:id/edit', requireAuth, ideaController.getEditIdeaPage)
 router.put('/ideas/:id', requireAuth, createContentLimiter, ideaController.updateIdea)
 router.delete('/ideas/:id', requireAuth, ideaController.deleteIdea)
 
+// Favorites 路由
+router.post('/ideas/:id/favorite', requireAuth, ideaController.addFavorite)
+router.delete('/ideas/:id/favorite', requireAuth, ideaController.removeFavorite)
+router.get('/users/:id/favorites', requireAuth, ideaController.getUserFavorites)
+
 router.get('/explore', requireAuth, ideaController.getExplorePage)
 
 router.get('/', (req, res) => {

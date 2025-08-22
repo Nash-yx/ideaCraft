@@ -113,7 +113,7 @@ const ideaController = {
 
       // 並行獲取 ideas 和熱門標籤資料
       const [ideas, popularTags] = await Promise.all([
-        ideaServices.getPublicIdeas(searchQuery),
+        ideaServices.getPublicIdeas(searchQuery, req.user.id),
         ideaServices.getPopularTags(8)
       ])
 
@@ -130,6 +130,78 @@ const ideaController = {
       return res.render('explore', templateData)
     } catch (err) {
       next(err)
+    }
+  },
+
+  // Favorites 相關控制器
+  addFavorite: async (req, res, next) => {
+    try {
+      const { id: ideaId } = req.params
+      const userId = req.user.id
+
+      await ideaServices.addFavorite(userId, parseInt(ideaId))
+
+      // 返回 JSON 供 AJAX 使用
+      return res.json({
+        success: true,
+        favorited: true,
+        message: 'Added to favorites'
+      })
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      })
+    }
+  },
+
+  removeFavorite: async (req, res, next) => {
+    try {
+      const { id: ideaId } = req.params
+      const userId = req.user.id
+
+      await ideaServices.removeFavorite(userId, parseInt(ideaId))
+
+      // 返回 JSON 供 AJAX 使用
+      return res.json({
+        success: true,
+        favorited: false,
+        message: 'Removed from favorites'
+      })
+    } catch (err) {
+      return res.status(400).json({
+        success: false,
+        message: err.message
+      })
+    }
+  },
+
+  getUserFavorites: async (req, res, next) => {
+    try {
+      const { id: userId } = req.params
+      const { limit, offset } = req.query
+
+      // 檢查權限：只有本人可以查看自己的收藏
+      if (parseInt(userId) !== req.user.id) {
+        req.flash('error_msg', 'Access denied')
+        return res.redirect('/ideas')
+      }
+
+      const favoriteIdeas = await ideaServices.getUserFavorites(
+        parseInt(userId),
+        {
+          limit: limit ? parseInt(limit) : 50,
+          offset: offset ? parseInt(offset) : 0
+        }
+      )
+
+      return res.render('favorites', {
+        ideas: favoriteIdeas,
+        activePage: 'favorites'
+      })
+    } catch (err) {
+      req.flash('error_msg', err.message)
+      return res.redirect('/ideas')
     }
   }
 }
