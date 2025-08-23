@@ -2,7 +2,7 @@
 {{!-- Usage: {{> idea-card idea=idea showAuthor=true showActions=false}} --}}
 <a href="{{#if exploreTab}}/explore?share={{shareLink}}{{else}}/ideas/{{id}}{{/if}}" class="idea-card" data-border="{{getBorderColor @index}}">
   {{#if showActions}}
-  <div class="idea-actions" onclick="event.preventDefault(); event.stopPropagation();">
+  <div class="idea-actions">
     <div class="idea-menu-wrapper">
       <button class="idea-menu-btn" title="More options" data-id="{{id}}">
         <i class="fas fa-ellipsis-h"></i>
@@ -18,6 +18,18 @@
         </button>
       </div>
     </div>
+  </div>
+  {{/if}}
+  
+  {{!-- Favorite button - only show on explore page for other people's ideas --}}
+  {{#if (and exploreTab (ne User.id @root.user.id))}}
+  <div class="idea-favorite">
+    <button class="favorite-btn {{#if isFavorited}}favorited{{/if}}" 
+            data-idea-id="{{id}}" 
+            title="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}"
+            aria-label="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}">
+      <i class="{{#if isFavorited}}fas{{else}}far{{/if}} fa-heart"></i>
+    </button>
   </div>
   {{/if}}
   

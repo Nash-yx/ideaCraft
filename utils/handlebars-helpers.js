@@ -25,6 +25,16 @@ const handlebarsHelpers = {
     return a === b
   },
 
+  // Not equal helper
+  ne: (a, b) => {
+    return a !== b
+  },
+
+  // Logical AND helper
+  and: (a, b) => {
+    return !!(a && b)
+  },
+
   // Conditional helper
   ifCond: function (conditional, options) {
     if (conditional) {

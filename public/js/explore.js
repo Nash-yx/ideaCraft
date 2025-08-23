@@ -114,5 +114,104 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
   
-  console.log('Explore page with backend search and popular tags initialized');
+  // ===== FAVORITES FUNCTIONALITY =====
+  
+  // Handle favorite button and area clicks
+  document.addEventListener('click', function(e) {
+    // 阻止整個收藏區域的點擊事件冒泡
+    if (e.target.closest('.idea-favorite')) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // 只有點擊收藏按鈕才觸發收藏功能
+      if (e.target.closest('.favorite-btn')) {
+        const button = e.target.closest('.favorite-btn');
+        const ideaId = button.getAttribute('data-idea-id');
+        
+        if (ideaId && !button.disabled) {
+          toggleFavorite(ideaId, button);
+        }
+      }
+    }
+  });
+  
+  /**
+   * Toggle favorite status for an idea
+   * @param {string} ideaId - The ID of the idea to favorite/unfavorite
+   * @param {HTMLElement} buttonElement - The favorite button element
+   */
+  async function toggleFavorite(ideaId, buttonElement) {
+    // Prevent multiple simultaneous requests
+    if (buttonElement.disabled) return;
+    
+    // 保存原始 ideaId，防止在過程中被修改
+    const originalIdeaId = ideaId;
+    
+    buttonElement.disabled = true;
+    const isFavorited = buttonElement.classList.contains('favorited');
+    const heartIcon = buttonElement.querySelector('i');
+    
+    try {
+      // Optimistic UI update
+      updateFavoriteUI(buttonElement, !isFavorited);
+      
+      // API request - 使用保存的 ideaId
+      const url = `/ideas/${originalIdeaId}/favorite`;
+      const method = isFavorited ? 'DELETE' : 'POST';
+      
+      // Get CSRF token from meta tag
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+      
+      const response = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (!result.success) {
+        // Revert optimistic update
+        updateFavoriteUI(buttonElement, isFavorited);
+      } else {
+        // Add success animation
+        buttonElement.classList.add('pulse');
+        setTimeout(() => {
+          buttonElement.classList.remove('pulse');
+        }, 300);
+      }
+    } catch (error) {
+      // Revert optimistic update
+      updateFavoriteUI(buttonElement, isFavorited);
+    } finally {
+      // Re-enable button
+      setTimeout(() => {
+        buttonElement.disabled = false;
+      }, 300); // Small delay to prevent rapid clicking
+    }
+  }
+  
+  /**
+   * Update favorite button UI
+   * @param {HTMLElement} buttonElement - The favorite button element  
+   * @param {boolean} isFavorited - Whether the idea is favorited
+   */
+  function updateFavoriteUI(buttonElement, isFavorited) {
+    const heartIcon = buttonElement.querySelector('i');
+    
+    if (isFavorited) {
+      buttonElement.classList.add('favorited');
+      buttonElement.title = 'Remove from favorites';
+      buttonElement.setAttribute('aria-label', 'Remove from favorites');
+      heartIcon.className = 'fas fa-heart';
+    } else {
+      buttonElement.classList.remove('favorited');
+      buttonElement.title = 'Add to favorites';
+      buttonElement.setAttribute('aria-label', 'Add to favorites');
+      heartIcon.className = 'far fa-heart';
+    }
+  }
+  
 });

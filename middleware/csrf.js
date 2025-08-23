@@ -32,7 +32,7 @@ const csrfMiddleware = {
       }
     }
 
-    const token = req.body._csrf || req.headers['x-csrf-token']
+    const token = (req.body && req.body._csrf) || req.headers['x-csrf-token']
 
     if (!token || !tokens.verify(req.session.csrfSecret, token)) {
       const isAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' ||

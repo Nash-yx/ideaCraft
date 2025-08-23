@@ -4,6 +4,18 @@ const authMiddleware = {
     if (req.isAuthenticated()) {
       return next()
     }
+
+    // 檢查是否為 AJAX 請求
+    const isAjax = req.headers['x-requested-with'] === 'XMLHttpRequest' ||
+                   (req.headers.accept && req.headers.accept.includes('application/json'))
+
+    if (isAjax) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      })
+    }
+
     req.flash('error_msg', 'Please log in to access this page')
     res.redirect('/login')
   },
