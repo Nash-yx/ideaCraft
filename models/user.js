@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       User.hasMany(models.Idea, { foreignKey: 'userId' })
       User.hasMany(models.Favorite, { foreignKey: 'userId' })
+      User.hasMany(models.View, { foreignKey: 'userId' })
       User.belongsToMany(models.Idea, {
         through: models.Favorite,
         foreignKey: 'userId',
