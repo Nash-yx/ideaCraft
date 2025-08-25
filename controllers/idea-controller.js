@@ -1,4 +1,5 @@
 const ideaServices = require('../services/idea-services')
+const viewServices = require('../services/view-services')
 
 const ideaController = {
   getIdeas: async (req, res, next) => {
@@ -23,6 +24,16 @@ const ideaController = {
     try {
       const idea = await ideaServices.getIdea(req)
       const isOwner = idea.userId === req.user.id
+
+      // 記錄瀏覽（非作者時才記錄）
+      if (!isOwner) {
+        try {
+          await viewServices.recordView(req.user.id, idea.id)
+        } catch (error) {
+          console.error('Failed to record view:', error.message)
+        }
+      }
+
       return res.render('idea-detail', {
         idea,
         isOwner,
