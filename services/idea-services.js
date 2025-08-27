@@ -1,5 +1,6 @@
-const { Idea, User, Tag, Favorite } = require('../models')
+const { Idea, User, Tag, Favorite, View } = require('../models')
 const { v4: uuidv4 } = require('uuid')
+const hotnessServices = require('./hotness-services')
 
 const ideaServices = {
   getIdeas: async (req) => {
@@ -170,7 +171,8 @@ const ideaServices = {
     await idea.destroy()
   },
   getPublicIdeas: async (searchQuery = '', userId = null) => {
-    const { Op } = require('sequelize')
+    const { Op, sequelize } = require('sequelize')
+    // const sequelize = Idea.sequelize
 
     // 安全搜尋函數：驗證和淨化輸入
     function safeSearch (query) {
@@ -266,7 +268,7 @@ const ideaServices = {
           through: { attributes: [] }
         }
       ],
-      order: [['createdAt', 'DESC']],
+      order: [['createdAt', 'DESC']], // 保留原排序作為 fallback
       limit: 50, // 限制結果數量防止大量資料返回
       raw: false,
       nest: true
@@ -274,9 +276,61 @@ const ideaServices = {
 
     const ideaResults = ideas.map(idea => idea.toJSON())
 
+    // 如果沒有結果，直接返回空陣列
+    if (ideaResults.length === 0) {
+      return ideaResults
+    }
+
+    // 批量獲取統計數據並計算熱門度
+    const ideaIds = ideaResults.map(idea => idea.id)
+    let sortedIdeas = ideaResults
+
+    try {
+      // 並行查詢收藏數和瀏覽數統計
+      const [favoriteStats, viewStats] = await Promise.all([
+        Favorite.findAll({
+          where: { ideaId: { [Op.in]: ideaIds } },
+          attributes: [
+            'ideaId',
+            [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+          ],
+          group: ['ideaId'],
+          raw: true
+        }),
+        View.findAll({
+          where: { ideaId: { [Op.in]: ideaIds } },
+          attributes: [
+            'ideaId',
+            [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+          ],
+          group: ['ideaId'],
+          raw: true
+        })
+      ])
+
+      // 整合統計數據並計算熱門度
+      const ideasWithHotness = ideaServices.combineStatsAndCalculateHotness(
+        ideaResults,
+        favoriteStats,
+        viewStats
+      )
+
+      // 按熱門度排序（熱門度相同時按創建時間排序）
+      sortedIdeas = ideasWithHotness.sort((a, b) => {
+        if (b.hotScore === a.hotScore) {
+          return new Date(b.createdAt) - new Date(a.createdAt)
+        }
+        return b.hotScore - a.hotScore
+      })
+    } catch (error) {
+      // 如果統計查詢失敗，記錄錯誤但不影響頁面顯示
+      console.error('Failed to calculate hotness scores:', error.message)
+      // 使用原始的時間排序作為 fallback
+      sortedIdeas = ideaResults
+    }
+
     // 如果有用戶ID，批量檢查收藏狀態
-    if (userId && ideaResults.length > 0) {
-      const ideaIds = ideaResults.map(idea => idea.id)
+    if (userId) {
       const favoriteRecords = await Favorite.findAll({
         where: {
           userId,
@@ -288,17 +342,43 @@ const ideaServices = {
       const favoritedIdeaIds = new Set(favoriteRecords.map(f => f.ideaId))
 
       // 為每個想法添加收藏狀態
-      ideaResults.forEach(idea => {
+      sortedIdeas.forEach(idea => {
         idea.isFavorited = favoritedIdeaIds.has(idea.id)
       })
     } else {
       // 如果沒有用戶ID，設置為未收藏
-      ideaResults.forEach(idea => {
+      sortedIdeas.forEach(idea => {
         idea.isFavorited = false
       })
     }
 
-    return ideaResults
+    return sortedIdeas
+  },
+
+  // 輔助函數：整合統計數據並計算熱門度
+  combineStatsAndCalculateHotness: (ideas, favoriteStats, viewStats) => {
+    // 建立統計數據快速查找 Map
+    const favoriteMap = new Map(favoriteStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0]))
+    const viewMap = new Map(viewStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0]))
+
+    // 為每個 idea 添加統計數據並計算熱門度
+    return ideas.map(idea => {
+      const favoriteCount = favoriteMap.get(idea.id) || 0
+      const viewCount = viewMap.get(idea.id) || 0
+
+      const hotScore = hotnessServices.calculateHotScore(
+        idea,
+        favoriteCount,
+        viewCount
+      )
+
+      return {
+        ...idea,
+        favoriteCount,
+        viewCount,
+        hotScore
+      }
+    })
   },
   getIdeaByShareLink: async (shareLink) => {
     const idea = await Idea.findOne({

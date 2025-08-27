@@ -34,7 +34,7 @@ const hotnessServices = {
   calculateBulkHotScores: (ideasWithStats) => {
     return ideasWithStats.map(item => ({
       ...item,
-      hotScore: this.calculateHotScore(
+      hotScore: hotnessServices.calculateHotScore(
         item.idea || item,
         item.favoriteCount || 0,
         item.viewCount || 0
