@@ -116,14 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // ===== FAVORITES FUNCTIONALITY =====
   
-  // Handle favorite button and area clicks
+  // Handle favorite button clicks (both old and new integrated buttons)
   document.addEventListener('click', function(e) {
-    // 阻止整個收藏區域的點擊事件冒泡
+    // Handle old favorite button style
     if (e.target.closest('.idea-favorite')) {
       e.preventDefault();
       e.stopPropagation();
       
-      // 只有點擊收藏按鈕才觸發收藏功能
       if (e.target.closest('.favorite-btn')) {
         const button = e.target.closest('.favorite-btn');
         const ideaId = button.getAttribute('data-idea-id');
@@ -131,6 +130,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (ideaId && !button.disabled) {
           toggleFavorite(ideaId, button);
         }
+      }
+    }
+    
+    // Handle new integrated favorite button with count
+    if (e.target.closest('.favorite-btn-with-count')) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const button = e.target.closest('.favorite-btn-with-count');
+      const ideaId = button.getAttribute('data-idea-id');
+      
+      if (ideaId && !button.disabled) {
+        toggleFavorite(ideaId, button);
       }
     }
   });
@@ -194,24 +206,88 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   /**
-   * Update favorite button UI
+   * Update favorite button UI and statistics
    * @param {HTMLElement} buttonElement - The favorite button element  
    * @param {boolean} isFavorited - Whether the idea is favorited
    */
   function updateFavoriteUI(buttonElement, isFavorited) {
     const heartIcon = buttonElement.querySelector('i');
+    const isIntegratedButton = buttonElement.classList.contains('favorite-btn-with-count');
     
     if (isFavorited) {
       buttonElement.classList.add('favorited');
       buttonElement.title = 'Remove from favorites';
       buttonElement.setAttribute('aria-label', 'Remove from favorites');
       heartIcon.className = 'fas fa-heart';
+      
+      // For integrated button, update the count within the button
+      if (isIntegratedButton) {
+        const countElement = buttonElement.querySelector('[data-favorite-count]');
+        if (countElement) {
+          updateStatCount(countElement, 1);
+        }
+      } else {
+        // For old button style, find external count element
+        const ideaCard = buttonElement.closest('.idea-card');
+        const favoriteCountElement = ideaCard?.querySelector('[data-favorite-count]');
+        if (favoriteCountElement) {
+          updateStatCount(favoriteCountElement, 1);
+        }
+      }
     } else {
       buttonElement.classList.remove('favorited');
       buttonElement.title = 'Add to favorites';
       buttonElement.setAttribute('aria-label', 'Add to favorites');
       heartIcon.className = 'far fa-heart';
+      
+      // For integrated button, update the count within the button
+      if (isIntegratedButton) {
+        const countElement = buttonElement.querySelector('[data-favorite-count]');
+        if (countElement) {
+          updateStatCount(countElement, -1);
+        }
+      } else {
+        // For old button style, find external count element
+        const ideaCard = buttonElement.closest('.idea-card');
+        const favoriteCountElement = ideaCard?.querySelector('[data-favorite-count]');
+        if (favoriteCountElement) {
+          updateStatCount(favoriteCountElement, -1);
+        }
+      }
     }
+  }
+  
+  /**
+   * Update statistic count display
+   * @param {HTMLElement} statElement - The stat count element
+   * @param {number} change - The change amount (+1 or -1)
+   */
+  function updateStatCount(statElement, change) {
+    const currentCount = parseInt(statElement.getAttribute('data-favorite-count') || '0');
+    const newCount = Math.max(0, currentCount + change); // Ensure non-negative
+    
+    // Update data attribute
+    statElement.setAttribute('data-favorite-count', newCount.toString());
+    
+    // Update displayed text using formatNumber helper
+    statElement.textContent = formatNumberJS(newCount);
+  }
+  
+  /**
+   * JavaScript version of formatNumber helper (matching handlebars helper)
+   * @param {number} num - Number to format
+   * @returns {string} Formatted number string
+   */
+  function formatNumberJS(num) {
+    if (!num || isNaN(num)) return '0';
+    const number = parseInt(num);
+    if (number >= 1000000) {
+      return (number / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (number >= 1000) {
+      return (number / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    }
+    return number.toString();
   }
   
 });

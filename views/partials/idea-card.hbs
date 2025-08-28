@@ -21,15 +21,33 @@
   </div>
   {{/if}}
   
-  {{!-- Favorite button - only show on explore page for other people's ideas --}}
-  {{#if (and exploreTab (ne User.id @root.user.id))}}
-  <div class="idea-favorite">
-    <button class="favorite-btn {{#if isFavorited}}favorited{{/if}}" 
-            data-idea-id="{{id}}" 
-            title="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}"
-            aria-label="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}">
-      <i class="{{#if isFavorited}}fas{{else}}far{{/if}} fa-heart"></i>
-    </button>
+  {{!-- Top-right corner: Statistics with integrated favorite button --}}
+  {{#if exploreTab}}
+  <div class="idea-top-right">
+    <div class="idea-stats-corner">
+      {{!-- View count --}}
+      <span class="stat-item">
+        <i class="fas fa-eye"></i>
+        <span class="stat-count" data-view-count="{{viewCount}}">{{formatNumber viewCount}}</span>
+      </span>
+      
+      {{!-- Favorite button with count - show for other people's ideas --}}
+      {{#if (ne User.id @root.user.id)}}
+      <button class="favorite-btn-with-count {{#if isFavorited}}favorited{{/if}}" 
+              data-idea-id="{{id}}" 
+              title="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}"
+              aria-label="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}">
+        <i class="{{#if isFavorited}}fas{{else}}far{{/if}} fa-heart"></i>
+        <span class="stat-count" data-favorite-count="{{favoriteCount}}">{{formatNumber favoriteCount}}</span>
+      </button>
+      {{else}}
+      {{!-- For own ideas, show favorite count without button --}}
+      <span class="stat-item">
+        <i class="fas fa-heart"></i>
+        <span class="stat-count" data-favorite-count="{{favoriteCount}}">{{formatNumber favoriteCount}}</span>
+      </span>
+      {{/if}}
+    </div>
   </div>
   {{/if}}
   

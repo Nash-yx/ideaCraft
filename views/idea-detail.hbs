@@ -25,6 +25,12 @@
           <span>Delete</span>
         </button>
       </div>
+      {{else}}
+      <div class="header-right">
+        <button class="favorite-btn {{#if idea.isFavorited}}favorited{{/if}}" data-idea-id="{{idea.id}}" title="{{#if idea.isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}">
+          <i class="{{#if idea.isFavorited}}fas{{else}}far{{/if}} fa-heart"></i>
+        </button>
+      </div>
       {{/if}}
     </div>
     
@@ -370,6 +376,40 @@
   cursor: pointer;
 }
 
+/* Favorite button */
+.favorite-btn {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--neutral-300);
+  background: var(--bg-primary);
+  color: var(--neutral-400);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.favorite-btn:hover {
+  background: var(--red-50);
+  color: var(--red-500);
+  border-color: var(--red-300);
+}
+
+.favorite-btn.favorited {
+  background: var(--red-50);
+  color: var(--red-500);
+  border-color: var(--red-300);
+}
+
+.favorite-btn.favorited:hover {
+  background: var(--red-100);
+  color: var(--red-600);
+  border-color: var(--red-400);
+}
+
 .edit-idea-btn:hover {
   background: var(--blue-50);
   color: var(--blue-600);
@@ -475,6 +515,30 @@
   color: #333;
 }
 
+.dark-mode .favorite-btn {
+  background: #262626;
+  border-color: #404040;
+  color: #737373;
+}
+
+.dark-mode .favorite-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.dark-mode .favorite-btn.favorited {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.dark-mode .favorite-btn.favorited:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .metadata-row {
@@ -495,6 +559,58 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Favorite button functionality
+  const favoriteBtn = document.querySelector('.favorite-btn');
+  if (favoriteBtn) {
+    favoriteBtn.addEventListener('click', function() {
+      const ideaId = this.getAttribute('data-idea-id');
+      const isFavorited = this.classList.contains('favorited');
+      const icon = this.querySelector('i');
+      
+      // Disable button during request
+      this.disabled = true;
+      
+      // Determine the method and endpoint
+      const method = isFavorited ? 'DELETE' : 'POST';
+      const endpoint = `/ideas/${ideaId}/favorite`;
+      
+      fetch(endpoint, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-CSRF-Token': '{{csrfToken}}'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update button state
+          if (data.favorited) {
+            this.classList.add('favorited');
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            this.title = 'Remove from favorites';
+          } else {
+            this.classList.remove('favorited');
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            this.title = 'Add to favorites';
+          }
+        } else {
+          throw new Error(data.message || 'Failed to update favorite');
+        }
+      })
+      .catch(error => {
+        console.error('Favorite error:', error);
+        alert('Failed to update favorite: ' + error.message);
+      })
+      .finally(() => {
+        this.disabled = false;
+      });
+    });
+  }
+
   // Delete button functionality
   const deleteBtn = document.querySelector('.delete-idea-btn');
   if (deleteBtn) {

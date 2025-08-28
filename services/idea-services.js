@@ -171,8 +171,8 @@ const ideaServices = {
     await idea.destroy()
   },
   getPublicIdeas: async (searchQuery = '', userId = null) => {
-    const { Op, sequelize } = require('sequelize')
-    // const sequelize = Idea.sequelize
+    const { Op } = require('sequelize')
+    const sequelize = Idea.sequelize
 
     // 安全搜尋函數：驗證和淨化輸入
     function safeSearch (query) {
@@ -380,7 +380,7 @@ const ideaServices = {
       }
     })
   },
-  getIdeaByShareLink: async (shareLink) => {
+  getIdeaByShareLink: async (shareLink, userId = null) => {
     const idea = await Idea.findOne({
       where: { shareLink },
       include: [
@@ -399,7 +399,20 @@ const ideaServices = {
       nest: true
     })
     if (!idea) throw new Error('Idea not found')
-    return idea.toJSON()
+
+    const ideaData = idea.toJSON()
+
+    // Add favorite status if userId is provided
+    if (userId) {
+      const favorite = await Favorite.findOne({
+        where: { userId, ideaId: idea.id }
+      })
+      ideaData.isFavorited = !!favorite
+    } else {
+      ideaData.isFavorited = false
+    }
+
+    return ideaData
   },
 
   // Tag 相關 service

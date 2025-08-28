@@ -1496,9 +1496,6 @@ body:has(.home-wrapper) .container-fluid {
 
 /* ===== FAVORITE BUTTON STYLES ===== */
 .idea-favorite {
-  position: absolute;
-  top: 16px;
-  right: 16px;
   display: flex;
   z-index: 10;
 }

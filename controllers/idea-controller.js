@@ -115,8 +115,23 @@ const ideaController = {
   getExplorePage: async (req, res, next) => {
     try {
       if (req.query.share) {
-        const idea = await ideaServices.getIdeaByShareLink(req.query.share)
-        return res.render('idea-detail', { idea, activePage: 'explore', isOwner: false })
+        const idea = await ideaServices.getIdeaByShareLink(req.query.share, req.user.id)
+        const isOwner = idea.userId === req.user.id
+
+        // 記錄瀏覽（非作者時才記錄）
+        if (!isOwner) {
+          try {
+            await viewServices.recordView(req.user.id, idea.id)
+          } catch (error) {
+            console.error('Failed to record view:', error.message)
+          }
+        }
+
+        return res.render('idea-detail', {
+          idea,
+          activePage: 'explore',
+          isOwner
+        })
       }
 
       // 獲取搜尋查詢參數

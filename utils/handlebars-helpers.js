@@ -174,6 +174,19 @@ const handlebarsHelpers = {
     if (!tagName) return ''
     if (tagName.length <= maxLength) return tagName
     return tagName.substring(0, maxLength - 2) + '...'
+  },
+
+  // Format number for display (1234 -> 1.2k, 1234567 -> 1.2M)
+  formatNumber: (num) => {
+    if (!num || isNaN(num)) return '0'
+    const number = parseInt(num)
+    if (number >= 1000000) {
+      return (number / 1000000).toFixed(1).replace(/\.0$/, '') + 'M'
+    }
+    if (number >= 1000) {
+      return (number / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+    }
+    return number.toString()
   }
 }
 
