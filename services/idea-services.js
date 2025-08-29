@@ -70,6 +70,15 @@ const ideaServices = {
       await ideaServices.associateTagsWithIdea(idea, tagNames)
     }
 
+    // 如果是公開想法，初始化熱門度分數
+    if (ideaData.isPublic) {
+      try {
+        await hotnessServices.updateSingleIdeaHotness(idea.id)
+      } catch (error) {
+        console.error(`Failed to initialize hotness score for new idea ${idea.id}:`, error.message)
+      }
+    }
+
     return idea
   },
   getIdea: async (req) => {
@@ -537,6 +546,14 @@ const ideaServices = {
 
     // 建立收藏記錄
     const favorite = await Favorite.create({ userId, ideaId })
+
+    // 即時更新該想法的熱門度分數
+    try {
+      await hotnessServices.updateSingleIdeaHotness(ideaId)
+    } catch (error) {
+      console.error(`Failed to update hotness score after favorite add for idea ${ideaId}:`, error.message)
+    }
+
     return favorite
   },
 
@@ -550,6 +567,14 @@ const ideaServices = {
     }
 
     await favorite.destroy()
+
+    // 即時更新該想法的熱門度分數
+    try {
+      await hotnessServices.updateSingleIdeaHotness(ideaId)
+    } catch (error) {
+      console.error(`Failed to update hotness score after favorite remove for idea ${ideaId}:`, error.message)
+    }
+
     return { success: true }
   },
 
