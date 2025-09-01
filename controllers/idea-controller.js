@@ -229,6 +229,65 @@ const ideaController = {
       req.flash('error_msg', err.message)
       return res.redirect('/ideas')
     }
+  },
+
+  // API 端點：分頁探索想法
+  getExploreIdeasAPI: async (req, res, next) => {
+    try {
+      const { cursor, limit = 20, q: searchQuery = '' } = req.query
+      const userId = req.user.id
+
+      // 參數驗證
+      const pageLimit = Math.min(Math.max(parseInt(limit) || 20, 1), 50) // 限制在1-50之間
+      const trimmedQuery = (searchQuery || '').trim().substring(0, 50) // 限制搜尋字串長度
+
+      // 呼叫 service 獲取分頁資料
+      const result = await ideaServices.getPublicIdeasPaginated(
+        cursor,
+        pageLimit,
+        trimmedQuery,
+        userId
+      )
+      console.log(result)
+      // 返回 JSON 格式
+      return res.json({
+        success: true,
+        ideas: result.ideas,
+        nextCursor: result.nextCursor,
+        hasMore: result.hasMore,
+        currentPage: {
+          count: result.ideas.length,
+          searchQuery: trimmedQuery,
+          hasSearch: trimmedQuery.length > 0
+        }
+      })
+    } catch (error) {
+      console.error('API error in getExploreIdeasAPI:', error.message)
+
+      // 區分不同類型的錯誤
+      if (error.message.includes('Invalid cursor')) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid cursor parameter',
+          code: 'INVALID_CURSOR'
+        })
+      }
+
+      if (error.message.includes('Database')) {
+        return res.status(500).json({
+          success: false,
+          error: 'Database error occurred',
+          code: 'DATABASE_ERROR'
+        })
+      }
+
+      // 一般錯誤
+      return res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        code: 'INTERNAL_ERROR'
+      })
+    }
   }
 }
 

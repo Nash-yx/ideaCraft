@@ -52,6 +52,9 @@ router.get('/users/:id/favorites', requireAuth, ideaController.getUserFavorites)
 
 router.get('/explore', requireAuth, ideaController.getExplorePage)
 
+// API 端點：分頁探索想法
+router.get('/api/explore/ideas', requireAuth, ideaController.getExploreIdeasAPI)
+
 router.get('/', (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/ideas')

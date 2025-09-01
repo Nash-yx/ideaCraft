@@ -183,87 +183,20 @@ const ideaServices = {
     const { Op } = require('sequelize')
     const sequelize = Idea.sequelize
 
-    // 安全搜尋函數：驗證和淨化輸入
-    function safeSearch (query) {
-      // 基本驗證
-      if (!query || typeof query !== 'string') {
-        return null
-      }
-
-      const trimmed = query.trim()
-
-      // 長度限制 (1-50 字符)
-      if (trimmed.length < 1 || trimmed.length > 50) {
-        return null
-      }
-
-      // 轉義 LIKE 特殊字符：% _ \
-      return trimmed.replace(/[%_\\]/g, (match) => `\\${match}`)
-    }
-
     // 基本查詢條件
-    const baseWhere = { isPublic: true }
+    let whereCondition = { isPublic: true }
 
-    // 安全的搜尋條件處理
-    const safeQuery = safeSearch(searchQuery)
-    let searchWhere = {}
-
-    if (safeQuery) {
-      // 構建搜尋條件陣列
-      const orConditions = [
-        { title: { [Op.like]: `%${safeQuery}%` } },
-        { content: { [Op.like]: `%${safeQuery}%` } }
-      ]
-
-      // 搜尋匹配的用戶名稱
-      const matchingUsers = await User.findAll({
-        where: {
-          name: { [Op.like]: `%${safeQuery}%` }
-        },
-        attributes: ['id']
-      })
-
-      // 如果找到匹配的用戶，將其加入搜尋條件
-      if (matchingUsers.length > 0) {
-        const userIds = matchingUsers.map(user => user.id)
-        orConditions.push({ userId: { [Op.in]: userIds } })
-      }
-
-      // 搜尋匹配的標籤
-      const matchingTag = await Tag.findAll({
-        where: {
-          name: { [Op.like]: `%${safeQuery}%` }
-        },
-        attributes: ['id']
-      })
-
-      // 如果找到匹配的標籤，找到擁有這些標籤的 ideas
-      if (matchingTag.length > 0) {
-        const tagId = matchingTag.map(tag => tag.id)
-
-        // 從 IdeaTag 關聯表找到相關的 idea IDs
-        const { IdeaTag } = require('../models')
-        const ideaTagRelations = await IdeaTag.findAll({
-          where: { tagId },
-          attributes: ['ideaId']
-        })
-
-        if (ideaTagRelations.length > 0) {
-          const ideaIds = ideaTagRelations.map(relation => relation.ideaId)
-          orConditions.push({ id: { [Op.in]: ideaIds } })
-        }
-      }
-
-      searchWhere = {
-        [Op.or]: orConditions
+    // 處理搜尋條件
+    if (searchQuery && searchQuery.trim()) {
+      const safeQuery = ideaServices.safeSearch(searchQuery.trim())
+      if (safeQuery) {
+        const searchConditions = await ideaServices.buildSearchConditions(safeQuery)
+        whereCondition = { ...whereCondition, ...searchConditions }
       }
     }
-
-    // 合併查詢條件
-    const whereClause = { ...baseWhere, ...searchWhere }
 
     const ideas = await Idea.findAll({
-      where: whereClause,
+      where: whereCondition,
       include: [
         {
           model: User,
@@ -627,6 +560,222 @@ const ideaServices = {
     })
 
     return !!favorite
+  },
+
+  /**
+   * 分頁獲取公開想法 (Cursor-based pagination)
+   * @param {string} cursor - 分頁游標
+   * @param {number} limit - 每頁數量
+   * @param {string} searchQuery - 搜尋關鍵字
+   * @param {number} userId - 用戶ID
+   * @returns {Promise<Object>} { ideas, nextCursor, hasMore }
+   */
+  getPublicIdeasPaginated: async (cursor, limit = 20, searchQuery = '', userId = null) => {
+    const { Op } = require('sequelize')
+    const cursorUtils = require('../utils/cursor-utils')
+    const sequelize = Idea.sequelize
+
+    try {
+      // 解碼游標
+      let cursorData = null
+      if (cursor) {
+        cursorData = cursorUtils.decodeCursor(cursor)
+        if (!cursorData) {
+          throw new Error('Invalid cursor format')
+        }
+      }
+
+      // 基本查詢條件：只要公開的想法
+      let whereCondition = { isPublic: true }
+
+      // 處理搜尋條件（複用現有邏輯）
+      if (searchQuery && searchQuery.trim()) {
+        const safeQuery = ideaServices.safeSearch(searchQuery.trim())
+        if (safeQuery) {
+          const searchConditions = await ideaServices.buildSearchConditions(safeQuery)
+          whereCondition = { ...whereCondition, ...searchConditions }
+        }
+      }
+
+      // 加入游標條件
+      if (cursorData) {
+        const cursorCondition = cursorUtils.buildWhereCondition(cursorData, Op)
+        whereCondition = { ...whereCondition, ...cursorCondition }
+      }
+
+      // 執行查詢（多取一筆來檢查是否還有更多）
+      const ideas = await Idea.findAll({
+        where: whereCondition,
+        include: [
+          {
+            model: User,
+            as: 'User',
+            attributes: ['id', 'name', 'avatar']
+          },
+          {
+            model: Tag,
+            as: 'tags',
+            attributes: ['id', 'name'],
+            through: { attributes: [] }
+          }
+        ],
+        order: [
+          ['hotnessScore', 'DESC'],  // 按熱門度排序
+          ['createdAt', 'DESC'],     // 相同熱度時按時間排序
+          ['id', 'DESC']             // 確保排序唯一性
+        ],
+        limit: limit + 1, // 多取一筆檢查是否還有更多
+        raw: false,
+        nest: true
+      })
+
+      // 檢查是否還有更多資料
+      const hasMore = ideas.length > limit
+      const resultIdeas = hasMore ? ideas.slice(0, limit) : ideas
+
+      // 轉換資料格式
+      const ideaResults = resultIdeas.map(idea => idea.toJSON())
+
+      // 如果有結果，獲取統計數據
+      let ideasWithStats = ideaResults
+      if (ideaResults.length > 0) {
+        const ideaIds = ideaResults.map(idea => idea.id)
+
+        // 並行查詢收藏數統計
+        const favoriteStats = await Favorite.findAll({
+          where: { ideaId: { [Op.in]: ideaIds } },
+          attributes: [
+            'ideaId',
+            [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+          ],
+          group: ['ideaId'],
+          raw: true
+        })
+
+        // 建立收藏數映射
+        const favoriteMap = new Map(
+          favoriteStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0])
+        )
+
+        // 為每個想法添加統計數據
+        ideasWithStats = ideaResults.map(idea => ({
+          ...idea,
+          favoriteCount: favoriteMap.get(idea.id) || 0
+        }))
+      }
+
+      // 如果有用戶ID，檢查收藏狀態
+      if (userId && ideasWithStats.length > 0) {
+        const ideaIds = ideasWithStats.map(idea => idea.id)
+        const favoriteRecords = await Favorite.findAll({
+          where: {
+            userId,
+            ideaId: { [Op.in]: ideaIds }
+          },
+          attributes: ['ideaId']
+        })
+
+        const favoritedIdeaIds = new Set(favoriteRecords.map(f => f.ideaId))
+
+        // 添加收藏狀態
+        ideasWithStats.forEach(idea => {
+          idea.isFavorited = favoritedIdeaIds.has(idea.id)
+        })
+      } else {
+        // 未登入用戶設為未收藏
+        ideasWithStats.forEach(idea => {
+          idea.isFavorited = false
+        })
+      }
+
+      // 生成下一頁游標
+      let nextCursor = null
+      if (hasMore && resultIdeas.length > 0) {
+        const lastIdea = resultIdeas[resultIdeas.length - 1]
+        nextCursor = cursorUtils.encodeCursor(
+          lastIdea.hotnessScore,
+          lastIdea.createdAt,
+          lastIdea.id
+        )
+      }
+
+      return {
+        ideas: ideasWithStats,
+        nextCursor,
+        hasMore
+      }
+    } catch (error) {
+      console.error('Error in getPublicIdeasPaginated:', error.message)
+      throw error
+    }
+  },
+
+  /**
+   * 安全搜尋函數（從 getPublicIdeas 提取出來）
+   * @param {string} query - 搜尋字串
+   * @returns {string|null} 安全的搜尋字串
+   */
+  safeSearch: (query) => {
+    if (!query || typeof query !== 'string') {
+      return null
+    }
+
+    const trimmed = query.trim()
+    if (trimmed.length < 1 || trimmed.length > 50) {
+      return null
+    }
+
+    // 轉義 LIKE 特殊字符：% _ \
+    return trimmed.replace(/[%_\\]/g, (match) => `\\${match}`)
+  },
+
+  /**
+   * 建立搜尋條件（從 getPublicIdeas 提取出來）
+   * @param {string} safeQuery - 安全的搜尋字串
+   * @returns {Promise<Object>} 搜尋條件物件
+   */
+  buildSearchConditions: async (safeQuery) => {
+    const { Op } = require('sequelize')
+
+    const orConditions = [
+      { title: { [Op.like]: `%${safeQuery}%` } },
+      { content: { [Op.like]: `%${safeQuery}%` } }
+    ]
+
+    // 搜尋匹配的用戶名稱
+    const matchingUsers = await User.findAll({
+      where: { name: { [Op.like]: `%${safeQuery}%` } },
+      attributes: ['id']
+    })
+
+    if (matchingUsers.length > 0) {
+      const userIds = matchingUsers.map(user => user.id)
+      orConditions.push({ userId: { [Op.in]: userIds } })
+    }
+
+    // 搜尋匹配的標籤
+    const matchingTags = await Tag.findAll({
+      where: { name: { [Op.like]: `%${safeQuery}%` } },
+      attributes: ['id']
+    })
+
+    if (matchingTags.length > 0) {
+      const tagIds = matchingTags.map(tag => tag.id)
+      const { IdeaTag } = require('../models')
+      const ideaTagRelations = await IdeaTag.findAll({
+        where: { tagId: { [Op.in]: tagIds } },
+        attributes: ['ideaId']
+      })
+
+      if (ideaTagRelations.length > 0) {
+        const ideaIds = ideaTagRelations.map(relation => relation.ideaId)
+        orConditions.push({ id: { [Op.in]: ideaIds } })
+      }
+    }
+
+    return {
+      [Op.or]: orConditions
+    }
   }
 }
 

@@ -29,6 +29,8 @@ build/
 *.tmp
 *.temp 
 
+test.js
+
 spec.md
 CLAUDE.md
 /docs

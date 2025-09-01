@@ -32,7 +32,18 @@ module.exports = (sequelize, DataTypes) => {
     content: DataTypes.TEXT,
     userId: DataTypes.INTEGER,
     isPublic: DataTypes.BOOLEAN,
-    shareLink: DataTypes.STRING
+    shareLink: DataTypes.STRING,
+    hotnessScore: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0.00,
+      comment: 'Pre-calculated hotness score for efficient pagination'
+    },
+    lastHotnessUpdate: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'Timestamp of last hotness score update'
+    }
   }, {
     sequelize,
     modelName: 'Idea',
