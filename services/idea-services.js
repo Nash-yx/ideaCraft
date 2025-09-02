@@ -210,22 +210,26 @@ const ideaServices = {
           through: { attributes: [] }
         }
       ],
-      order: [['createdAt', 'DESC']], // 保留原排序作為 fallback
-      limit: 50, // 限制結果數量防止大量資料返回
+      order: [
+        ['hotnessScore', 'DESC'],
+        ['createdAt', 'DESC'],
+        ['id', 'DESC']
+      ],
+      limit: 20,
       raw: false,
       nest: true
     })
 
-    const ideaResults = ideas.map(idea => idea.toJSON())
+    const ideaJsons = ideas.map(idea => idea.toJSON())
 
     // 如果沒有結果，直接返回空陣列
-    if (ideaResults.length === 0) {
-      return ideaResults
+    if (ideaJsons.length === 0) {
+      return ideaJsons
     }
 
     // 批量獲取統計數據並計算熱門度
-    const ideaIds = ideaResults.map(idea => idea.id)
-    let sortedIdeas = ideaResults
+    const ideaIds = ideaJsons.map(idea => idea.id)
+    let ideasWithStats = ideaJsons
 
     try {
       // 並行查詢收藏數和瀏覽數統計
@@ -250,25 +254,24 @@ const ideaServices = {
         })
       ])
 
-      // 整合統計數據並計算熱門度
-      const ideasWithHotness = ideaServices.combineStatsAndCalculateHotness(
-        ideaResults,
-        favoriteStats,
-        viewStats
-      )
+      // 建立統計數據快速查找 Map
+      const favoriteMap = new Map(favoriteStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0]))
+      const viewMap = new Map(viewStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0]))
 
-      // 按熱門度排序（熱門度相同時按創建時間排序）
-      sortedIdeas = ideasWithHotness.sort((a, b) => {
-        if (b.hotScore === a.hotScore) {
-          return new Date(b.createdAt) - new Date(a.createdAt)
-        }
-        return b.hotScore - a.hotScore
-      })
+      // 為每個 idea 添加統計數據
+      ideasWithStats = ideaJsons.map(idea => ({
+        ...idea,
+        favoriteCount: favoriteMap.get(idea.id) || 0,
+        viewCount: viewMap.get(idea.id) || 0
+      }))
     } catch (error) {
-      // 如果統計查詢失敗，記錄錯誤但不影響頁面顯示
-      console.error('Failed to calculate hotness scores:', error.message)
-      // 使用原始的時間排序作為 fallback
-      sortedIdeas = ideaResults
+      // 如果統計查詢失敗，記錄錯誤但設置默認值
+      console.error('Failed to fetch statistics:', error.message)
+      ideasWithStats = ideaJsons.map(idea => ({
+        ...idea,
+        favoriteCount: 0,
+        viewCount: 0
+      }))
     }
 
     // 如果有用戶ID，批量檢查收藏狀態
@@ -284,17 +287,17 @@ const ideaServices = {
       const favoritedIdeaIds = new Set(favoriteRecords.map(f => f.ideaId))
 
       // 為每個想法添加收藏狀態
-      sortedIdeas.forEach(idea => {
+      ideasWithStats.forEach(idea => {
         idea.isFavorited = favoritedIdeaIds.has(idea.id)
       })
     } else {
       // 如果沒有用戶ID，設置為未收藏
-      sortedIdeas.forEach(idea => {
+      ideasWithStats.forEach(idea => {
         idea.isFavorited = false
       })
     }
 
-    return sortedIdeas
+    return ideasWithStats
   },
 
   // 輔助函數：整合統計數據並計算熱門度
@@ -570,7 +573,7 @@ const ideaServices = {
    * @param {number} userId - 用戶ID
    * @returns {Promise<Object>} { ideas, nextCursor, hasMore }
    */
-  getPublicIdeasPaginated: async (cursor, limit = 20, searchQuery = '', userId = null) => {
+  getPublicIdeasPaginated: async (cursor, limit = 10, searchQuery = '', userId = null) => {
     const { Op } = require('sequelize')
     const cursorUtils = require('../utils/cursor-utils')
     const sequelize = Idea.sequelize
@@ -631,36 +634,52 @@ const ideaServices = {
 
       // 檢查是否還有更多資料
       const hasMore = ideas.length > limit
-      const resultIdeas = hasMore ? ideas.slice(0, limit) : ideas
+      const queryIdeas = hasMore ? ideas.slice(0, limit) : ideas
 
       // 轉換資料格式
-      const ideaResults = resultIdeas.map(idea => idea.toJSON())
+      const ideaJsons = queryIdeas.map(idea => idea.toJSON())
 
       // 如果有結果，獲取統計數據
-      let ideasWithStats = ideaResults
-      if (ideaResults.length > 0) {
-        const ideaIds = ideaResults.map(idea => idea.id)
+      let ideasWithStats = ideaJsons
+      if (ideaJsons.length > 0) {
+        const ideaIds = ideaJsons.map(idea => idea.id)
 
-        // 並行查詢收藏數統計
-        const favoriteStats = await Favorite.findAll({
-          where: { ideaId: { [Op.in]: ideaIds } },
-          attributes: [
-            'ideaId',
-            [sequelize.fn('COUNT', sequelize.col('id')), 'count']
-          ],
-          group: ['ideaId'],
-          raw: true
-        })
+        // 並行查詢收藏數和瀏覽數統計
+        const [favoriteStats, viewStats] = await Promise.all([
+          Favorite.findAll({
+            where: { ideaId: { [Op.in]: ideaIds } },
+            attributes: [
+              'ideaId',
+              [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+            ],
+            group: ['ideaId'],
+            raw: true
+          }),
+          // 使用 Sequelize ORM 查詢瀏覽數統計
+          View.findAll({
+            where: { ideaId: { [Op.in]: ideaIds } },
+            attributes: [
+              'ideaId',
+              [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+            ],
+            group: ['ideaId'],
+            raw: true
+          })
+        ])
 
-        // 建立收藏數映射
+        // 建立統計數據映射
         const favoriteMap = new Map(
           favoriteStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0])
         )
+        const viewMap = new Map(
+          viewStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0])
+        )
 
         // 為每個想法添加統計數據
-        ideasWithStats = ideaResults.map(idea => ({
+        ideasWithStats = ideaJsons.map(idea => ({
           ...idea,
-          favoriteCount: favoriteMap.get(idea.id) || 0
+          favoriteCount: favoriteMap.get(idea.id) || 0,
+          viewCount: viewMap.get(idea.id) || 0
         }))
       }
 
@@ -690,10 +709,10 @@ const ideaServices = {
 
       // 生成下一頁游標
       let nextCursor = null
-      if (hasMore && resultIdeas.length > 0) {
-        const lastIdea = resultIdeas[resultIdeas.length - 1]
+      if (hasMore && queryIdeas.length > 0) {
+        const lastIdea = queryIdeas[queryIdeas.length - 1]
         nextCursor = cursorUtils.encodeCursor(
-          lastIdea.hotnessScore,
+          parseFloat(lastIdea.hotnessScore), // 轉換字串為數字
           lastIdea.createdAt,
           lastIdea.id
         )

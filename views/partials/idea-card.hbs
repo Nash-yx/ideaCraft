@@ -1,6 +1,6 @@
 {{!-- Reusable idea card component --}}
 {{!-- Usage: {{> idea-card idea=idea showAuthor=true showActions=false}} --}}
-<a href="{{#if exploreTab}}/explore?share={{shareLink}}{{else}}/ideas/{{id}}{{/if}}" class="idea-card" data-border="{{getBorderColor @index}}">
+<a href="{{#if exploreTab}}/explore?share={{shareLink}}{{else}}/ideas/{{id}}{{/if}}" class="idea-card" data-border="{{getBorderColor @index}}" data-idea-id="{{id}}">
   {{#if showActions}}
   <div class="idea-actions">
     <div class="idea-menu-wrapper">

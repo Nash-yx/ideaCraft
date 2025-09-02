@@ -2,13 +2,13 @@
 document.addEventListener('DOMContentLoaded', function() {
   
   // Progressive Enhancement for search form
-  const searchForm = document.querySelector('.search-form');
-  const searchInput = searchForm?.querySelector('input[name="q"]');
-  const searchButton = searchForm?.querySelector('.search-submit-btn');
+  const mainSearchForm = document.querySelector('.search-form');
+  const searchInput = mainSearchForm?.querySelector('input[name="q"]');
+  const searchButton = mainSearchForm?.querySelector('.search-submit-btn');
   
-  if (searchForm && searchInput) {
+  if (mainSearchForm && searchInput) {
     // Add loading state on form submission
-    searchForm.addEventListener('submit', function(e) {
+    mainSearchForm.addEventListener('submit', function(e) {
       // Show loading state
       if (searchButton) {
         const originalHtml = searchButton.innerHTML;
@@ -289,5 +289,520 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     return number.toString();
   }
+  
+  // ===== INFINITE SCROLL FUNCTIONALITY =====
+  
+  // Infinite scroll state management
+  const infiniteScrollState = {
+    isLoading: false,
+    hasMore: true,
+    currentCursor: null,
+    searchQuery: new URLSearchParams(window.location.search).get('q') || ''
+  };
+
+  // Initialize infinite scroll state with smart detection
+  function initializeInfiniteScrollState() {
+    const existingIdeas = document.querySelectorAll('.idea-card');
+    const existingCount = existingIdeas.length;
+    
+    // Smart initialization logic
+    if (existingCount === 0) {
+      infiniteScrollState.hasMore = false;
+    } else {
+      infiniteScrollState.hasMore = true;
+    }
+  }
+  
+  // Initialize state after DOM is ready
+  initializeInfiniteScrollState();
+  
+  /**
+   * Initialize infinite scroll functionality
+   */
+  function initInfiniteScroll() {
+    const ideasGrid = document.getElementById('exploreIdeasGrid');
+    if (!ideasGrid) {
+      console.error('❌ Ideas grid not found');
+      return;
+    }
+    
+    // Create sentinel element for intersection observer
+    const sentinel = createSentinel();
+    ideasGrid.parentNode.appendChild(sentinel);
+    
+    // Initialize intersection observer
+    const observer = new IntersectionObserver(
+      handleIntersection,
+      {
+        root: null,
+        rootMargin: '200px', // Trigger 200px before reaching the sentinel
+        threshold: 0.1
+      }
+    );
+    
+    observer.observe(sentinel);
+    
+    // Store references for cleanup if needed
+    infiniteScrollState.observer = observer;
+    infiniteScrollState.sentinel = sentinel;
+  }
+  
+  /**
+   * Create sentinel element for intersection detection
+   * @returns {HTMLElement} The sentinel element
+   */
+  function createSentinel() {
+    const sentinel = document.createElement('div');
+    sentinel.id = 'infinite-scroll-sentinel';
+    sentinel.style.height = '1px';
+    sentinel.style.background = 'transparent';
+    sentinel.style.width = '100%';
+    return sentinel;
+  }
+  
+  /**
+   * Handle intersection observer callback
+   * @param {IntersectionObserverEntry[]} entries - Observer entries
+   */
+  function handleIntersection(entries) {
+    const [entry] = entries;
+    
+    // Only trigger if sentinel is visible and we're not already loading
+    if (entry.isIntersecting && 
+        !infiniteScrollState.isLoading && 
+        infiniteScrollState.hasMore) {
+      
+      // Debounce to prevent multiple rapid calls
+      if (infiniteScrollState.loadTimeout) {
+        clearTimeout(infiniteScrollState.loadTimeout);
+      }
+      
+      infiniteScrollState.loadTimeout = setTimeout(() => {
+        loadMoreIdeas();
+      }, 100); // 100ms debounce
+    }
+  }
+  
+  /**
+   * Load more ideas from the API
+   */
+  async function loadMoreIdeas() {
+    if (infiniteScrollState.isLoading || !infiniteScrollState.hasMore) {
+      return;
+    }
+    
+    infiniteScrollState.isLoading = true;
+    showLoadingIndicator();
+    
+    try {
+      const params = new URLSearchParams({
+        limit: '10',
+        q: infiniteScrollState.searchQuery
+      });
+      
+      if (infiniteScrollState.currentCursor) {
+        params.set('cursor', infiniteScrollState.currentCursor);
+      }
+      
+      const response = await fetch(`/api/explore/ideas?${params}`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.ideas && data.ideas.length > 0) {
+        appendNewIdeas(data.ideas);
+        infiniteScrollState.currentCursor = data.nextCursor;
+        infiniteScrollState.hasMore = data.hasMore;
+        
+        if (!data.hasMore) {
+          showEndMessage();
+        }
+      } else {
+        infiniteScrollState.hasMore = false;
+        showEndMessage();
+      }
+      
+    } catch (error) {
+      console.error('Error loading more ideas:', error);
+      showErrorState(error);
+    } finally {
+      infiniteScrollState.isLoading = false;
+      hideLoadingIndicator();
+    }
+  }
+  
+  /**
+   * Show loading indicator
+   */
+  function showLoadingIndicator() {
+    let indicator = document.getElementById('infinite-scroll-loading');
+    if (!indicator) {
+      indicator = document.createElement('div');
+      indicator.id = 'infinite-scroll-loading';
+      indicator.className = 'infinite-scroll-loading';
+      indicator.innerHTML = `
+        <div class="loading-content">
+          <div class="loading-spinner"></div>
+          <span class="loading-text">Loading more ideas...</span>
+        </div>
+      `;
+      
+      const sentinel = infiniteScrollState.sentinel;
+      sentinel.parentNode.insertBefore(indicator, sentinel);
+    }
+    
+    indicator.style.display = 'block';
+  }
+  
+  /**
+   * Hide loading indicator
+   */
+  function hideLoadingIndicator() {
+    const indicator = document.getElementById('infinite-scroll-loading');
+    if (indicator) {
+      indicator.style.display = 'none';
+    }
+  }
+  
+  /**
+   * Show end of content message
+   */
+  function showEndMessage() {
+    let endMessage = document.getElementById('infinite-scroll-end');
+    if (!endMessage) {
+      endMessage = document.createElement('div');
+      endMessage.id = 'infinite-scroll-end';
+      endMessage.className = 'infinite-scroll-end';
+      endMessage.innerHTML = `
+        <div class="end-message">
+          <i class="fas fa-check-circle"></i>
+          <span>You've reached the end!</span>
+        </div>
+      `;
+      
+      const sentinel = infiniteScrollState.sentinel;
+      sentinel.parentNode.insertBefore(endMessage, sentinel);
+    }
+    
+    endMessage.style.display = 'block';
+  }
+  
+  /**
+   * Show error state with retry option
+   * @param {Error} error - The error that occurred
+   */
+  function showErrorState(error) {
+    let errorElement = document.getElementById('infinite-scroll-error');
+    if (!errorElement) {
+      errorElement = document.createElement('div');
+      errorElement.id = 'infinite-scroll-error';
+      errorElement.className = 'infinite-scroll-error';
+      errorElement.innerHTML = `
+        <div class="error-content">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span class="error-message">Failed to load more ideas</span>
+          <button class="retry-btn" onclick="retryLoadMore()">
+            <i class="fas fa-redo"></i>
+            Try Again
+          </button>
+        </div>
+      `;
+      
+      const sentinel = infiniteScrollState.sentinel;
+      sentinel.parentNode.insertBefore(errorElement, sentinel);
+    }
+    
+    errorElement.style.display = 'block';
+  }
+  
+  /**
+   * Global retry function for error state
+   */
+  window.retryLoadMore = function() {
+    const errorElement = document.getElementById('infinite-scroll-error');
+    if (errorElement) {
+      errorElement.style.display = 'none';
+    }
+    
+    // Reset loading state and try again
+    infiniteScrollState.isLoading = false;
+    loadMoreIdeas();
+  };
+  
+  /**
+   * Append new ideas to the grid (with duplicate detection)
+   * @param {Array} ideas - Array of idea objects from API
+   */
+  function appendNewIdeas(ideas) {
+    const ideasGrid = document.getElementById('exploreIdeasGrid');
+    if (!ideasGrid) return;
+    
+    // Get existing idea IDs to prevent duplicates
+    const existingIdeas = new Set();
+    const existingCards = ideasGrid.querySelectorAll('.idea-card[data-idea-id]');
+    existingCards.forEach(card => {
+      const ideaId = card.getAttribute('data-idea-id');
+      if (ideaId) {
+        existingIdeas.add(parseInt(ideaId));
+      }
+    });
+    
+    // Filter out duplicate ideas
+    const newIdeas = ideas.filter(idea => {
+      const isDuplicate = existingIdeas.has(idea.id);
+      if (isDuplicate) {
+        console.warn('⚠️ Duplicate idea detected and filtered out:', idea.id, idea.title);
+      }
+      return !isDuplicate;
+    });
+    
+    // Only append non-duplicate ideas
+    newIdeas.forEach(idea => {
+      const ideaCardHTML = generateIdeaCardHTML(idea);
+      ideasGrid.insertAdjacentHTML('beforeend', ideaCardHTML);
+    });
+    
+    // Add hover effects to new cards
+    const newCards = ideasGrid.querySelectorAll('.idea-card:not([data-hover-initialized])');
+    newCards.forEach(card => {
+      card.setAttribute('data-hover-initialized', 'true');
+      card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+      });
+      
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+  }
+  
+  /**
+   * Generate HTML for an idea card (client-side templating)
+   * @param {Object} idea - Idea object from API
+   * @returns {string} HTML string for the idea card
+   */
+  function generateIdeaCardHTML(idea) {
+    const borderColor = getBorderColorJS(Math.floor(Math.random() * 8)); // Random border color
+    const viewCount = formatNumberJS(idea.viewCount || 0);
+    const favoriteCount = formatNumberJS(idea.favoriteCount || 0);
+    const heartIcon = idea.isFavorited ? 'fas fa-heart' : 'far fa-heart';
+    const favoritedClass = idea.isFavorited ? 'favorited' : '';
+    
+    // Generate tags HTML with proper styling (use tag index like Handlebars)
+    const tagsHTML = idea.tags && idea.tags.length > 0 
+      ? idea.tags.map((tag, index) => {
+          const tagColor = getTagColorJS(index);
+          const tagName = truncateTagJS(tag.name, 10);
+          return `<span class="tag-badge ${tagColor}" title="${escapeHTML(tag.name)}">${escapeHTML(tagName)}</span>`;
+        }).join('')
+      : '';
+    
+    // Truncate content like Handlebars helper
+    const truncatedContent = idea.content.length > 40 
+      ? idea.content.substring(0, 40) + '...' 
+      : idea.content;
+    
+    return `
+      <a href="/explore?share=${idea.shareLink}" class="idea-card" data-border="${borderColor}" data-idea-id="${idea.id}">
+        <div class="idea-top-right">
+          <div class="idea-stats-corner">
+            <span class="stat-item">
+              <i class="fas fa-eye"></i>
+              <span class="stat-count" data-view-count="${idea.viewCount || 0}">${viewCount}</span>
+            </span>
+            <button 
+              class="favorite-btn-with-count ${favoritedClass}"
+              data-idea-id="${idea.id}"
+              title="${idea.isFavorited ? 'Remove from favorites' : 'Add to favorites'}"
+              aria-label="${idea.isFavorited ? 'Remove from favorites' : 'Add to favorites'}"
+            >
+              <i class="${heartIcon}"></i>
+              <span class="stat-count" data-favorite-count="${idea.favoriteCount || 0}">${favoriteCount}</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="idea-color-bar" data-color="${borderColor}"></div>
+        
+        <div class="idea-content">
+          <h3 class="idea-title">${escapeHTML(idea.title)}</h3>
+          <p class="idea-description">${escapeHTML(truncatedContent)}</p>
+          
+          <div class="idea-footer">
+            <div class="idea-author-info author-clickable" data-user-id="${idea.User?.id || ''}">
+              <img src="${idea.User?.avatar || '/img/default-avatar.svg'}" alt="${escapeHTML(idea.User?.name || 'Anonymous')}" class="author-avatar">
+              <span class="author-name">${escapeHTML(idea.User?.name || 'Anonymous')}</span>
+            </div>
+            ${tagsHTML ? `<div class="idea-tags">${tagsHTML}</div>` : ''}
+          </div>
+        </div>
+      </a>
+    `;
+  }
+  
+  function getBorderColorJS(index) {
+    const colors = ['purple', 'green', 'red', 'blue', 'orange', 'teal', 'pink', 'indigo'];
+    return colors[index % colors.length];
+  }
+  
+  function getTagColorJS(index) {
+    // Match Handlebars helper color order exactly
+    const tagColors = ['tag-blue', 'tag-orange', 'tag-green', 'tag-purple', 'tag-pink'];
+    return tagColors[index % tagColors.length];
+  }
+
+  function truncateTagJS(tagName, maxLength = 10) {
+    if (!tagName) return '';
+    if (tagName.length <= maxLength) return tagName;
+    return tagName.substring(0, maxLength - 2) + '...';
+  }
+  
+  /**
+   * Escape HTML to prevent XSS
+   * @param {string} text - Text to escape
+   * @returns {string} Escaped text
+   */
+  function escapeHTML(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+  
+  // Initialize infinite scroll when DOM is ready
+  if (document.getElementById('exploreIdeasGrid')) {
+    initInfiniteScroll();
+  }
+  
+  // ===== BACK TO TOP FUNCTIONALITY =====
+  
+  /**
+   * Initialize back to top button
+   */
+  function initBackToTop() {
+    // Check if button already exists
+    if (document.querySelector('.back-to-top')) {
+      return;
+    }
+    
+    // Create back to top button
+    const backToTopBtn = document.createElement('button');
+    backToTopBtn.className = 'back-to-top';
+    backToTopBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    backToTopBtn.title = 'Back to top';
+    backToTopBtn.setAttribute('aria-label', 'Back to top');
+    
+    document.body.appendChild(backToTopBtn);
+    
+    // Show/hide button based on scroll position
+    let scrollTimeout;
+    window.addEventListener('scroll', function() {
+      // Use requestAnimationFrame for smooth performance
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+      
+      scrollTimeout = setTimeout(() => {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const shouldShow = scrollTop > 200; // Show after scrolling 200px
+        
+        if (shouldShow && !backToTopBtn.classList.contains('visible')) {
+          backToTopBtn.classList.add('visible');
+        } else if (!shouldShow && backToTopBtn.classList.contains('visible')) {
+          backToTopBtn.classList.remove('visible');
+        }
+      }, 10);
+    });
+    
+    // Handle click to scroll to top
+    backToTopBtn.addEventListener('click', function() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+  
+  // Initialize back to top button
+  initBackToTop();
+  
+  // ===== SEARCH INTEGRATION WITH INFINITE SCROLL =====
+  
+  /**
+   * Handle search form submission to reset infinite scroll
+   */
+  const searchFormForInfiniteScroll = document.querySelector('.search-form');
+  if (searchFormForInfiniteScroll) {
+    searchFormForInfiniteScroll.addEventListener('submit', function() {
+      // Reset infinite scroll state when searching
+      infiniteScrollState.currentCursor = null;
+      infiniteScrollState.hasMore = true;
+      infiniteScrollState.isLoading = false;
+      
+      // Update search query from form
+      const searchInput = searchFormForInfiniteScroll.querySelector('input[name="q"]');
+      if (searchInput) {
+        infiniteScrollState.searchQuery = searchInput.value.trim();
+      }
+      
+      // Hide any existing infinite scroll elements
+      const elements = [
+        'infinite-scroll-loading',
+        'infinite-scroll-end', 
+        'infinite-scroll-error'
+      ];
+      
+      elements.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.style.display = 'none';
+        }
+      });
+    });
+  }
+  
+  // ===== MOBILE OPTIMIZATION =====
+  
+  /**
+   * Adjust infinite scroll behavior for mobile devices
+   */
+  function optimizeForMobile() {
+    const isMobile = window.innerWidth <= 768;
+    
+    if (isMobile) {
+      // Adjust root margin for mobile (trigger earlier)
+      if (infiniteScrollState.observer) {
+        infiniteScrollState.observer.disconnect();
+        
+        const observer = new IntersectionObserver(
+          handleIntersection,
+          {
+            root: null,
+            rootMargin: '150px', // Smaller margin for mobile
+            threshold: 0.1
+          }
+        );
+        
+        observer.observe(infiniteScrollState.sentinel);
+        infiniteScrollState.observer = observer;
+      }
+    }
+  }
+  
+  // Apply mobile optimization on load and resize
+  optimizeForMobile();
+  window.addEventListener('resize', function() {
+    // Debounce resize events
+    clearTimeout(this.resizeTimeout);
+    this.resizeTimeout = setTimeout(optimizeForMobile, 250);
+  });
   
 });

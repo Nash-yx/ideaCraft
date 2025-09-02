@@ -234,11 +234,11 @@ const ideaController = {
   // API 端點：分頁探索想法
   getExploreIdeasAPI: async (req, res, next) => {
     try {
-      const { cursor, limit = 20, q: searchQuery = '' } = req.query
+      const { cursor, limit = 10, q: searchQuery = '' } = req.query
       const userId = req.user.id
 
       // 參數驗證
-      const pageLimit = Math.min(Math.max(parseInt(limit) || 20, 1), 50) // 限制在1-50之間
+      const pageLimit = Math.min(Math.max(parseInt(limit) || 10, 1), 20) // 限制在1-20之間
       const trimmedQuery = (searchQuery || '').trim().substring(0, 50) // 限制搜尋字串長度
 
       // 呼叫 service 獲取分頁資料
