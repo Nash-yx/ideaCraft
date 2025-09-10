@@ -1,5 +1,6 @@
 const { User } = require('../models')
 const userServices = require('../services/user-services')
+const profileServices = require('../services/profile-services')
 const userController = {
   signupPage: (req, res) => {
     res.render('signup', { layout: 'auth' })
@@ -43,12 +44,36 @@ const userController = {
     }
   },
   getAuthor: async (req, res) => {
-    const id = req.params.id
-    const user = await User.findByPk(id, { raw: true })
-    if (!user) {
-      return res.status(404).render('error', { message: 'User not found' })
+    try {
+      const id = req.params.id
+      const user = await User.findByPk(id, { raw: true })
+      if (!user) {
+        return res.status(404).render('error', { message: 'User not found' })
+      }
+
+      // 獲取用戶的統計數據和熱門ideas
+      const profileData = await profileServices.getUserProfileData(id)
+
+      return res.render('author', {
+        user,
+        stats: profileData.stats,
+        topIdeas: profileData.topIdeas,
+        activePage: 'explore'
+      })
+    } catch (error) {
+      console.error('Error in getAuthor:', error)
+      const user = await User.findByPk(req.params.id, { raw: true })
+      if (!user) {
+        return res.status(404).render('error', { message: 'User not found' })
+      }
+
+      return res.render('author', {
+        user,
+        stats: { totalViews: 0, totalFavorites: 0, ideasCount: 0 },
+        topIdeas: [],
+        activePage: 'explore'
+      })
     }
-    return res.render('author', { user, activePage: 'explore' })
   }
 }
 
