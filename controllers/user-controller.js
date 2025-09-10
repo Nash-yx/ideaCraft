@@ -30,9 +30,36 @@ const userController = {
     })
   },
   getUser: async (req, res) => {
-    const id = req.user.id
-    const user = await User.findByPk(id, { raw: true })
-    return res.render('profile', { user, activePage: 'profile' })
+    try {
+      const id = req.user.id
+      const user = await User.findByPk(id, { raw: true })
+      if (!user) {
+        return res.status(404).render('error', { message: 'User not found' })
+      }
+
+      // 獲取用戶的統計數據和熱門ideas
+      const profileData = await profileServices.getUserProfileData(id)
+
+      return res.render('profile', {
+        user,
+        stats: profileData.stats,
+        topIdeas: profileData.topIdeas,
+        activePage: 'profile'
+      })
+    } catch (error) {
+      console.error('Error in getUser:', error)
+      const user = await User.findByPk(req.user.id, { raw: true })
+      if (!user) {
+        return res.status(404).render('error', { message: 'User not found' })
+      }
+
+      return res.render('profile', {
+        user,
+        stats: { totalViews: 0, totalFavorites: 0, ideasCount: 0 },
+        topIdeas: [],
+        activePage: 'profile'
+      })
+    }
   },
   putUser: async (req, res, next) => {
     try {
@@ -53,6 +80,9 @@ const userController = {
 
       // 獲取用戶的統計數據和熱門ideas
       const profileData = await profileServices.getUserProfileData(id)
+
+      // 檢查是否為當前用戶自己的Profile
+      user.isCurrentUser = req.user && req.user.id == id
 
       return res.render('author', {
         user,
