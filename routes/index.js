@@ -5,6 +5,7 @@ const passport = require('../config/passport')
 const { requireAuth } = require('../middleware/auth')
 const { upload } = require('../middleware/multer')
 const { authLimiter, createContentLimiter } = require('../middleware/rate-limit')
+const csrfMiddleware = require('../middleware/csrf')
 const ideaController = require('../controllers/idea-controller')
 
 router.get('/signup', userController.signupPage)
@@ -33,7 +34,7 @@ router.get('/auth/github/callback',
 router.get('/logout', userController.logout)
 
 router.get('/users/:id', requireAuth, userController.getUser)
-router.put('/users/:id', requireAuth, upload.single('avatar'), userController.putUser)
+router.put('/users/:id', requireAuth, upload.single('avatar'), csrfMiddleware.verifyTokenManually, userController.putUser)
 
 router.get('/author/:id', requireAuth, userController.getAuthor)
 

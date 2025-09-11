@@ -32,6 +32,16 @@ const csrfMiddleware = {
       }
     }
 
+    // 檢查是否為 multipart 表單
+    const contentType = req.get('Content-Type') || ''
+    const isMultipart = contentType.includes('multipart/form-data')
+
+    // 對於 multipart 表單，跳過全局驗證，讓路由處理
+    if (isMultipart) {
+      req._skipCSRFVerification = false // 標記需要稍後驗證
+      return next()
+    }
+
     const token = (req.body && req.body._csrf) || req.headers['x-csrf-token']
 
     if (!token || !tokens.verify(req.session.csrfSecret, token)) {
@@ -44,6 +54,23 @@ const csrfMiddleware = {
         req.flash('error_msg', 'Security token invalid. Please try again.')
         return res.redirect('/login')
       }
+    }
+
+    next()
+  },
+
+  // 手動驗證 CSRF token（用於 multer 路由）
+  verifyTokenManually: (req, res, next) => {
+    if (!req.session.csrfSecret) {
+      req.flash('error_msg', 'Security token missing. Please try again.')
+      return res.redirect('/login')
+    }
+
+    const token = (req.body && req.body._csrf) || req.headers['x-csrf-token']
+
+    if (!token || !tokens.verify(req.session.csrfSecret, token)) {
+      req.flash('error_msg', 'Security token invalid. Please try again.')
+      return res.redirect('/login')
     }
 
     next()
