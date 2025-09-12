@@ -9,7 +9,7 @@
     <!-- Header -->
     <div class="home-header">
       <div class="header-left">
-        <a href="{{#if isOwner}}/ideas{{else}}/explore{{/if}}" class="back-link">
+        <a href="{{#if (eq activePage 'explore')}}/explore{{else}}/ideas{{/if}}" class="back-link" id="backLink">
           <i class="fas fa-arrow-left"></i>
         </a>
         <h1 class="page-title">{{idea.title}}</h1>
@@ -559,6 +559,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Handle hash-based navigation for back link
+  const backLink = document.getElementById('backLink');
+  if (backLink) {
+    const hash = window.location.hash;
+    
+    if (hash.includes('from=profile')) {
+      // User came from profile page, return to profile
+      backLink.href = '/users/{{user.id}}';
+    } else if (hash.includes('from=author')) {
+      // User came from author page, extract author ID and return, \d -> 匹配任何數字字符(0-9)
+      const authorIdMatch = hash.match(/authorId=(\d+)/); // return ["authorId=123", "123"] -> [完整匹配, 捕獲組1]
+      if (authorIdMatch) {
+        const authorId = authorIdMatch[1];
+        backLink.href = `/author/${authorId}`;
+      }
+    }
+    // Otherwise, keep the default behavior from template logic
+  }
   // Favorite button functionality
   const favoriteBtn = document.querySelector('.favorite-btn');
   if (favoriteBtn) {

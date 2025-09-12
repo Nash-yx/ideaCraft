@@ -7,9 +7,9 @@
     <!-- Author Header -->
     <div class="profile-header">
       <div class="header-left">
-        <button onclick="history.back()" class="back-link">
+        <a href="/explore" class="back-link">
           <i class="fas fa-arrow-left"></i>
-        </button>
+        </a>
         <h1 class="profile-title">User Profile</h1>
       </div>
     </div>
@@ -127,7 +127,7 @@
             {{#if topIdeas.length}}
               <div class="top-ideas-list">
                 {{#each topIdeas}}
-                  <div class="top-idea-item" onclick="window.open('/ideas/{{shareLink}}', '_blank')">
+                  <div class="top-idea-item" data-share-link="{{shareLink}}">
                     <div class="idea-content">
                       <h4 class="idea-title">{{truncatedTitle}}</h4>
                       <p class="idea-description">{{truncatedContent}}</p>
@@ -252,3 +252,39 @@
   color: #9ca3af;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Set correct back navigation based on URL hash
+  const backLink = document.querySelector('.back-link');
+  if (backLink) {
+    const hash = window.location.hash;
+    
+    if (hash.includes('from=ideas')) {
+      backLink.href = '/ideas';
+    } else if (hash.includes('from=explore')) {
+      backLink.href = '/explore';  
+    } else {
+      backLink.href = '/explore'; // Default to explore
+    }
+  }
+
+  // Handle top idea item clicks
+  const topIdeaItems = document.querySelectorAll('.top-idea-item[data-share-link]');
+  topIdeaItems.forEach(item => {
+    item.addEventListener('click', function() {
+      const shareLink = this.dataset.shareLink;
+      if (shareLink && shareLink !== '' && shareLink !== 'undefined') {
+        // Get current author ID from URL for return navigation
+        const currentUrl = window.location.pathname;
+        const authorId = currentUrl.split('/author/')[1]?.split('#')[0];
+        
+        // Navigate to explore page with share parameter and author source
+        window.location.href = `/explore?share=${shareLink}#from=author&authorId=${authorId}`;
+      } else {
+        console.warn('Invalid share link for navigation:', shareLink);
+      }
+    });
+  });
+});
+</script>

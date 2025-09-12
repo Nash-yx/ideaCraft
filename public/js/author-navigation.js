@@ -18,8 +18,18 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Only navigate if userId exists and is not empty or undefined
       if (userId && userId !== '' && userId !== 'undefined' && userId !== 'null') {
-        // Navigate to author page
-        window.location.href = `/author/${userId}`;
+        // Add source tracking via URL hash (more reliable than referer)
+        const currentPath = window.location.pathname;
+        let source = 'explore'; // default
+        
+        if (currentPath.includes('/ideas')) {
+          source = 'ideas';
+        } else if (currentPath.includes('/users')) {
+          source = 'profile';
+        }
+        
+        // Navigate to author page with source info
+        window.location.href = `/author/${userId}#from=${source}`;
       } else {
         console.warn('Invalid user ID for author navigation:', userId);
       }
