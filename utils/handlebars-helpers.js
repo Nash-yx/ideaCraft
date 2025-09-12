@@ -164,6 +164,11 @@ const handlebarsHelpers = {
     return (parseInt(a) || 0) - (parseInt(b) || 0)
   },
 
+  // Math add helper
+  add: (a, b) => {
+    return (parseInt(a) || 0) + (parseInt(b) || 0)
+  },
+
   // Greater than comparison helper
   gt: (a, b) => {
     return (parseInt(a) || 0) > (parseInt(b) || 0)

@@ -16,9 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
       // Get the user ID from data attribute
       const userId = this.getAttribute('data-user-id');
       
-      if (userId) {
+      // Only navigate if userId exists and is not empty or undefined
+      if (userId && userId !== '' && userId !== 'undefined' && userId !== 'null') {
         // Navigate to author page
         window.location.href = `/author/${userId}`;
+      } else {
+        console.warn('Invalid user ID for author navigation:', userId);
       }
     });
   });

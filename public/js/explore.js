@@ -637,7 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <p class="idea-description">${escapeHTML(truncatedContent)}</p>
           
           <div class="idea-footer">
-            <div class="idea-author-info author-clickable" data-user-id="${idea.User?.id || ''}">
+            <div class="idea-author-info ${idea.User?.id ? 'author-clickable' : ''}" ${idea.User?.id ? `data-user-id="${idea.User.id}"` : ''}>
               <img src="${idea.User?.avatar || '/img/default-avatar.svg'}" alt="${escapeHTML(idea.User?.name || 'Anonymous')}" class="author-avatar">
               <span class="author-name">${escapeHTML(idea.User?.name || 'Anonymous')}</span>
             </div>
