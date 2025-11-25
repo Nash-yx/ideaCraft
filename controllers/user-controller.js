@@ -82,10 +82,10 @@ const userController = {
       const profileData = await profileServices.getUserProfileData(id)
 
       // 檢查是否為當前用戶自己的Profile
-      user.isCurrentUser = req.user && req.user.id == id
+      user.isCurrentUser = req.user && req.user.id === parseInt(id)
 
       return res.render('author', {
-        user,
+        author: user,
         stats: profileData.stats,
         topIdeas: profileData.topIdeas,
         activePage: 'explore'
@@ -98,7 +98,7 @@ const userController = {
       }
 
       return res.render('author', {
-        user,
+        author: user,
         stats: { totalViews: 0, totalFavorites: 0, ideasCount: 0 },
         topIdeas: [],
         activePage: 'explore'

@@ -1,0 +1,119 @@
+<link rel="stylesheet" href="/css/home.css">
+<link rel="stylesheet" href="/css/explore.css">
+<link rel="stylesheet" href="/css/favorites.css">
+
+<div class="home-wrapper favorites-page">
+      
+      {{> sidebar}}
+      {{> messages}}
+      <!-- Main Content -->
+      <div class="home-main">
+        <!-- Header -->
+        <div class="home-header">
+          <div class="header-left">
+            <h1 class="page-title">❤️ My Favorite Ideas</h1>
+            <p class="page-subtitle">💝 Ideas you've saved for inspiration</p>
+          </div>
+          <div class="header-right">
+            <a href="/explore" class="explore-more-btn">
+              <i class="fas fa-search"></i>
+              <span>Explore More</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Favorites Statistics -->
+        <div class="ideas-stats favorites-stats">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Total Favorites</span>
+            </div>
+            <div class="stat-number">{{stats.totalFavorites}}</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">This Week</span>
+              {{#if stats.thisWeekFavorites}}
+              <div class="stat-trend positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>{{stats.thisWeekFavorites}}</span>
+              </div>
+              {{/if}}
+            </div>
+            <div class="stat-number">{{stats.thisWeekFavorites}}</div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Authors</span>
+            </div>
+            <div class="stat-number">{{stats.uniqueAuthors}}</div>
+          </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="favorites-controls">
+          {{> search-bar placeholder="Search in your favorites..." inputId="favoritesSearch"}}
+          <div class="sort-controls">
+            <select id="favoritesSort" class="sort-dropdown">
+              <option value="recent">Most Recent</option>
+              <option value="oldest">Oldest First</option>
+              <option value="popular">Most Popular</option>
+              <option value="author">By Author</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Ideas Content -->
+        <div class="ideas-content">
+          {{#if ideas.length}}
+          <div class="ideas-grid" id="favoritesIdeasGrid">
+            {{#each ideas}}
+            {{> idea-card showActions=false showAuthor=true favoritesTab=true}}
+            {{/each}}
+          </div>
+          {{else}}
+          <!-- Empty State -->
+          <div class="empty-state">
+            <div class="empty-state-content">
+              <div class="empty-state-icon">
+                <i class="fas fa-heart"></i>
+              </div>
+              <h3 class="empty-state-title">No favorite ideas yet</h3>
+              <p class="empty-state-message">Start exploring and save ideas that inspire you!</p>
+              <a href="/explore" class="btn btn-primary">
+                <i class="fas fa-search"></i>
+                Explore Ideas
+              </a>
+            </div>
+          </div>
+          {{/if}}
+        </div>
+
+        <!-- Smart Loading Section -->
+        {{#unless loadAll}}
+        {{#if (gt stats.totalFavorites ideas.length)}}
+        <div class="smart-loading-section">
+          <div class="loading-info">
+            <i class="fas fa-book"></i>
+            <span>You have {{subtract stats.totalFavorites ideas.length}} more favorites</span>
+          </div>
+          <div class="loading-buttons">
+            <button id="loadAllToSearch" class="btn btn-outline">
+              <i class="fas fa-search"></i>
+              Load All to Search
+            </button>
+            <button id="loadAllFavorites" class="btn btn-primary">
+              <i class="fas fa-heart"></i>
+              Load All Favorites
+            </button>
+          </div>
+        </div>
+        {{/if}}
+        {{/unless}}
+
+      </div>
+    </div>
+
+<script src="/js/favorites.js"></script>

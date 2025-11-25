@@ -1,6 +1,6 @@
 {{!-- Reusable idea card component --}}
 {{!-- Usage: {{> idea-card idea=idea showAuthor=true showActions=false}} --}}
-<a href="{{#if exploreTab}}/explore?share={{shareLink}}{{else}}/ideas/{{id}}{{/if}}" class="idea-card" data-border="{{getBorderColor @index}}" data-idea-id="{{id}}">
+<a href="{{#if (or exploreTab favoritesTab)}}/explore?share={{shareLink}}{{else}}/ideas/{{id}}{{/if}}" class="idea-card" data-border="{{getBorderColor @index}}" data-idea-id="{{id}}">
   {{#if showActions}}
   <div class="idea-actions">
     <div class="idea-menu-wrapper">
@@ -22,7 +22,7 @@
   {{/if}}
   
   {{!-- Top-right corner: Statistics with integrated favorite button --}}
-  {{#if exploreTab}}
+  {{#if (or exploreTab favoritesTab)}}
   <div class="idea-top-right">
     <div class="idea-stats-corner">
       {{!-- View count --}}
@@ -31,21 +31,32 @@
         <span class="stat-count" data-view-count="{{viewCount}}">{{formatNumber viewCount}}</span>
       </span>
       
-      {{!-- Favorite button with count - show for other people's ideas --}}
-      {{#if (ne User.id @root.user.id)}}
-      <button class="favorite-btn-with-count {{#if isFavorited}}favorited{{/if}}" 
+      {{#if favoritesTab}}
+      {{!-- Favorites tab: Always show unfavorite button --}}
+      <button class="favorite-btn-with-count favorited unfavorite-btn" 
               data-idea-id="{{id}}" 
-              title="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}"
-              aria-label="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}">
-        <i class="{{#if isFavorited}}fas{{else}}far{{/if}} fa-heart"></i>
+              title="Remove from favorites"
+              aria-label="Remove from favorites">
+        <i class="fas fa-heart"></i>
         <span class="stat-count" data-favorite-count="{{favoriteCount}}">{{formatNumber favoriteCount}}</span>
       </button>
       {{else}}
-      {{!-- For own ideas, show favorite count without button --}}
-      <span class="stat-item">
-        <i class="fas fa-heart"></i>
-        <span class="stat-count" data-favorite-count="{{favoriteCount}}">{{formatNumber favoriteCount}}</span>
-      </span>
+      {{!-- Explore tab: Regular favorite/unfavorite logic --}}
+        {{#if (ne User.id @root.user.id)}}
+        <button class="favorite-btn-with-count {{#if isFavorited}}favorited{{/if}}" 
+                data-idea-id="{{id}}" 
+                title="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}"
+                aria-label="{{#if isFavorited}}Remove from favorites{{else}}Add to favorites{{/if}}">
+          <i class="fas fa-heart"></i>
+          <span class="stat-count" data-favorite-count="{{favoriteCount}}">{{formatNumber favoriteCount}}</span>
+        </button>
+        {{else}}
+        {{!-- For own ideas, show favorite count without button --}}
+        <span class="stat-item">
+          <i class="fas fa-heart"></i>
+          <span class="stat-count" data-favorite-count="{{favoriteCount}}">{{formatNumber favoriteCount}}</span>
+        </span>
+        {{/if}}
       {{/if}}
     </div>
   </div>
@@ -65,39 +76,68 @@
       </div>
       {{/if}}
     {{/unless}}
-    <div class="idea-footer">
-      {{#if showAuthor}}
-        <!-- Explore mode: show author with avatar -->
+    {{#if favoritesTab}}
+      <!-- Favorites mode: show tags above author row -->
+      {{#if tags.length}}
+      <div class="idea-tags-row">
+        <div class="idea-tags inline-tags">
+          {{#each (slice tags 0 3)}}
+            <span class="tag-badge {{getTagColor @index}}" title="{{name}}">{{truncateTag name 8}}</span>
+          {{/each}}
+          {{#if (gt tags.length 3)}}
+            <span class="more-tags">+{{subtract tags.length 3}}</span>
+          {{/if}}
+        </div>
+      </div>
+      {{/if}}
+      
+      <!-- Favorites mode: author and favorited time on same row -->
+      <div class="idea-footer favorites-footer">
         <div class="idea-author-info author-clickable" data-user-id="{{User.id}}">
           <img src="{{defaultAvatar User.avatar}}" alt="{{User.name}}" class="author-avatar">
           <span class="author-name">{{User.name}}</span>
         </div>
-      {{else}}
-        <!-- My Ideas mode: show date -->
-        <span class="idea-date">{{formatDate createdAt}}</span>
-      {{/if}}
-      <div class="idea-metadata">
-        <div class="idea-status">
-          {{#if exploreTab}}
-            {{#if tags.length}}
-              <div class="idea-tags inline-tags">
-                {{#each (slice tags 0 3)}}
-                  <span class="tag-badge {{getTagColor @index}}" title="{{name}}">{{truncateTag name 8}}</span>
-                {{/each}}
-                {{#if (gt tags.length 3)}}
-                  <span class="more-tags">+{{subtract tags.length 3}}</span>
-                {{/if}}
-              </div>
-            {{/if}}
-          {{else}}
-            {{#if isPublic}}
-              <span class="status-indicator public">Public</span>
-            {{else}}
-              <span class="status-indicator private">Private</span>
-            {{/if}}
-          {{/if}}
+        <div class="favorited-time">
+          <i class="fas fa-heart"></i>
+          <span>Favorited {{timeAgo favoritedAt}}</span>
         </div>
       </div>
-    </div>
+    {{else}}
+      <!-- Other modes: normal footer -->
+      <div class="idea-footer">
+        {{#if showAuthor}}
+          <!-- Explore mode: show author with avatar -->
+          <div class="idea-author-info author-clickable" data-user-id="{{User.id}}">
+            <img src="{{defaultAvatar User.avatar}}" alt="{{User.name}}" class="author-avatar">
+            <span class="author-name">{{User.name}}</span>
+          </div>
+        {{else}}
+          <!-- My Ideas mode: show date -->
+          <span class="idea-date">{{formatDate createdAt}}</span>
+        {{/if}}
+        <div class="idea-metadata">
+          <div class="idea-status">
+            {{#if exploreTab}}
+              {{#if tags.length}}
+                <div class="idea-tags inline-tags">
+                  {{#each (slice tags 0 3)}}
+                    <span class="tag-badge {{getTagColor @index}}" title="{{name}}">{{truncateTag name 8}}</span>
+                  {{/each}}
+                  {{#if (gt tags.length 3)}}
+                    <span class="more-tags">+{{subtract tags.length 3}}</span>
+                  {{/if}}
+                </div>
+              {{/if}}
+            {{else}}
+              {{#if isPublic}}
+                <span class="status-indicator public">Public</span>
+              {{else}}
+                <span class="status-indicator private">Private</span>
+              {{/if}}
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    {{/if}}
   </div>
 </a>

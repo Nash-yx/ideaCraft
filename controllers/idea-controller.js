@@ -188,24 +188,31 @@ const ideaController = {
 
       await ideaServices.removeFavorite(userId, parseInt(ideaId))
 
-      // 返回 JSON 供 AJAX 使用
-      return res.json({
-        success: true,
-        favorited: false,
-        message: 'Removed from favorites'
-      })
+      // Set flash message for favorites page
+      req.flash('success_msg', 'Removed from favorites')
+
+      // For AJAX requests from favorites page, return success status
+      if (req.xhr || req.headers['content-type'] === 'application/json') {
+        return res.status(200).json({ success: true })
+      }
+
+      // For regular form submissions, redirect back
+      return res.redirect('back')
     } catch (err) {
-      return res.status(400).json({
-        success: false,
-        message: err.message
-      })
+      req.flash('error_msg', err.message || 'Failed to remove from favorites')
+
+      if (req.xhr || req.headers['content-type'] === 'application/json') {
+        return res.status(400).json({ success: false })
+      }
+
+      return res.redirect('back')
     }
   },
 
   getUserFavorites: async (req, res, next) => {
     try {
       const { id: userId } = req.params
-      const { limit, offset } = req.query
+      const { limit, offset, loadAll } = req.query
 
       // 檢查權限：只有本人可以查看自己的收藏
       if (parseInt(userId) !== req.user.id) {
@@ -213,17 +220,27 @@ const ideaController = {
         return res.redirect('/ideas')
       }
 
+      // 智慧載入邏輯：根據loadAll參數決定載入數量
+      const loadLimit = loadAll === 'true' ? undefined : (limit ? parseInt(limit) : 50)
+      const loadOffset = offset ? parseInt(offset) : 0
+
+      // 取得收藏的ideas
       const favoriteIdeas = await ideaServices.getUserFavorites(
         parseInt(userId),
         {
-          limit: limit ? parseInt(limit) : 50,
-          offset: offset ? parseInt(offset) : 0
+          limit: loadLimit,
+          offset: loadOffset
         }
       )
 
+      // 計算統計資料
+      const stats = await ideaServices.getFavoriteStats(parseInt(userId))
+
       return res.render('favorites', {
         ideas: favoriteIdeas,
-        activePage: 'favorites'
+        stats,
+        activePage: 'favorites',
+        loadAll: loadAll === 'true'
       })
     } catch (err) {
       req.flash('error_msg', err.message)

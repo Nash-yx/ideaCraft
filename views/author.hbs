@@ -22,15 +22,15 @@
           <!-- Profile Photo Section -->
           <div class="profile-photo-card">
             <div class="photo-gradient-container">
-              <div class="gradient-background" style="background: {{#if user.backgroundColor}}{{user.backgroundColor}}{{else}}linear-gradient(135deg, #E879F9 0%, #8B5CF6 25%, #06B6D4 50%, #10B981 75%, #F59E0B 100%){{/if}};">
+              <div class="gradient-background" style="background: {{#if author.backgroundColor}}{{author.backgroundColor}}{{else}}linear-gradient(135deg, #E879F9 0%, #8B5CF6 25%, #06B6D4 50%, #10B981 75%, #F59E0B 100%){{/if}};">
               </div>
               <div class="profile-avatar-container">
-                <img src="{{defaultAvatar user.avatar}}" alt="Profile Avatar" class="profile-avatar-img">
+                <img src="{{defaultAvatar author.avatar}}" alt="Profile Avatar" class="profile-avatar-img">
               </div>
             </div>
             <div class="photo-section-content">
               <h3 class="photo-title">Profile Photo</h3>
-              <p class="photo-description">{{user.name}}'s profile picture</p>
+              <p class="photo-description">{{author.name}}'s profile picture</p>
             </div>
           </div>
 
@@ -42,7 +42,7 @@
               <label class="field-label">Full Name</label>
               <div class="info-value">
                 <i class="fas fa-user info-icon"></i>
-                <span>{{user.name}}</span>
+                <span>{{author.name}}</span>
               </div>
             </div>
 
@@ -50,7 +50,7 @@
               <label class="field-label">Email Address</label>
               <div class="info-value">
                 <i class="fas fa-envelope info-icon"></i>
-                <span>{{#if user.email}}{{user.email}}{{else}}Not provided{{/if}}</span>
+                <span>{{#if user.email}}{{author.email}}{{else}}Not provided{{/if}}</span>
               </div>
             </div>
 
@@ -58,7 +58,7 @@
               <label class="field-label">Role</label>
               <div class="info-value">
                 <i class="fas fa-briefcase info-icon"></i>
-                <span>{{#if user.role}}{{user.role}}{{else}}Not specified{{/if}}</span>
+                <span>{{#if user.role}}{{author.role}}{{else}}Not specified{{/if}}</span>
               </div>
             </div>
 
@@ -79,7 +79,7 @@
             <h3 class="section-title">Bio</h3>
             <div class="bio-content">
               {{#if user.bio}}
-                <p>{{user.bio}}</p>
+                <p>{{author.bio}}</p>
               {{else}}
                 <p class="no-bio">This user hasn't added a bio yet.</p>
               {{/if}}

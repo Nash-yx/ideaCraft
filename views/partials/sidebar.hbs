@@ -24,6 +24,10 @@
         <i class="fas fa-globe"></i>
         <span>Explore</span>
       </a>
+      <a href="/users/{{user.id}}/favorites" class="nav-item {{#ifCond (eq activePage 'favorites')}}active{{/ifCond}}">
+        <i class="fas fa-heart"></i>
+        <span>Favorites</span>
+      </a>
     </nav>
   </div>
 

@@ -275,8 +275,6 @@
     padding: 16px;
   }
 }
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
 
 .stat-item {
   display: flex;
@@ -314,7 +312,8 @@
 
 .favorite-btn-with-count i {
   font-size: 11px;
-  opacity: 0.8;
+  opacity: 0.6;
+  color: #9ca3af;
   transition: all 0.2s ease;
   padding: 3px;
   border-radius: 50%;

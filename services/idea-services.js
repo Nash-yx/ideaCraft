@@ -522,37 +522,143 @@ const ideaServices = {
       throw new Error('User not found')
     }
 
-    // 透過多對多關係查詢用戶收藏的想法
-    const favoriteIdeas = await user.getFavoriteIdeas({
+    // 使用更簡單直接的查詢方式
+    const favorites = await Favorite.findAll({
+      where: { userId },
       include: [
         {
-          model: User,
-          as: 'User',
-          attributes: ['id', 'name', 'avatar']
-        },
-        {
-          model: Tag,
-          as: 'tags',
-          attributes: ['id', 'name'],
-          through: { attributes: [] }
+          model: Idea,
+          include: [
+            {
+              model: User,
+              attributes: ['id', 'name', 'avatar']
+            },
+            {
+              model: Tag,
+              as: 'tags',
+              attributes: ['id', 'name'],
+              through: { attributes: [] }
+            }
+          ]
         }
       ],
-      through: {
-        attributes: ['createdAt'], // 包含收藏時間
-        as: 'favoriteInfo'
-      },
-      order: [[{ model: Favorite, as: 'favoriteInfo' }, 'createdAt', 'DESC']],
+      order: [['createdAt', 'DESC']], // 依收藏時間排序
       limit,
       offset
     })
 
-    return favoriteIdeas.map(idea => {
-      const ideaJson = idea.toJSON()
-      // 將收藏時間移到頂層方便存取
-      ideaJson.favoritedAt = ideaJson.favoriteInfo?.createdAt
-      delete ideaJson.favoriteInfo
+    // 提取idea對象並添加收藏時間
+    const ideaJsons = favorites.map(favorite => {
+      const ideaJson = favorite.Idea.toJSON()
+      ideaJson.favoritedAt = favorite.createdAt
       return ideaJson
     })
+
+    // 如果沒有收藏的ideas，直接返回空陣列
+    if (ideaJsons.length === 0) {
+      return ideaJsons
+    }
+
+    // 批量獲取統計數據
+    const { Op } = require('sequelize')
+    const sequelize = Idea.sequelize
+    const ideaIds = ideaJsons.map(idea => idea.id)
+
+    try {
+      // 並行查詢收藏數和瀏覽數統計
+      const [favoriteStats, viewStats] = await Promise.all([
+        Favorite.findAll({
+          where: { ideaId: { [Op.in]: ideaIds } },
+          attributes: [
+            'ideaId',
+            [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+          ],
+          group: ['ideaId'],
+          raw: true
+        }),
+        View.findAll({
+          where: { ideaId: { [Op.in]: ideaIds } },
+          attributes: [
+            'ideaId',
+            [sequelize.fn('COUNT', sequelize.col('id')), 'count']
+          ],
+          group: ['ideaId'],
+          raw: true
+        })
+      ])
+
+      // 建立統計數據快速查找 Map
+      const favoriteMap = new Map(favoriteStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0]))
+      const viewMap = new Map(viewStats.map(stat => [stat.ideaId, parseInt(stat.count) || 0]))
+
+      // 為每個 idea 添加統計數據
+      return ideaJsons.map(idea => ({
+        ...idea,
+        favoriteCount: favoriteMap.get(idea.id) || 0,
+        viewCount: viewMap.get(idea.id) || 0
+      }))
+    } catch (error) {
+      // 如果統計查詢失敗，記錄錯誤但設置默認值
+      console.error('Failed to fetch favorite statistics:', error.message)
+      return ideaJsons.map(idea => ({
+        ...idea,
+        favoriteCount: 0,
+        viewCount: 0
+      }))
+    }
+  },
+  /**
+   * 取得使用者收藏統計資料
+   * @param {number} userId - 使用者ID
+   * @returns {Promise<Object>} 統計資料
+   */
+  getFavoriteStats: async (userId) => {
+    const { Op } = require('sequelize')
+    const moment = require('moment')
+
+    try {
+      // 總收藏數
+      const totalCount = await Favorite.count({
+        where: { userId }
+      })
+
+      // 本週新增收藏數
+      const weekStart = moment().startOf('week').toDate()
+      const thisWeekCount = await Favorite.count({
+        where: {
+          userId,
+          createdAt: { [Op.gte]: weekStart }
+        }
+      })
+
+      // 收藏的作者數量（不重複）
+      const favoritesWithAuthors = await Favorite.findAll({
+        where: { userId },
+        include: [{
+          model: Idea,
+          attributes: ['userId'],
+          required: true
+        }],
+        attributes: []
+      })
+
+      // 使用 Set 計算不重複的作者數量
+      const authorIds = new Set(favoritesWithAuthors.map(fav => fav.Idea.userId))
+      const uniqueAuthorsCount = authorIds.size
+
+      return {
+        totalFavorites: totalCount,
+        thisWeekFavorites: thisWeekCount,
+        uniqueAuthors: uniqueAuthorsCount
+      }
+    } catch (error) {
+      console.error('Error getting favorite stats:', error)
+      return {
+        totalFavorites: 0,
+        thisWeekFavorites: 0,
+        uniqueAuthors: 0
+      }
+    }
   },
 
   checkIfFavorited: async (userId, ideaId) => {

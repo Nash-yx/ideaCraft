@@ -35,6 +35,11 @@ const handlebarsHelpers = {
     return !!(a && b)
   },
 
+  // Logical OR helper
+  or: (a, b) => {
+    return !!(a || b)
+  },
+
   // Conditional helper
   ifCond: function (conditional, options) {
     if (conditional) {
