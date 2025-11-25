@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const ideaId = this.dataset.ideaId;
       if (ideaId && ideaId !== '' && ideaId !== 'undefined') {
         // Navigate to own idea management page with profile source tracking
-        window.location.href = `/ideas/${ideaId}#from=profile`;
+        window.location.href = `/ideas/${ideaId}`;
       } else {
         console.warn('Invalid idea ID for navigation:', ideaId);
       }
