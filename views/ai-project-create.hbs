@@ -1,0 +1,138 @@
+<link rel="stylesheet" href="/css/idea-form.css">
+<link rel="stylesheet" href="/css/ai-features.css">
+
+<div class="home-wrapper">
+  {{> sidebar}}
+  {{> messages}}
+
+  <!-- Main Content -->
+  <div class="home-main">
+    <!-- Header -->
+    <div class="ai-header">
+      <div class="ai-header-content">
+        <div class="ai-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="ai-header-text">
+          <h1 class="ai-title">AI Project Assistant</h1>
+          <p class="ai-subtitle">Transform your ideas into actionable plans</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="ai-container">
+      <div class="ai-content">
+        <!-- Input Section -->
+        <div class="ai-input-section">
+          <form action="/ai-projects" method="POST" class="ai-form">
+            <div class="ai-input-group">
+              <p class="ai-prompt">Tell me about your project idea</p>
+              <textarea
+                id="description"
+                name="description"
+                class="ai-textarea"
+                rows="4"
+                placeholder="I want to build a personal finance app that helps users track expenses, set budgets, and get AI-powered financial advice..."
+                maxlength="1000"
+                required
+              ></textarea>
+              <div class="ai-textarea-footer">
+                <span class="character-count">
+                  <span id="charCount">0</span>/1000
+                </span>
+                <div class="ai-actions">
+                  <button type="button" class="ai-btn ai-btn-clear" onclick="document.getElementById('description').value=''; document.getElementById('charCount').textContent='0';">
+                    <i class="fas fa-eraser"></i>
+                    Clear
+                  </button>
+                  <button type="submit" class="ai-btn ai-btn-primary" id="submitBtn">
+                    <i class="fas fa-sparkles"></i>
+                    <span>Generate Plan</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Features Section -->
+        <div class="ai-features-section">
+          <div class="ai-features-header">
+            <h3>What you'll get</h3>
+          </div>
+          <div class="ai-features-grid">
+            <div class="ai-feature-card">
+              <div class="ai-feature-icon">
+                <i class="fas fa-list-alt"></i>
+              </div>
+              <div class="ai-feature-content">
+                <h4>User Stories</h4>
+                <p>Breakdown into user-focused features</p>
+              </div>
+            </div>
+            <div class="ai-feature-card">
+              <div class="ai-feature-icon">
+                <i class="fas fa-tasks"></i>
+              </div>
+              <div class="ai-feature-content">
+                <h4>Action Items</h4>
+                <p>Specific tasks to implement</p>
+              </div>
+            </div>
+            <div class="ai-feature-card">
+              <div class="ai-feature-icon">
+                <i class="fas fa-columns"></i>
+              </div>
+              <div class="ai-feature-content">
+                <h4>Kanban Board</h4>
+                <p>Visual progress tracking</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const descriptionTextarea = document.getElementById('description')
+  const charCount = document.getElementById('charCount')
+  const submitBtn = document.getElementById('submitBtn')
+  const form = document.querySelector('.ai-form')
+
+  // Character count functionality
+  if (descriptionTextarea && charCount) {
+    const updateCharCount = () => {
+      const count = descriptionTextarea.value.length
+      charCount.textContent = count
+    }
+
+    descriptionTextarea.addEventListener('input', updateCharCount)
+    updateCharCount()
+  }
+
+  // Form submission with loading state
+  if (form && submitBtn) {
+    form.addEventListener('submit', function(e) {
+      submitBtn.disabled = true
+      submitBtn.innerHTML = `
+        <i class="fas fa-spinner fa-spin"></i>
+        <span>Analyzing...</span>
+      `
+
+      setTimeout(() => {
+        if (submitBtn.disabled) {
+          submitBtn.disabled = false
+          submitBtn.innerHTML = `
+            <i class="fas fa-sparkles"></i>
+            <span>Generate Plan</span>
+          `
+        }
+      }, 30000)
+    })
+  }
+})
+</script>

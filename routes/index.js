@@ -7,6 +7,7 @@ const { upload } = require('../middleware/multer')
 const { authLimiter, createContentLimiter } = require('../middleware/rate-limit')
 const csrfMiddleware = require('../middleware/csrf')
 const ideaController = require('../controllers/idea-controller')
+const aiProjectController = require('../controllers/ai-project-controller')
 
 router.get('/signup', userController.signupPage)
 router.post('/signup', authLimiter, userController.signup)
@@ -52,6 +53,10 @@ router.delete('/ideas/:id/favorite', requireAuth, ideaController.removeFavorite)
 router.get('/users/:id/favorites', requireAuth, ideaController.getUserFavorites)
 
 router.get('/explore', requireAuth, ideaController.getExplorePage)
+
+// AI Projects 路由
+router.get('/ai-projects', requireAuth, aiProjectController.getCreatePage)
+router.post('/ai-projects', requireAuth, createContentLimiter, aiProjectController.postProject)
 
 // API 端點：分頁探索想法
 router.get('/api/explore/ideas', requireAuth, ideaController.getExploreIdeasAPI)
