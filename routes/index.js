@@ -58,6 +58,9 @@ router.get('/explore', requireAuth, ideaController.getExplorePage)
 router.get('/ai-projects', requireAuth, aiProjectController.getCreatePage)
 router.post('/ai-projects', requireAuth, createContentLimiter, aiProjectController.postProject)
 
+// AI 測試路由（開發用）
+router.get('/api/ai/test', aiProjectController.testAIConnection)
+
 // API 端點：分頁探索想法
 router.get('/api/explore/ideas', requireAuth, ideaController.getExploreIdeasAPI)
 
