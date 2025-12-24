@@ -1,0 +1,229 @@
+<link rel="stylesheet" href="/css/idea-form.css">
+<link rel="stylesheet" href="/css/ai-features.css">
+<link rel="stylesheet" href="/css/kanban.css">
+
+<div class="home-wrapper">
+  {{> sidebar}}
+  {{> messages}}
+
+  <!-- Main Content -->
+  <div class="home-main">
+    <!-- Header -->
+    <div class="ai-header">
+      <div class="ai-header-content">
+        <div class="ai-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="ai-header-text">
+          <h1 class="ai-title">{{project.title}}</h1>
+          <p class="ai-subtitle">{{project.summary}}</p>
+        </div>
+        <div class="ai-header-actions">
+          <a href="/ai-projects" class="ai-btn ai-btn-secondary">
+            <i class="fas fa-plus"></i>
+            New Project
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project Stats -->
+    <div class="project-stats">
+      <div class="stat-item">
+        <div class="stat-number">{{meta.stories_count}}</div>
+        <div class="stat-label">User Stories</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{meta.tasks_count}}</div>
+        <div class="stat-label">Tasks</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{meta.input_length}}</div>
+        <div class="stat-label">Characters</div>
+      </div>
+    </div>
+
+    <!-- Kanban Board -->
+    <div class="kanban-container">
+      <div class="kanban-board">
+        <!-- Backlog Column -->
+        <div class="kanban-column" data-status="backlog">
+          <div class="kanban-column-header">
+            <div class="kanban-column-title">
+              <i class="fas fa-inbox"></i>
+              Backlog
+            </div>
+            <div class="kanban-column-count">
+              {{#each project.stories}}{{#if (eq status "backlog")}}1{{/if}}{{/each}}
+            </div>
+          </div>
+          <div class="kanban-column-content" id="backlog-stories">
+            {{#each project.stories}}
+            {{#if (eq status "backlog")}}
+              <div class="story-card" data-story-id="{{id}}" data-priority="{{priority}}">
+                <div class="story-header">
+                  <div class="story-title">{{title}}</div>
+                  <div class="story-priority priority-{{priority}}">P{{priority}}</div>
+                </div>
+                <div class="story-description">{{description}}</div>
+                <div class="story-tasks">
+                  {{#each tasks}}
+                    <div class="task-item" data-task-id="{{id}}" data-status="{{status}}">
+                      <div class="task-status status-{{status}}">
+                        {{#if (eq status "todo")}}
+                          <i class="far fa-circle"></i>
+                        {{else if (eq status "in_progress")}}
+                          <i class="fas fa-play-circle"></i>
+                        {{else if (eq status "done")}}
+                          <i class="fas fa-check-circle"></i>
+                        {{/if}}
+                      </div>
+                      <div class="task-content">
+                        <div class="task-title">{{title}}</div>
+                        <div class="task-hours">{{estimated_hours}}h</div>
+                      </div>
+                    </div>
+                  {{/each}}
+                </div>
+              </div>
+            {{/if}}
+            {{/each}}
+          </div>
+        </div>
+
+        <!-- In Progress Column -->
+        <div class="kanban-column" data-status="in_progress">
+          <div class="kanban-column-header">
+            <div class="kanban-column-title">
+              <i class="fas fa-play"></i>
+              In Progress
+            </div>
+            <div class="kanban-column-count">0</div>
+          </div>
+          <div class="kanban-column-content" id="progress-stories">
+            <!-- Stories will be moved here -->
+          </div>
+        </div>
+
+        <!-- Done Column -->
+        <div class="kanban-column" data-status="done">
+          <div class="kanban-column-header">
+            <div class="kanban-column-title">
+              <i class="fas fa-check"></i>
+              Done
+            </div>
+            <div class="kanban-column-count">0</div>
+          </div>
+          <div class="kanban-column-content" id="done-stories">
+            <!-- Completed stories will be moved here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Original Description -->
+    <div class="project-description">
+      <h3>Original Description</h3>
+      <div class="description-content">{{originalDescription}}</div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 初始化拖拽功能
+  initializeDragAndDrop()
+
+  // 初始化任務點擊功能
+  initializeTaskToggle()
+
+  // 更新計數器
+  updateColumnCounts()
+})
+
+function initializeDragAndDrop() {
+  const storyCards = document.querySelectorAll('.story-card')
+  const columns = document.querySelectorAll('.kanban-column-content')
+
+  storyCards.forEach(card => {
+    card.draggable = true
+
+    card.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', card.dataset.storyId)
+      card.classList.add('dragging')
+    })
+
+    card.addEventListener('dragend', function(e) {
+      card.classList.remove('dragging')
+    })
+  })
+
+  columns.forEach(column => {
+    column.addEventListener('dragover', function(e) {
+      e.preventDefault()
+      column.classList.add('drag-over')
+    })
+
+    column.addEventListener('dragleave', function(e) {
+      column.classList.remove('drag-over')
+    })
+
+    column.addEventListener('drop', function(e) {
+      e.preventDefault()
+      column.classList.remove('drag-over')
+
+      const storyId = e.dataTransfer.getData('text/plain')
+      const storyCard = document.querySelector(`[data-story-id="${storyId}"]`)
+      const newStatus = column.parentElement.dataset.status
+
+      if (storyCard && newStatus) {
+        column.appendChild(storyCard)
+        updateColumnCounts()
+
+        // 可以在這裡添加 AJAX 請求來保存狀態變更
+        console.log(`Story ${storyId} moved to ${newStatus}`)
+      }
+    })
+  })
+}
+
+function initializeTaskToggle() {
+  const taskItems = document.querySelectorAll('.task-item')
+
+  taskItems.forEach(task => {
+    task.addEventListener('click', function() {
+      const statusIcon = task.querySelector('.task-status i')
+      const currentStatus = task.dataset.status
+
+      let newStatus
+      if (currentStatus === 'todo') {
+        newStatus = 'in_progress'
+        statusIcon.className = 'fas fa-play-circle'
+      } else if (currentStatus === 'in_progress') {
+        newStatus = 'done'
+        statusIcon.className = 'fas fa-check-circle'
+      } else {
+        newStatus = 'todo'
+        statusIcon.className = 'far fa-circle'
+      }
+
+      task.dataset.status = newStatus
+      task.querySelector('.task-status').className = `task-status status-${newStatus}`
+
+      console.log(`Task ${task.dataset.taskId} changed to ${newStatus}`)
+    })
+  })
+}
+
+function updateColumnCounts() {
+  const columns = document.querySelectorAll('.kanban-column')
+
+  columns.forEach(column => {
+    const storyCount = column.querySelectorAll('.story-card').length
+    const countElement = column.querySelector('.kanban-column-count')
+    if (countElement) {
+      countElement.textContent = storyCount
+    }
+  })
+}
+</script>

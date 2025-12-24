@@ -26,6 +26,7 @@
         <!-- Input Section -->
         <div class="ai-input-section">
           <form action="/ai-projects" method="POST" class="ai-form">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
             <div class="ai-input-group">
               <p class="ai-prompt">Tell me about your project idea</p>
               <textarea

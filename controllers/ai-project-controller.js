@@ -43,12 +43,11 @@ const aiProjectController = {
       console.log('✅ AI分析完成')
       console.log('📊 生成故事數:', analysisResult.stories?.length || 0)
 
-      // 3. 暫時將結果以JSON格式返回（MVP階段）
-      // 將來這裡會保存到資料庫並渲染kanban board
-      return res.json({
-        success: true,
-        message: 'AI分析完成',
-        data: analysisResult,
+      // 3. 渲染 kanban board 頁面顯示 AI 分析結果
+      return res.render('ai-project-kanban', {
+        activePage: 'ai-projects',
+        project: analysisResult,
+        originalDescription: description,
         meta: {
           user_id: req.user.id,
           input_length: description.length,
