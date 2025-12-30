@@ -1,160 +1,264 @@
-<link rel="stylesheet" href="/css/idea-form.css">
-<link rel="stylesheet" href="/css/ai-features.css">
 <link rel="stylesheet" href="/css/kanban.css">
 
 <div class="home-wrapper">
   {{> sidebar}}
   {{> messages}}
 
-  <!-- Main Content -->
-  <div class="home-main">
+  <div class="kanban-main">
     <!-- Header -->
-    <div class="ai-header">
-      <div class="ai-header-content">
-        <div class="ai-icon">
-          <i class="fas fa-robot"></i>
+    <header class="kanban-header">
+      <div class="kanban-header-content">
+        <div class="kanban-header-left">
+          <h1 class="kanban-title">{{project.title}}</h1>
+          <p class="kanban-subtitle">{{project.summary}}</p>
         </div>
-        <div class="ai-header-text">
-          <h1 class="ai-title">{{project.title}}</h1>
-          <p class="ai-subtitle">{{project.summary}}</p>
-        </div>
-        <div class="ai-header-actions">
-          <a href="/ai-projects" class="ai-btn ai-btn-secondary">
-            <i class="fas fa-plus"></i>
-            New Project
-          </a>
-        </div>
+        <a href="/ai-projects" class="kanban-new-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          New Project
+        </a>
+      </div>
+    </header>
+
+    <!-- Stats Bar -->
+    <div class="kanban-stats">
+      <div class="stat">
+        <span class="stat-value">{{meta.stories_count}}</span>
+        <span class="stat-label">Stories</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-value">{{meta.tasks_count}}</span>
+        <span class="stat-label">Tasks</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="priority-legend">
+        <span class="legend-label">Priority:</span>
+        <span class="legend-item"><span class="priority-dot high"></span>High</span>
+        <span class="legend-item"><span class="priority-dot medium"></span>Medium</span>
+        <span class="legend-item"><span class="priority-dot low"></span>Low</span>
       </div>
     </div>
 
-    <!-- Project Stats -->
-    <div class="project-stats">
-      <div class="stat-item">
-        <div class="stat-number">{{meta.stories_count}}</div>
-        <div class="stat-label">User Stories</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">{{meta.tasks_count}}</div>
-        <div class="stat-label">Tasks</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">{{meta.input_length}}</div>
-        <div class="stat-label">Characters</div>
-      </div>
-    </div>
-
-    <!-- Kanban Board -->
-    <div class="kanban-container">
-      <div class="kanban-board">
-        <!-- Backlog Column -->
-        <div class="kanban-column" data-status="backlog">
-          <div class="kanban-column-header">
-            <div class="kanban-column-title">
-              <i class="fas fa-inbox"></i>
-              Backlog
-            </div>
-            <div class="kanban-column-count">
-              {{#each project.stories}}{{#if (eq status "backlog")}}1{{/if}}{{/each}}
-            </div>
-          </div>
-          <div class="kanban-column-content" id="backlog-stories">
-            {{#each project.stories}}
-            {{#if (eq status "backlog")}}
-              <div class="story-card" data-story-id="{{id}}" data-priority="{{priority}}">
-                <div class="story-header">
-                  <div class="story-title">{{title}}</div>
-                  <div class="story-priority priority-{{priority}}">P{{priority}}</div>
-                </div>
-                <div class="story-description">{{description}}</div>
-                <div class="story-tasks">
-                  {{#each tasks}}
-                    <div class="task-item" data-task-id="{{id}}" data-status="{{status}}">
-                      <div class="task-status status-{{status}}">
-                        {{#if (eq status "todo")}}
-                          <i class="far fa-circle"></i>
-                        {{else if (eq status "in_progress")}}
-                          <i class="fas fa-play-circle"></i>
-                        {{else if (eq status "done")}}
-                          <i class="fas fa-check-circle"></i>
-                        {{/if}}
-                      </div>
-                      <div class="task-content">
-                        <div class="task-title">{{title}}</div>
-                        <div class="task-hours">{{estimated_hours}}h</div>
-                      </div>
-                    </div>
-                  {{/each}}
-                </div>
+    <!-- Board -->
+    <div class="kanban-board">
+      <!-- Backlog Column -->
+      <div class="kanban-column" data-status="backlog">
+        <div class="column-header">
+          <div class="column-indicator backlog"></div>
+          <span class="column-title">Backlog</span>
+          <span class="column-count">0</span>
+        </div>
+        <div class="column-content" id="backlog-stories">
+          {{#each project.stories}}
+          {{#if (eq status "backlog")}}
+          <article class="story-card" data-story-id="{{id}}" data-priority="{{priority}}" draggable="true">
+            <div class="story-content">
+              <div class="story-header">
+                <span class="story-priority-dot"></span>
+                <h3 class="story-title">{{title}}</h3>
+                <button class="story-toggle collapsed" aria-label="Toggle tasks" aria-expanded="false">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
               </div>
-            {{/if}}
-            {{/each}}
-          </div>
-        </div>
-
-        <!-- In Progress Column -->
-        <div class="kanban-column" data-status="in_progress">
-          <div class="kanban-column-header">
-            <div class="kanban-column-title">
-              <i class="fas fa-play"></i>
-              In Progress
+              <p class="story-description">{{description}}</p>
+              <div class="story-tasks collapsed">
+                {{#each tasks}}
+                <div class="task-item" data-task-id="{{id}}" data-status="{{status}}">
+                  <div class="task-checkbox">
+                    {{#if (eq status "done")}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M4.5 7L6 8.5L9.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{else if (eq status "in_progress")}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <circle cx="7" cy="7" r="2" fill="currentColor"/>
+                    </svg>
+                    {{else}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                    {{/if}}
+                  </div>
+                  <span class="task-title">{{title}}</span>
+                </div>
+                {{/each}}
+              </div>
             </div>
-            <div class="kanban-column-count">0</div>
-          </div>
-          <div class="kanban-column-content" id="progress-stories">
-            <!-- Stories will be moved here -->
-          </div>
+          </article>
+          {{/if}}
+          {{/each}}
         </div>
+      </div>
 
-        <!-- Done Column -->
-        <div class="kanban-column" data-status="done">
-          <div class="kanban-column-header">
-            <div class="kanban-column-title">
-              <i class="fas fa-check"></i>
-              Done
+      <!-- In Progress Column -->
+      <div class="kanban-column" data-status="in_progress">
+        <div class="column-header">
+          <div class="column-indicator progress"></div>
+          <span class="column-title">In Progress</span>
+          <span class="column-count">0</span>
+        </div>
+        <div class="column-content" id="progress-stories">
+          {{#each project.stories}}
+          {{#if (eq status "in_progress")}}
+          <article class="story-card" data-story-id="{{id}}" data-priority="{{priority}}" draggable="true">
+            <div class="story-content">
+              <div class="story-header">
+                <span class="story-priority-dot"></span>
+                <h3 class="story-title">{{title}}</h3>
+                <button class="story-toggle collapsed" aria-label="Toggle tasks" aria-expanded="false">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              <p class="story-description">{{description}}</p>
+              <div class="story-tasks collapsed">
+                {{#each tasks}}
+                <div class="task-item" data-task-id="{{id}}" data-status="{{status}}">
+                  <div class="task-checkbox">
+                    {{#if (eq status "done")}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M4.5 7L6 8.5L9.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{else if (eq status "in_progress")}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <circle cx="7" cy="7" r="2" fill="currentColor"/>
+                    </svg>
+                    {{else}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                    {{/if}}
+                  </div>
+                  <span class="task-title">{{title}}</span>
+                </div>
+                {{/each}}
+              </div>
             </div>
-            <div class="kanban-column-count">0</div>
-          </div>
-          <div class="kanban-column-content" id="done-stories">
-            <!-- Completed stories will be moved here -->
-          </div>
+          </article>
+          {{/if}}
+          {{/each}}
+        </div>
+      </div>
+
+      <!-- Done Column -->
+      <div class="kanban-column" data-status="done">
+        <div class="column-header">
+          <div class="column-indicator done"></div>
+          <span class="column-title">Done</span>
+          <span class="column-count">0</span>
+        </div>
+        <div class="column-content" id="done-stories">
+          {{#each project.stories}}
+          {{#if (eq status "done")}}
+          <article class="story-card" data-story-id="{{id}}" data-priority="{{priority}}" draggable="true">
+            <div class="story-content">
+              <div class="story-header">
+                <span class="story-priority-dot"></span>
+                <h3 class="story-title">{{title}}</h3>
+                <button class="story-toggle collapsed" aria-label="Toggle tasks" aria-expanded="false">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </div>
+              <p class="story-description">{{description}}</p>
+              <div class="story-tasks collapsed">
+                {{#each tasks}}
+                <div class="task-item" data-task-id="{{id}}" data-status="{{status}}">
+                  <div class="task-checkbox">
+                    {{#if (eq status "done")}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <path d="M4.5 7L6 8.5L9.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    {{else if (eq status "in_progress")}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                      <circle cx="7" cy="7" r="2" fill="currentColor"/>
+                    </svg>
+                    {{else}}
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                      <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                    {{/if}}
+                  </div>
+                  <span class="task-title">{{title}}</span>
+                </div>
+                {{/each}}
+              </div>
+            </div>
+          </article>
+          {{/if}}
+          {{/each}}
         </div>
       </div>
     </div>
 
-    <!-- Original Description -->
-    <div class="project-description">
-      <h3>Original Description</h3>
-      <div class="description-content">{{originalDescription}}</div>
-    </div>
+    <!-- Original Input -->
+    <details class="original-input">
+      <summary>Original Description</summary>
+      <p>{{originalDescription}}</p>
+    </details>
   </div>
 </div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // 初始化拖拽功能
   initializeDragAndDrop()
-
-  // 初始化任務點擊功能
   initializeTaskToggle()
-
-  // 更新計數器
+  initializeStoryToggle()
   updateColumnCounts()
 })
 
+function initializeStoryToggle() {
+  const toggleButtons = document.querySelectorAll('.story-toggle')
+
+  toggleButtons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      e.stopPropagation()
+      e.preventDefault()
+
+      const card = button.closest('.story-card')
+      const tasks = card.querySelector('.story-tasks')
+      const isCollapsed = tasks.classList.toggle('collapsed')
+
+      button.classList.toggle('collapsed', isCollapsed)
+      button.setAttribute('aria-expanded', !isCollapsed)
+    })
+  })
+}
+
 function initializeDragAndDrop() {
   const storyCards = document.querySelectorAll('.story-card')
-  const columns = document.querySelectorAll('.kanban-column-content')
+  const columns = document.querySelectorAll('.column-content')
 
   storyCards.forEach(card => {
-    card.draggable = true
-
     card.addEventListener('dragstart', function(e) {
+      if (e.target.closest('.story-toggle')) {
+        e.preventDefault()
+        return
+      }
       e.dataTransfer.setData('text/plain', card.dataset.storyId)
       card.classList.add('dragging')
+
+      requestAnimationFrame(() => {
+        card.style.opacity = '0.5'
+      })
     })
 
-    card.addEventListener('dragend', function(e) {
+    card.addEventListener('dragend', function() {
       card.classList.remove('dragging')
+      card.style.opacity = ''
     })
   })
 
@@ -165,7 +269,9 @@ function initializeDragAndDrop() {
     })
 
     column.addEventListener('dragleave', function(e) {
-      column.classList.remove('drag-over')
+      if (!column.contains(e.relatedTarget)) {
+        column.classList.remove('drag-over')
+      }
     })
 
     column.addEventListener('drop', function(e) {
@@ -179,8 +285,6 @@ function initializeDragAndDrop() {
       if (storyCard && newStatus) {
         column.appendChild(storyCard)
         updateColumnCounts()
-
-        // 可以在這裡添加 AJAX 請求來保存狀態變更
         console.log(`Story ${storyId} moved to ${newStatus}`)
       }
     })
@@ -191,24 +295,39 @@ function initializeTaskToggle() {
   const taskItems = document.querySelectorAll('.task-item')
 
   taskItems.forEach(task => {
-    task.addEventListener('click', function() {
-      const statusIcon = task.querySelector('.task-status i')
-      const currentStatus = task.dataset.status
+    task.addEventListener('click', function(e) {
+      e.stopPropagation()
 
+      const checkbox = task.querySelector('.task-checkbox')
+      const currentStatus = task.dataset.status
       let newStatus
+
       if (currentStatus === 'todo') {
         newStatus = 'in_progress'
-        statusIcon.className = 'fas fa-play-circle'
       } else if (currentStatus === 'in_progress') {
         newStatus = 'done'
-        statusIcon.className = 'fas fa-check-circle'
       } else {
         newStatus = 'todo'
-        statusIcon.className = 'far fa-circle'
       }
 
       task.dataset.status = newStatus
-      task.querySelector('.task-status').className = `task-status status-${newStatus}`
+
+      // Update SVG icon
+      if (newStatus === 'done') {
+        checkbox.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M4.5 7L6 8.5L9.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>`
+      } else if (newStatus === 'in_progress') {
+        checkbox.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="7" cy="7" r="2" fill="currentColor"/>
+        </svg>`
+      } else {
+        checkbox.innerHTML = `<svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="6" stroke="currentColor" stroke-width="1.5"/>
+        </svg>`
+      }
 
       console.log(`Task ${task.dataset.taskId} changed to ${newStatus}`)
     })
@@ -220,7 +339,7 @@ function updateColumnCounts() {
 
   columns.forEach(column => {
     const storyCount = column.querySelectorAll('.story-card').length
-    const countElement = column.querySelector('.kanban-column-count')
+    const countElement = column.querySelector('.column-count')
     if (countElement) {
       countElement.textContent = storyCount
     }

@@ -16,31 +16,30 @@ class AIService {
    * @returns {string} - 格式化的prompt
    */
   createAnalysisPrompt (projectDescription) {
-    return `你是一位資深的專案管理師和軟體架構師。請分析以下專案想法，並將其分解為具體的用戶故事(user stories)和技術任務(tasks)。
+    return `You are a senior project manager and software architect. Analyze the following project idea and break it down into specific user stories and technical tasks.
 
-專案描述：
+Project Description:
 "${projectDescription}"
 
-請以JSON格式回應，必須嚴格遵循以下結構：
+Please respond in JSON format, strictly following this structure:
 
 {
   "project_analysis": {
-    "title": "專案標題（從描述中提取或生成，最多20字）",
-    "summary": "專案概要（100字以內）",
+    "title": "Project Title (max 50 characters)",
+    "summary": "Project summary (max 200 characters)",
     "stories": [
       {
         "id": "story-1",
-        "title": "故事標題（最多30字）",
-        "description": "作為[用戶角色]，我想要[功能描述]，這樣我就能[價值/目標]",
-        "priority": 1,
+        "title": "Story Title (max 60 characters)",
+        "description": "As a [user role], I want to [feature description], so that I can [value/goal]",
+        "priority": "high",
         "status": "backlog",
         "tasks": [
           {
             "id": "task-1",
-            "title": "具體技術任務（最多40字）",
-            "description": "詳細的實作說明（最多100字）",
+            "title": "Specific technical task (max 80 characters)",
+            "description": "Detailed implementation notes (max 150 characters)",
             "status": "todo",
-            "estimated_hours": 4,
             "story_id": "story-1"
           }
         ]
@@ -49,17 +48,17 @@ class AIService {
   }
 }
 
-要求：
-1. 生成3-5個用戶故事
-2. 每個故事包含2-4個技術任務
-3. 故事按優先級排序（priority: 1最高，5最低）
-4. 任務要具體且可執行
-5. 預估工時要合理（1-8小時）
-6. 必須是有效的JSON格式，不要包含markdown標記
-7. 所有文字使用繁體中文
-8. 確保JSON格式正確，特別注意引號和逗號
+Requirements:
+1. Generate 3-5 user stories
+2. Each story contains 2-4 technical tasks
+3. Priority must be one of: "high", "medium", or "low"
+4. Sort stories by priority (high first, then medium, then low)
+5. Tasks should be specific and actionable
+6. All text must be in English
+7. Must be valid JSON format without markdown markers
+8. Ensure proper JSON syntax with correct quotes and commas
 
-重要：請只回應JSON，不要包含任何其他說明文字或markdown格式。`
+IMPORTANT: Only respond with JSON, do not include any other explanatory text or markdown formatting.`
   }
 
   /**
