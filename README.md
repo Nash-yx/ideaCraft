@@ -15,9 +15,6 @@ A web application for capturing and organizing creative ideas with AI-powered pr
 
 ## Screenshots
 
-### Dashboard
-![Dashboard](screenshots/image.png)
-
 ### Idea Management
 ![Idea Management](screenshots/idea-management.png)
 
@@ -26,11 +23,6 @@ A web application for capturing and organizing creative ideas with AI-powered pr
 
 ### User Profile
 ![User Profile](screenshots/profile.png)
-
-### Explore Page
-![Explore Ideas](screenshots/explore.png)
-
-> **Note**: Add screenshots to the `screenshots/` directory to display them here.
 
 ## Tech Stack
 

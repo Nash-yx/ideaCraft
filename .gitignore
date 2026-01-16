@@ -31,7 +31,8 @@ build/
 
 test.js
 
-spec.md
-CLAUDE.md
-/docs
 .claude
+CLAUDE.md
+/screenshots
+/docs
+spec.md
