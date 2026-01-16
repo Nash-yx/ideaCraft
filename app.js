@@ -14,7 +14,7 @@ const logger = require('./utils/logger') // 載入日誌配置
 const passport = require('./config/passport')
 const session = require('express-session')
 const flash = require('connect-flash')
-const { generalErrorHandler, errorHandler, notFoundHandler } = require('./middleware/error-handler')
+const { generalErrorHandler } = require('./middleware/error-handler')
 const { getUser } = require('./middleware/auth')
 const csrfMiddleware = require('./middleware/csrf')
 const { globalLimiter } = require('./middleware/rate-limit')
@@ -104,13 +104,6 @@ app.use(router)
 
 app.use(generalErrorHandler)
 
-// 404 處理
-// app.use(notFoundHandler)
-
-// 錯誤處理中間件
-// app.use(errorHandler)
-
-// 啟動服務器
 app.listen(PORT, () => {
   logger.info(`Server is running on http://localhost:${PORT}`)
 })

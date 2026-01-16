@@ -9,8 +9,8 @@ const generalErrorHandler = (err, req, res, next) => {
   } else {
     req.flash('error_msg', `${err}`)
   }
-  // 重定向到上一頁
-  const referer = req.get('Referrer')
+  // 重定向到上一頁，若無 Referrer 則回首頁
+  const referer = req.get('Referrer') || '/'
   res.redirect(referer)
 }
 

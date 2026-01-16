@@ -68,7 +68,7 @@ router.get('/', (req, res) => {
   if (req.isAuthenticated()) {
     return res.redirect('/ideas')
   }
-  res.render('home', { activePage: 'ideas' })
+  res.redirect('/login')
 })
 
 module.exports = router
