@@ -28,3 +28,6 @@ uploads/
 *.md
 /docs
 test.js
+
+#screenshots
+/screenshots

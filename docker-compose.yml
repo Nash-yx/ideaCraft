@@ -1,0 +1,92 @@
+# Docker Compose 版本（v2.x+ 可省略，但保留以提升兼容性）
+# version: '3.8'
+
+# 定義所有服務（容器）
+services:
+
+  # ===================
+  # Web 應用服務
+  # ===================
+  web:
+    # 從當前目錄的 Dockerfile 建立 image
+    build: .
+
+    # 指定建立的 image 名稱和標籤
+    image: ideacraft:latest
+
+    # 容器名稱（方便使用 docker logs、docker exec 等指令）
+    container_name: ideacraft
+
+    # 載入環境變數檔案（.env）
+    # 包含資料庫連線、API keys 等敏感資訊
+    env_file:
+      - .env
+
+    # Port 映射：主機 port 對應到容器 port 3000
+    # 格式：<主機 port>:<容器 port>
+    ports:
+      - "${PORT:-3000}:3000"
+
+    # Volume 掛載：將主機目錄掛載到容器內
+    # 格式：<主機路徑>:<容器路徑>
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+
+    # 服務依賴：等待 mysql 健康檢查通過後才啟動
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+    command: sh -c "npx sequelize-cli db:migrate && node app.js"
+
+    # 重啟策略：除非手動停止，否則容器會自動重啟
+    # 選項：no, always, on-failure, unless-stopped
+    restart: unless-stopped
+
+  # ===================
+  # MySQL 資料庫服務
+  # ===================
+  mysql:
+    # 使用官方 MySQL 8 image
+    image: mysql:8
+
+    # 容器名稱
+    container_name: ideacraft-mysql
+
+    # 設定字符集，避免中文亂碼
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+    # MySQL 環境變數設定
+    environment:
+      # root 用戶密碼（必填）
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-password}
+      # 容器啟動時自動建立的資料庫
+      MYSQL_DATABASE: ${DB_NAME:-idea_craft}
+
+    # 健康檢查：確保 MySQL 完全就緒
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    # Volume 掛載：持久化資料庫資料
+    # 使用 named volume，由 Docker 管理
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+    # 開放 port（可選，方便用 MySQL Workbench 等工具連線）
+    # ports:
+    #   - "3307:3306"
+
+    # 重啟策略
+    restart: unless-stopped
+
+# ===================
+# 宣告 Named Volumes
+# ===================
+volumes:
+  # MySQL 資料持久化
+  mysql-data:
+  

@@ -105,7 +105,70 @@ Server runs at `http://localhost:3000`
 
 ---
 
-### Running with Docker
+### Running with Docker Compose (Recommended)
+
+This method runs both the application and MySQL database in containers.
+
+**1. Set up environment variables**
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set the database URL for Docker Compose:
+
+```env
+DATABASE_URL=mysql://root:password@mysql:3306/idea_craft
+```
+
+**2. Start all services**
+
+```bash
+# Build and start in background
+docker compose up -d --build
+
+# View logs
+docker compose logs -f
+```
+
+**3. Access the application**
+
+Open `http://localhost:3000` in your browser.
+
+**Useful commands:**
+
+```bash
+docker compose ps              # View running containers
+docker compose logs web        # View web app logs
+docker compose logs mysql      # View MySQL logs
+docker compose down            # Stop all services
+docker compose down -v         # Stop and remove volumes (data will be lost)
+docker compose up -d --build   # Rebuild and restart
+```
+
+**Architecture:**
+
+```
+┌─────────────────────────────────────────────────┐
+│              Docker Network                     │
+│                                                 │
+│  ┌─────────────┐         ┌─────────────────┐   │
+│  │  web        │  mysql  │  mysql          │   │
+│  │  (Node.js)  │───────▶ │  (MySQL 8)      │   │
+│  │  Port 3000  │  :3306  │  Port 3306      │   │
+│  └──────┬──────┘         └────────┬────────┘   │
+│         │                         │            │
+└─────────┼─────────────────────────┼────────────┘
+          │                         │
+     localhost:3000            mysql-data
+     (Browser access)          (Data persistence)
+```
+
+---
+
+### Running with Docker (Without Compose)
+
+Use this method if you have an external MySQL database.
 
 **1. Build Docker image**
 
@@ -116,12 +179,7 @@ docker build -t ideacraft:latest .
 **2. Run container**
 
 ```bash
-docker run -d \
-  -p 3000:3000 \
-  --env-file .env \
-  -v $(pwd)/uploads:/app/uploads \
-  --name ideacraft \
-  ideacraft:latest
+docker run -d -p 3000:3000 --env-file .env -v $(pwd)/uploads:/app/uploads --name ideacraft ideacraft:latest
 ```
 
 **Notes:**
@@ -224,7 +282,8 @@ ideaCraft/
 ├── utils/              # Helper functions
 ├── logs/               # Application logs
 ├── uploads/            # User-uploaded files (avatars, etc.)
-└── Dockerfile          # Docker configuration
+├── Dockerfile          # Docker image configuration
+└── docker-compose.yml  # Docker Compose configuration
 ```
 
 ## License
